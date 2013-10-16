@@ -6,16 +6,24 @@
 # Vytvoreno: brezen 2013
 ######################################
 
-CPPFLAGS=--std=c++98 -Wall -pedantic -g
+CPPFLAGS = --std=c++98 -Wall -pedantic -g
+CC = g++ $(CPPFLAGS)
+OBJ = creategen.o iowork.o evalexpre.o
 
-all: main
+executable: cocgp
 
-main: main.o
-	g++ $(CPPFLAGS) main.o -o main
+cocgp: cocgp.cpp $(OBJ)
+	$(CC) -o cocgp cocgp.cpp $(OBJ)
 
-main.o: main.cpp
-	g++ $(CPPFLAGS) -c main.cpp
+creategen.o: creategen.h creategen.cpp
+	$(CC) -c creategen.cpp
+
+iowork.o: iowork.h iowork.cpp
+	$(CC) -c iowork.cpp
+
+evalexpre.o: evalexpre.h evalexpre.cpp
+	$(CC) -c evalexpre.cpp
 
 clean: 
 	rm -f *.o
-	rm main
+	rm cocgp
