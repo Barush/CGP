@@ -49,7 +49,7 @@ void getActiveNodes(TIndividual* geneticArray, TCgpProperties* geneticP){
 	return;
 }
 
-void getValue(TIndividual* geneticArray, TCgpProperties* geneticP, int in1, int in2, int in3, int in4){
+void getValue(TIndividual* geneticArray, TCgpProperties* geneticP, int in1, int in2, int in3, int in4, int in5){
 	int row, col, compIn1, compIn2;
 
 	for(int i = 0; i < geneticP->individCount; i++){
@@ -58,7 +58,7 @@ void getValue(TIndividual* geneticArray, TCgpProperties* geneticP, int in1, int 
 		for(int j = 0; j < (geneticP->rows * geneticP->cols); j++){
 
 			row = j % geneticP->rows;
-			col = j / geneticP->cols;
+			col = j / geneticP->rows;
 			if(geneticArray[i].activeNodes->at(j)){
 
 				if(geneticArray[i].CgpProgram[row][col].input1 < geneticP->inCount){
@@ -71,6 +71,8 @@ void getValue(TIndividual* geneticArray, TCgpProperties* geneticP, int in1, int 
 						compIn1 = in3;
 					else if(geneticArray[i].CgpProgram[row][col].input1 == 3)
 						compIn1 = in4;
+					else if(geneticArray[i].CgpProgram[row][col].input1 == 4)
+						compIn1 = in5;
 				}
 				else
 					compIn1 = values->at(geneticArray[i].CgpProgram[row][col].input1 - geneticP->inCount);
@@ -84,6 +86,8 @@ void getValue(TIndividual* geneticArray, TCgpProperties* geneticP, int in1, int 
 						compIn2 = in3;
 					else if(geneticArray[i].CgpProgram[row][col].input2 == 3)
 						compIn2 = in4;
+					else if(geneticArray[i].CgpProgram[row][col].input2 == 4)
+						compIn2 = in5;
 				}
 				else
 					compIn2 = values->at(geneticArray[i].CgpProgram[row][col].input2 - geneticP->inCount);
