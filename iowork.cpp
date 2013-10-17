@@ -14,12 +14,12 @@
 
 
 /***************** TEMPORARILY DEFINES ********************/
-#define INCOUNT 3
+#define INCOUNT 5
 #define OUTCOUNT 1
 #define COMPINCOUNT 2
 #define FUNCTIONCOUNT 3
-#define ROW 8
-#define COL 5
+#define ROW 5
+#define COL 6
 #define L_BACK 10
 #define GENER 1
 

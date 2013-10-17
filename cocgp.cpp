@@ -25,7 +25,7 @@ int main(int argc, char** argv){
 	geneticArray = createGeneration(geneticParams);
 
 	getActiveNodes(geneticArray, geneticParams);
-	getValue(geneticArray, geneticParams, 10, 20, 30, 50);
+	getValue(geneticArray, geneticParams, 10, 20, 30, 50, 5);
 	for(int i = 0; i < geneticParams->individCount; i++){
 		cout << "Individual no. " << i+1 << ":" << endl;
 		printResult(&geneticArray[i], geneticParams);
