@@ -25,7 +25,23 @@ int main(int argc, char** argv){
 	geneticArray = createGeneration(geneticParams);
 
 	getActiveNodes(geneticArray, geneticParams);
-	getValue(geneticArray, geneticParams, 10, 20, 30, 50, 5);
+
+	int *data = (int*)malloc((geneticParams->inCount + 1) * sizeof(int));
+	ifstream testData.open(argv[0], ios::in);
+	string line, number;
+
+	while(getline(testData, line)){
+		for(int i = 0; i < (geneticParams->inCount + 1); i++){
+			for(int j = 0; line.c_str()[j] != " "; j++){
+				number.c_str()[j] = line.c_str()[j];
+			}
+			number >> data[i];
+		}
+		
+	}
+	getValue(geneticArray, geneticParams, data);
+
+
 	for(int i = 0; i < geneticParams->individCount; i++){
 		cout << "Individual no. " << i+1 << ":" << endl;
 		printResult(&geneticArray[i], geneticParams);
