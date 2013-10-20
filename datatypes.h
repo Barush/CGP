@@ -13,10 +13,14 @@
 #pragma once
 
 #include <iostream>
+#include <fstream>
 #include <cstdlib>
+#include <cstring>
 #include <cstdio>
 #include <vector>
 #include <stack>
+#include <string>
+#include <cmath>
 
 using namespace std;
 

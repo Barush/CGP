@@ -14,14 +14,14 @@
 
 
 /***************** TEMPORARILY DEFINES ********************/
-#define INCOUNT 5
+#define INCOUNT 3
 #define OUTCOUNT 1
 #define COMPINCOUNT 2
 #define FUNCTIONCOUNT 3
 #define ROW 5
 #define COL 6
 #define L_BACK 10
-#define GENER 1
+#define GENER 5
 
 TCgpProperties* getParams(){
 	TCgpProperties* params = (TCgpProperties*)malloc(sizeof(struct cgpProperties));
@@ -54,8 +54,36 @@ void printResult(TIndividual* result, TCgpProperties* geneticP){
 			cout << i  << ", ";
 	}
 	cout << endl;
-	cout << "Value: " << result->value << endl;
+	cout << "Fitness: " << result->fitness << endl;
 	cout << "====================================================================" << endl;
+
+	return;
+}
+
+int getDataCount(ifstream &data){
+	int count;
+	string line;
+
+	getline(data, line);
+	count = atoi(line.c_str());
+
+	return count;
+}
+
+void getNextData(ifstream &data, double* dataArray, int ioCount){
+	double num;
+	string line;
+
+	getline(data, line);
+	char *cline=new char[line.size()+1];
+	cline[line.size()]=0;
+	memcpy(cline,line.c_str(),line.size());
+
+	//for(int i = 0; i < ioCount; i++){
+	int i = 0;
+		sscanf(line.c_str(), "%lf %lf %lf %lf", &dataArray[i], &dataArray[i+1], &dataArray[i+2], &dataArray[i+3]);
+		//more work here, now just for one input
+	//}
 
 	return;
 }

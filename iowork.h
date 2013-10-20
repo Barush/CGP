@@ -15,3 +15,5 @@
 /******************* FUNCTION PROTOTYPES ***************************************/
 TCgpProperties* getParams();
 void printResult(TIndividual* result, TCgpProperties* geneticP);
+int getDataCount(ifstream &data);
+void getNextData(ifstream &data, double* dataArray, int ioCount);

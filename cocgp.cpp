@@ -19,36 +19,36 @@
 int main(int argc, char** argv){
 	TIndividual* geneticArray;
 	TCgpProperties* geneticParams;
+	ifstream data;
+	int dataCount = 0;
+	double* dataArray;
+
+	//make argv controls
+	data.open(argv[1], ifstream::in);
 
 	srand(time(NULL)); // initiate random generator
 	geneticParams = getParams();
 	geneticArray = createGeneration(geneticParams);
 
-	getActiveNodes(geneticArray, geneticParams);
+	dataArray = (double*)malloc((geneticParams->inCount + 1) * sizeof(double));
+	getActiveNodes(geneticArray, geneticParams);   
+	dataCount = getDataCount(data);
+	for(int i = 0; i < dataCount; i++){
+		getNextData(data, dataArray, geneticParams->inCount + 1);
+		getValue(geneticArray, geneticParams, dataArray);
+		for(int j = 0; j < geneticParams->individCount; j++){
+			//cout << "Value " << j << ": " << geneticArray[j].value << ", original is: " << dataArray[geneticParams->inCount] << endl;
+		}	
+		getFitness(geneticArray, geneticParams, dataArray);
+	}//test of all data inputs
+	
 
-	int *data = (int*)malloc((geneticParams->inCount + 1) * sizeof(int));
-	ifstream testData.open(argv[0], ios::in);
-	string line, number;
+    for(int i = 0; i < geneticParams->individCount; i++){
+            cout << "Individual no. " << i+1 << ":" << endl;
+            printResult(&geneticArray[i], geneticParams);
+    }
 
-	while(getline(testData, line)){
-		for(int i = 0; i < (geneticParams->inCount + 1); i++){
-			for(int j = 0; line.c_str()[j] != " "; j++){
-				number.c_str()[j] = line.c_str()[j];
-			}
-			number >> data[i];
-		}
-		
-	}
-	getValue(geneticArray, geneticParams, data);
-
-
-	for(int i = 0; i < geneticParams->individCount; i++){
-		cout << "Individual no. " << i+1 << ":" << endl;
-		printResult(&geneticArray[i], geneticParams);
-	}
-
-	destroyGeneration(&geneticArray, geneticParams);
-	free(geneticParams);
-
+    destroyGeneration(&geneticArray, geneticParams);
+    free(geneticParams);
 	return EXIT_SUCCESS;
 } 
