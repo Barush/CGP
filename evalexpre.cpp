@@ -106,7 +106,7 @@ void getFitness(TIndividual* geneticArray, TCgpProperties* geneticP, double* dat
 	for(int i = 0; i < geneticP->individCount; i++){
 		if(abs(geneticArray[i].value - dataArray[geneticP->inCount]) < 10){
 			geneticArray[i].fitness++; //HIT
-			cout << "Fitness of fenotype " << i << " increased." << endl;
+		//	cout << "Fitness of fenotype " << i << " increased." << endl;
 		}
 	}//for all fenotypes
 

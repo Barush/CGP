@@ -28,6 +28,7 @@ TIndividual* createIndividual(TCgpProperties* geneticP, TIndividual *subject){
 	subject->CgpProgram = alocateProgram(geneticP->rows, geneticP->cols);
 	subject->output = (TCell*)malloc(sizeof(struct cell)); 
 	subject->fitness = 0;
+	subject->wasParent = false;
 
 	for(int i = 0; i < geneticP->rows; i++){
 		for(int j = 0; j < geneticP->cols; j++){

@@ -14,6 +14,7 @@
 #include "evalexpre.h"
 #include "iowork.h"
 #include "creategen.h"
+#include "evolution.h"
 
 
 int main(int argc, char** argv){
@@ -22,6 +23,7 @@ int main(int argc, char** argv){
 	ifstream data;
 	int dataCount = 0;
 	double* dataArray;
+	TParents* parents;
 
 	//make argv controls
 	data.open(argv[1], ifstream::in);
@@ -41,8 +43,18 @@ int main(int argc, char** argv){
 		}	
 		getFitness(geneticArray, geneticParams, dataArray);
 	}//test of all data inputs
-	
+	parents = getParents(geneticParams, geneticArray);
 
+	
+	cout << "First generation: " << endl;
+    for(int i = 0; i < geneticParams->individCount; i++){
+            cout << "Individual no. " << i+1 << ":" << endl;
+            printResult(&geneticArray[i], geneticParams);
+    }
+
+	geneticArray = mutateGeneration(geneticArray, parents, geneticParams);
+	
+	cout << "Second generation: " << endl;
     for(int i = 0; i < geneticParams->individCount; i++){
             cout << "Individual no. " << i+1 << ":" << endl;
             printResult(&geneticArray[i], geneticParams);

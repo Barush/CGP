@@ -8,7 +8,7 @@
 
 CPPFLAGS = --std=c++98 -Wall -pedantic -g
 CC = g++ $(CPPFLAGS)
-OBJ = creategen.o iowork.o evalexpre.o
+OBJ = creategen.o iowork.o evalexpre.o evolution.o
 
 executable: cocgp generateData
 
@@ -26,6 +26,9 @@ iowork.o: iowork.h iowork.cpp
 
 evalexpre.o: evalexpre.h evalexpre.cpp
 	$(CC) -c evalexpre.cpp
+
+evolution.o: evolution.h evolution.cpp
+	$(CC) -c evolution.cpp
 
 clean: 
 	rm -f *.o

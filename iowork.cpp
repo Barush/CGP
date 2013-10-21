@@ -18,10 +18,10 @@
 #define OUTCOUNT 1
 #define COMPINCOUNT 2
 #define FUNCTIONCOUNT 3
-#define ROW 5
+#define ROW 10
 #define COL 6
 #define L_BACK 10
-#define GENER 5
+#define GENER 3
 
 TCgpProperties* getParams(){
 	TCgpProperties* params = (TCgpProperties*)malloc(sizeof(struct cgpProperties));
@@ -71,7 +71,7 @@ int getDataCount(ifstream &data){
 }
 
 void getNextData(ifstream &data, double* dataArray, int ioCount){
-	double num;
+	//double num;
 	string line;
 
 	getline(data, line);

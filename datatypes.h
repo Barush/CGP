@@ -57,4 +57,10 @@ typedef struct individual{
 	vector<bool>* activeNodes;
 	int value;
 	int fitness;
+	bool wasParent;
 }TIndividual;
+
+typedef struct parents{
+	TIndividual* parent1;
+	TIndividual* parent2;
+}TParents;
