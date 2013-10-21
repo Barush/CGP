@@ -38,11 +38,34 @@ TParents* getParents(TCgpProperties* geneticP, TIndividual* geneticArray){
 	return parents;
 } 
 
+void copyFenotype(TIndividual* parent, TIndividual* individ, TCgpProperties* geneticP){
+	for(int i = 0; i < geneticP->rows; i++){
+		for(int j = 0; j < geneticP->cols; j++){
+			individ->CgpProgram[i][j].input1 = parent->CgpProgram[i][j].input1;
+			individ->CgpProgram[i][j].input2 = parent->CgpProgram[i][j].input2;
+			individ->CgpProgram[i][j].function = parent->CgpProgram[i][j].function;
+		}
+	}
+	individ->output->input1 = parent->output->input1;
+
+	return;
+}
+
 void changeGenes(TIndividual* parent, TIndividual* individ, TCgpProperties* geneticP){
 	int index = 0, row, col;
 
+	copyFenotype(parent, individ, geneticP);
+
 	for(int i = 0; i < (int)(0.05 * geneticP->rows * geneticP->cols); i++){
-		index = rand() % (geneticP->rows * geneticP->cols);
+		index = rand() % (geneticP->rows * geneticP->cols + 1);
+		if(index == (geneticP->rows * geneticP->cols)){			
+			if((geneticP->cols - geneticP->l_back) <= 0){
+				individ->output->input1 = rand() % (geneticP->cols * geneticP->rows) + geneticP->inCount;
+			}
+			else{
+				individ->output->input1 = (rand() % (geneticP->rows * geneticP->l_back)) + (geneticP->cols - geneticP->l_back) * geneticP->rows + geneticP->inCount;
+			}
+		}
 		row = index % geneticP->rows;
 		col = index / geneticP->rows;
 		if((col - geneticP->l_back) < 0){
