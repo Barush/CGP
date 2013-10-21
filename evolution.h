@@ -13,5 +13,6 @@
 #include "datatypes.h"
 
 TParents* getParents(TCgpProperties* geneticP, TIndividual* geneticArray);
+void copyFenotype(TIndividual* parent, TIndividual* individ, TCgpProperties* geneticP);
 void changeGenes(TIndividual* parent, TIndividual* individ, TCgpProperties* geneticP);
 TIndividual* mutateGeneration(TIndividual* geneticArray, TParents* parents, TCgpProperties* geneticP);

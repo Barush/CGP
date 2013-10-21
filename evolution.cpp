@@ -58,7 +58,9 @@ void changeGenes(TIndividual* parent, TIndividual* individ, TCgpProperties* gene
 
 	for(int i = 0; i < (int)(0.05 * geneticP->rows * geneticP->cols); i++){
 		index = rand() % (geneticP->rows * geneticP->cols + 1);
+
 		if(index == (geneticP->rows * geneticP->cols)){			
+		//changes the output function
 			if((geneticP->cols - geneticP->l_back) <= 0){
 				individ->output->input1 = rand() % (geneticP->cols * geneticP->rows) + geneticP->inCount;
 			}
@@ -66,22 +68,26 @@ void changeGenes(TIndividual* parent, TIndividual* individ, TCgpProperties* gene
 				individ->output->input1 = (rand() % (geneticP->rows * geneticP->l_back)) + (geneticP->cols - geneticP->l_back) * geneticP->rows + geneticP->inCount;
 			}
 		}
-		row = index % geneticP->rows;
-		col = index / geneticP->rows;
-		if((col - geneticP->l_back) < 0){
-			individ->CgpProgram[row][col].input1 = rand() % ((index / geneticP->rows) * 
-				geneticP->rows + geneticP->inCount);
-			individ->CgpProgram[row][col].input2 = rand() % ((index / geneticP->rows) * 
-				geneticP->rows + geneticP->inCount);
-		}
-		else {
-			individ->CgpProgram[row][col].input1 = 
-				(rand() % (geneticP->rows * geneticP->l_back)) + (index / geneticP->rows - geneticP->l_back) * geneticP->rows + geneticP->inCount;
-			individ->CgpProgram[row][col].input2 = 
-				(rand() % (geneticP->rows * geneticP->l_back)) + (index / geneticP->rows - geneticP->l_back) * geneticP->rows + geneticP->inCount;
-		}
-		individ->CgpProgram[row][col].function = rand() % geneticP->functionCount;
-	}
+
+		else{
+		//changes some of the gens
+			row = index % geneticP->rows;
+			col = index / geneticP->rows;
+			if((col - geneticP->l_back) < 0){
+				individ->CgpProgram[row][col].input1 = rand() % ((index / geneticP->rows) * 
+					geneticP->rows + geneticP->inCount);
+				individ->CgpProgram[row][col].input2 = rand() % ((index / geneticP->rows) * 
+					geneticP->rows + geneticP->inCount);
+			}
+			else {
+				individ->CgpProgram[row][col].input1 = 
+					(rand() % (geneticP->rows * geneticP->l_back)) + (index / geneticP->rows - geneticP->l_back) * geneticP->rows + geneticP->inCount;
+				individ->CgpProgram[row][col].input2 = 
+					(rand() % (geneticP->rows * geneticP->l_back)) + (index / geneticP->rows - geneticP->l_back) * geneticP->rows + geneticP->inCount;
+			}
+			individ->CgpProgram[row][col].function = rand() % geneticP->functionCount;
+		}// else
+	}// for 5% of genes
 
 	return;
 }

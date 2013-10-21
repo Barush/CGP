@@ -14,7 +14,7 @@
 
 
 /***************** TEMPORARILY DEFINES ********************/
-#define INCOUNT 3
+#define INCOUNT 1
 #define OUTCOUNT 1
 #define COMPINCOUNT 2
 #define FUNCTIONCOUNT 3
@@ -81,7 +81,7 @@ void getNextData(ifstream &data, double* dataArray, int ioCount){
 
 	//for(int i = 0; i < ioCount; i++){
 	int i = 0;
-		sscanf(line.c_str(), "%lf %lf %lf %lf", &dataArray[i], &dataArray[i+1], &dataArray[i+2], &dataArray[i+3]);
+		sscanf(line.c_str(), "%lf %lf ", &dataArray[i], &dataArray[i+1]);
 		//more work here, now just for one input
 	//}
 

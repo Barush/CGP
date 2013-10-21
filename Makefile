@@ -33,3 +33,4 @@ evolution.o: evolution.h evolution.cpp
 clean: 
 	rm -f *.o
 	rm cocgp
+	rm generateData
