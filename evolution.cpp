@@ -86,7 +86,7 @@ void changeGenes(TIndividual* parent, TIndividual* individ, TCgpProperties* gene
 					(rand() % (geneticP->rows * geneticP->l_back)) + (index / geneticP->rows - geneticP->l_back) * geneticP->rows + geneticP->inCount;
 			}
 			individ->CgpProgram[row][col].function = rand() % geneticP->functionCount;
-		}// else
+		}
 	}// for 5% of genes
 
 	return;
@@ -109,6 +109,39 @@ TIndividual* mutateGeneration(TIndividual* geneticArray, TParents* parents, TCgp
 		} 
 	}
 	free(parents);
+
+	return geneticArray;
+}
+
+TIndividual* mutation(TCgpProperties* geneticP, TIndividual* geneticArray){	
+	TParents* parents = getParents(geneticP, geneticArray);
+	geneticArray = mutateGeneration(geneticArray, parents, geneticP);
+
+	return geneticArray;
+}
+
+TIndividual* evolutionStep(char* filename, TCgpProperties* geneticP, TIndividual* geneticArray, bool mutate){
+	int dataCount = 0;
+	ifstream data;
+	double* dataArray;
+
+	data.open(filename, ifstream::in);
+	dataArray = (double*)malloc((geneticP->inCount + 1) * sizeof(double));
+
+	if(mutate){
+		mutation(geneticP, geneticArray);
+	}
+
+	getActiveNodes(geneticArray, geneticP);   
+	dataCount = getDataCount(data);
+	for(int i = 0; i < dataCount; i++){
+		getNextData(data, dataArray, geneticP->inCount + 1);
+		getValue(geneticArray, geneticP, dataArray);
+		for(int j = 0; j < geneticP->individCount; j++){
+			//cout << "Value " << j << ": " << geneticArray[j].value << ", original is: " << dataArray[geneticParams->inCount] << endl;
+		}	
+		getFitness(geneticArray, geneticP, dataArray);
+	}//test of all data inputs
 
 	return geneticArray;
 }
