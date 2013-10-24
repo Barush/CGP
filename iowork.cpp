@@ -18,8 +18,8 @@
 #define OUTCOUNT 1
 #define COMPINCOUNT 2
 #define FUNCTIONCOUNT 3
-#define ROW 30
-#define COL 8
+#define ROW 5
+#define COL 6
 #define L_BACK 10
 #define GENER 10
 
@@ -34,6 +34,7 @@ TCgpProperties* getParams(){
 	params->cols = COL;
 	params->l_back = L_BACK;
 	params-> individCount = GENER;
+	params->countedNodes = 0;
 
 	return params;
 }

@@ -60,6 +60,7 @@ void getValue(TIndividual* geneticArray, TCgpProperties* geneticP, double* dataA
 			row = j % geneticP->rows;
 			col = j / geneticP->rows;
 			if(geneticArray[i].activeNodes->at(j)){
+				geneticP->countedNodes++;
 
 				if(geneticArray[i].CgpProgram[row][col].input1 < geneticP->inCount){
 					for(int k = 0; k < geneticP->inCount; k++){

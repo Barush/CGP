@@ -31,6 +31,7 @@ int main(int argc, char** argv){
 	geneticArray = evolutionStep(argv[1], geneticParams, geneticArray, false);
 
 	for(int i = 0; i < 100000; i++){
+		cout << "Gener: " << i << endl;
 		geneticArray = evolutionStep(argv[1], geneticParams, geneticArray, true);
 	}
 	/*	cout << i << ". generation: " << endl;
@@ -41,6 +42,7 @@ int main(int argc, char** argv){
 	}*/
 	TIndividual* solution = getParents(geneticParams, geneticArray);
 	printResult(solution, geneticParams);
+	cout << "Counted nodes: " << geneticParams->countedNodes << endl;
 
     destroyGeneration(&geneticArray, geneticParams);
     free(geneticParams);
