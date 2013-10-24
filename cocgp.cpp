@@ -30,15 +30,17 @@ int main(int argc, char** argv){
 
 	geneticArray = evolutionStep(argv[1], geneticParams, geneticArray, false);
 
-	for(int i = 0; i < 10; i++){
+	for(int i = 0; i < 100000; i++){
 		geneticArray = evolutionStep(argv[1], geneticParams, geneticArray, true);
-
-		cout << i << ". generation: " << endl;
+	}
+	/*	cout << i << ". generation: " << endl;
 	    for(int i = 0; i < geneticParams->individCount; i++){
 	            cout << "Individual no. " << i+1 << ":" << endl;
 	            printResult(&geneticArray[i], geneticParams);
 	    }		
-	}
+	}*/
+	TIndividual* solution = getParents(geneticParams, geneticArray);
+	printResult(solution, geneticParams);
 
     destroyGeneration(&geneticArray, geneticParams);
     free(geneticParams);

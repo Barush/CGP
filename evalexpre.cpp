@@ -100,6 +100,13 @@ void getValue(TIndividual* geneticArray, TCgpProperties* geneticP, double* dataA
 	return;
 }
 
+void resetFitness(TIndividual* geneticArray, TCgpProperties* geneticP){
+	for(int i = 0; i < geneticP->individCount; i++)
+		geneticArray[i].fitness = 0;
+
+	return;
+}
+
 
 void getFitness(TIndividual* geneticArray, TCgpProperties* geneticP, double* dataArray){
 

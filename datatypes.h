@@ -59,8 +59,3 @@ typedef struct individual{
 	int fitness;
 	bool wasParent;
 }TIndividual;
-
-typedef struct parents{
-	TIndividual* parent1;
-	TIndividual* parent2;
-}TParents;

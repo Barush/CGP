@@ -2,7 +2,7 @@
 #include <stdio.h>
 
 double function(double x){
-	return x*x + x*x*x - x;
+	return x*x + x*x*x;
 }
 
 

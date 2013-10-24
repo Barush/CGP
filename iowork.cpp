@@ -18,7 +18,7 @@
 #define OUTCOUNT 1
 #define COMPINCOUNT 2
 #define FUNCTIONCOUNT 3
-#define ROW 4
+#define ROW 30
 #define COL 8
 #define L_BACK 10
 #define GENER 10
@@ -39,7 +39,7 @@ TCgpProperties* getParams(){
 }
 
 void printResult(TIndividual* result, TCgpProperties* geneticP){
-	cout << "====================================================================" << endl;
+	//cout << "====================================================================" << endl;
 /*	for(int i = 0; i < geneticP->rows; i++){
 		for(int j = 0; j < geneticP->cols; j++){
 			cout << (*result).CgpProgram[i][j].input1 << " " << (*result).CgpProgram[i][j].input2 << " [" << (*result).CgpProgram[i][j].function << "]   ";
@@ -54,8 +54,8 @@ void printResult(TIndividual* result, TCgpProperties* geneticP){
 			cout << i  << ", ";
 	}
 	cout << endl;*/
-	cout << "Fitness: " << result->fitness << endl;
-	cout << "====================================================================" << endl;
+	//cout << "Fitness: " << result->fitness << endl;
+	//cout << "====================================================================" << endl;
 
 	return;
 }

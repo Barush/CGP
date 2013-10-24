@@ -12,30 +12,18 @@
 
 #include "evolution.h"
 
-TParents* getParents(TCgpProperties* geneticP, TIndividual* geneticArray){
-	int max = 0, second = 0;
-	int index = -1, secIndex = -1;
-	TParents *parents =  (TParents*)malloc(2 * sizeof(TIndividual*));
+TIndividual* getParents(TCgpProperties* geneticP, TIndividual* geneticArray){
+	int max = 0;
+	int index = -1;
 
 	for(int i = 0; i < geneticP->individCount; i++){
-		if(geneticArray[i].fitness > second){
-			if(geneticArray[i].fitness > max){
-				second = max;
-				secIndex = index;
-				max = geneticArray[i].fitness;
-				index = i;
-			}
-			else{
-				second = geneticArray[i].fitness;
-				secIndex = i;
-			}
+		if(geneticArray[i].fitness > max){
+			max = geneticArray[i].fitness;
+			index = i;
 		}
 	}
 
-	parents->parent1 = &geneticArray[index];
-	parents->parent2 = &geneticArray[secIndex];
-
-	return parents;
+	return &geneticArray[index];
 } 
 
 void copyFenotype(TIndividual* parent, TIndividual* individ, TCgpProperties* geneticP){
@@ -52,12 +40,14 @@ void copyFenotype(TIndividual* parent, TIndividual* individ, TCgpProperties* gen
 }
 
 void changeGenes(TIndividual* parent, TIndividual* individ, TCgpProperties* geneticP){
-	int index = 0, row, col;
+	//lepsi je mutovat po jedne slozce
+	int index = 0, change = 0, row, col;
 
 	copyFenotype(parent, individ, geneticP);
 
-	for(int i = 0; i < (int)(0.05 * geneticP->rows * geneticP->cols); i++){
+	for(int i = 0; i < (int)(0.05 * geneticP->rows * geneticP->cols * (geneticP->compInCount + 1)); i++){
 		index = rand() % (geneticP->rows * geneticP->cols + 1);
+		change = rand() % (geneticP->compInCount + 1);
 
 		if(index == (geneticP->rows * geneticP->cols)){			
 		//changes the output function
@@ -73,48 +63,53 @@ void changeGenes(TIndividual* parent, TIndividual* individ, TCgpProperties* gene
 		//changes some of the gens
 			row = index % geneticP->rows;
 			col = index / geneticP->rows;
-			if((col - geneticP->l_back) < 0){
-				individ->CgpProgram[row][col].input1 = rand() % ((index / geneticP->rows) * 
-					geneticP->rows + geneticP->inCount);
-				individ->CgpProgram[row][col].input2 = rand() % ((index / geneticP->rows) * 
-					geneticP->rows + geneticP->inCount);
+			if(((col - geneticP->l_back) < 0) && (change < 2)){
+				if(change == 0){
+					individ->CgpProgram[row][col].input1 = rand() % ((index / geneticP->rows) * 
+						geneticP->rows + geneticP->inCount);
+				}
+				else if(change == 1){
+					individ->CgpProgram[row][col].input2 = rand() % ((index / geneticP->rows) * 
+						geneticP->rows + geneticP->inCount);
+				}
 			}
-			else {
-				individ->CgpProgram[row][col].input1 = 
-					(rand() % (geneticP->rows * geneticP->l_back)) + (index / geneticP->rows - geneticP->l_back) * geneticP->rows + geneticP->inCount;
-				individ->CgpProgram[row][col].input2 = 
-					(rand() % (geneticP->rows * geneticP->l_back)) + (index / geneticP->rows - geneticP->l_back) * geneticP->rows + geneticP->inCount;
+			else if (change < 2){
+				if(change == 0){
+					individ->CgpProgram[row][col].input1 = 
+						(rand() % (geneticP->rows * geneticP->l_back)) + (index / geneticP->rows - geneticP->l_back) * geneticP->rows + geneticP->inCount;
+				}
+				else if(change == 1){
+					individ->CgpProgram[row][col].input2 = 
+						(rand() % (geneticP->rows * geneticP->l_back)) + (index / geneticP->rows - geneticP->l_back) * geneticP->rows + geneticP->inCount;
+				}
 			}
-			individ->CgpProgram[row][col].function = rand() % geneticP->functionCount;
+			else{
+				individ->CgpProgram[row][col].function = rand() % geneticP->functionCount;
+			}
 		}
 	}// for 5% of genes
 
 	return;
 }
 
-TIndividual* mutateGeneration(TIndividual* geneticArray, TParents* parents, TCgpProperties* geneticP){
+TIndividual* mutateGeneration(TIndividual* geneticArray, TIndividual* parents, TCgpProperties* geneticP){
 
 	for(int i = 0; i < geneticP->individCount; i++){
-		if( ( parents->parent1 == &(geneticArray[i]) ) || ( parents->parent2 == &(geneticArray[i]) ) ){
-			cout << "Array [" << i << "] is the parent." << endl;
+		if( parents == &(geneticArray[i]) ){
+			//cout << "Array [" << i << "] is the parent." << endl;
+			cout << "Fitness: " << geneticArray[i].fitness << endl;
 			continue;
 		}
 		else{
-			if (i % 2){
-				changeGenes(parents->parent1, &geneticArray[i], geneticP);
-			}
-			else{
-				changeGenes(parents->parent2, &geneticArray[i], geneticP);
-			}
+			changeGenes(parents, &geneticArray[i], geneticP);
 		} 
 	}
-	free(parents);
 
 	return geneticArray;
 }
 
 TIndividual* mutation(TCgpProperties* geneticP, TIndividual* geneticArray){	
-	TParents* parents = getParents(geneticP, geneticArray);
+	TIndividual* parents = getParents(geneticP, geneticArray);
 	geneticArray = mutateGeneration(geneticArray, parents, geneticP);
 
 	return geneticArray;
@@ -133,13 +128,15 @@ TIndividual* evolutionStep(char* filename, TCgpProperties* geneticP, TIndividual
 	}
 
 	getActiveNodes(geneticArray, geneticP);   
+	resetFitness(geneticArray, geneticP);
+
 	dataCount = getDataCount(data);
 	for(int i = 0; i < dataCount; i++){
 		getNextData(data, dataArray, geneticP->inCount + 1);
 		getValue(geneticArray, geneticP, dataArray);
-		for(int j = 0; j < geneticP->individCount; j++){
+		//for(int j = 0; j < geneticP->individCount; j++){
 			//cout << "Value " << j << ": " << geneticArray[j].value << ", original is: " << dataArray[geneticParams->inCount] << endl;
-		}	
+		//}	
 		getFitness(geneticArray, geneticP, dataArray);
 	}//test of all data inputs
 

@@ -14,9 +14,9 @@
 #include "iowork.h"
 #include "evalexpre.h"
 
-TParents* getParents(TCgpProperties* geneticP, TIndividual* geneticArray);
+TIndividual* getParents(TCgpProperties* geneticP, TIndividual* geneticArray);
 void copyFenotype(TIndividual* parent, TIndividual* individ, TCgpProperties* geneticP);
 void changeGenes(TIndividual* parent, TIndividual* individ, TCgpProperties* geneticP);
-TIndividual* mutateGeneration(TIndividual* geneticArray, TParents* parents, TCgpProperties* geneticP);
+TIndividual* mutateGeneration(TIndividual* geneticArray, TIndividual* parents, TCgpProperties* geneticP);
 TIndividual* mutation(TCgpProperties* geneticP, TIndividual* geneticArray);
 TIndividual* evolutionStep(char* filename, TCgpProperties* geneticP, TIndividual* geneticArray, bool mutate);
