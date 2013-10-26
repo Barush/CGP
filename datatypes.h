@@ -28,6 +28,9 @@ using namespace std;
 //Possible operations in CGP matrix, will be modified from program input
 typedef enum function {
 	MUL = 0,
+	DIV,
+	AND,
+	OR,
 	PLUS,
 	MINUS
 }TFunction;
@@ -48,7 +51,7 @@ typedef struct cgpProperties {
 	int cols;			//count of columns in the matrix
 	int l_back; 		//l-back param of the matrix
 	int individCount;	//count of individuals in the generation
-	int countedNodes;
+	long countedNodes;
 }TCgpProperties;
 
 //whole CGP struct

@@ -29,6 +29,8 @@ TIndividual* createIndividual(TCgpProperties* geneticP, TIndividual *subject){
 	subject->output = (TCell*)malloc(sizeof(struct cell)); 
 	subject->fitness = 0;
 	subject->wasParent = false;
+	vector<bool> *vect = new vector<bool>(geneticP->rows * geneticP->cols);	
+	subject->activeNodes = vect;
 
 	for(int i = 0; i < geneticP->rows; i++){
 		for(int j = 0; j < geneticP->cols; j++){

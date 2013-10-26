@@ -21,6 +21,10 @@ TIndividual* getParents(TCgpProperties* geneticP, TIndividual* geneticArray){
 			max = geneticArray[i].fitness;
 			index = i;
 		}
+		else if((geneticArray[i].fitness == max) && (!geneticArray[i].wasParent)){
+			max = geneticArray[i].fitness;
+			index = i;
+		}
 	}
 
 	return &geneticArray[index];
@@ -97,7 +101,7 @@ TIndividual* mutateGeneration(TIndividual* geneticArray, TIndividual* parents, T
 	for(int i = 0; i < geneticP->individCount; i++){
 		if( parents == &(geneticArray[i]) ){
 			//cout << "Array [" << i << "] is the parent." << endl;
-			cout << "Fitness: " << geneticArray[i].fitness << endl;
+			cout << " " << geneticArray[i].fitness << endl;
 			continue;
 		}
 		else{
@@ -117,28 +121,37 @@ TIndividual* mutation(TCgpProperties* geneticP, TIndividual* geneticArray){
 
 TIndividual* evolutionStep(char* filename, TCgpProperties* geneticP, TIndividual* geneticArray, bool mutate){
 	int dataCount = 0;
-	ifstream data;
+	FILE* data;
 	double* dataArray;
 
-	data.open(filename, ifstream::in);
+	// open the data source file
+	if((data = fopen(filename, "r")) == NULL){
+		cout << "Error in opening file: " << filename << endl;
+		exit(1);
+	}
+
+	// create array of data = one line of source file
 	dataArray = (double*)malloc((geneticP->inCount + 1) * sizeof(double));
 
 	if(mutate){
 		mutation(geneticP, geneticArray);
 	}
 
-	getActiveNodes(geneticArray, geneticP);   
+
 	resetFitness(geneticArray, geneticP);
+	getActiveNodes(geneticArray, geneticP);  
 
 	dataCount = getDataCount(data);
 	for(int i = 0; i < dataCount; i++){
 		getNextData(data, dataArray, geneticP->inCount + 1);
+
+		// each runs on whole geneticArray
 		getValue(geneticArray, geneticP, dataArray);
-		//for(int j = 0; j < geneticP->individCount; j++){
-			//cout << "Value " << j << ": " << geneticArray[j].value << ", original is: " << dataArray[geneticParams->inCount] << endl;
-		//}	
 		getFitness(geneticArray, geneticP, dataArray);
 	}//test of all data inputs
+
+	free(dataArray);
+	fclose(data);
 
 	return geneticArray;
 }

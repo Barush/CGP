@@ -19,8 +19,9 @@ void getActiveNodes(TIndividual* geneticArray, TCgpProperties* geneticP){
 	int actualCell, row, col;
 
 	for(int i = 0; i < geneticP->individCount; i++){
-		vector<bool> *vect = new vector<bool>(geneticP->rows * geneticP->cols);	
-		geneticArray[i].activeNodes = vect;
+		for(int j = 0; j < (geneticP->rows * geneticP->cols); j++){
+			geneticArray[i].activeNodes->at(j) = false;
+		}
 		myStack.push(geneticArray[i].output->input1);
 		while(!myStack.empty()){
 			//get the index of actual component
@@ -50,6 +51,8 @@ void getActiveNodes(TIndividual* geneticArray, TCgpProperties* geneticP){
 }
 
 void getValue(TIndividual* geneticArray, TCgpProperties* geneticP, double* dataArray){
+
+
 	int row, col;
 	double compIn1, compIn2;
 
@@ -83,6 +86,19 @@ void getValue(TIndividual* geneticArray, TCgpProperties* geneticP, double* dataA
 				switch (geneticArray[i].CgpProgram[row][col].function) {
 					case MUL:	values->at(j) = compIn1 * compIn2;
 								//cout << compIn1 << "*" << compIn2 << "=" << values->at(j) << endl;
+								break;
+					case DIV:	if(compIn2 == 0){
+									values->at(j) = 1;
+								}
+								else{
+									values->at(j) = compIn1 / compIn2;
+								}
+								break;
+					case AND:	values->at(j) = (int)compIn1 & (int)compIn2;
+								//cout << compIn1 << "&" << compIn2 << "=" << values->at(j) << endl;
+								break;
+					case OR:	values->at(j) = (int)compIn1 | (int)compIn2;
+								//cout << compIn1 << "|" << compIn2 << "=" << values->at(j) << endl;
 								break;
 					case PLUS:	values->at(j) = compIn1 + compIn2;
 								//cout << compIn1 << "+" << compIn2 << "=" << values->at(j) << endl;
