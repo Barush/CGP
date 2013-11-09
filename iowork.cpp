@@ -14,13 +14,13 @@
 
 
 /***************** TEMPORARILY DEFINES ********************/
-#define INCOUNT 1
+#define INCOUNT 2
 #define OUTCOUNT 1
 #define COMPINCOUNT 2
 #define FUNCTIONCOUNT 6
-#define ROW 5
-#define COL 6
-#define L_BACK 10
+#define ROW 3
+#define COL 3
+#define L_BACK 25
 #define GENER 10
 
 void printUsage(){

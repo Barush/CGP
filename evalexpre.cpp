@@ -58,7 +58,7 @@ void getValue(TIndividual* geneticArray, TCgpProperties* geneticP, double* dataA
 
 	for(int i = 0; i < geneticP->individCount; i++){
 
-		vector<int> *values = new vector<int>(geneticP->rows * geneticP->cols);
+		vector<double> *values = new vector<double>(geneticP->rows * geneticP->cols);
 		for(int j = 0; j < (geneticP->rows * geneticP->cols); j++){
 			row = j % geneticP->rows;
 			col = j / geneticP->rows;

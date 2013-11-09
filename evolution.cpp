@@ -100,12 +100,13 @@ TIndividual* mutateGeneration(TIndividual* geneticArray, TIndividual* parents, T
 
 	for(int i = 0; i < geneticP->individCount; i++){
 		if( parents == &(geneticArray[i]) ){
-			//cout << "Array [" << i << "] is the parent." << endl;
+			geneticArray[i].wasParent = true;
 			cout << " " << geneticArray[i].fitness << endl;
 			continue;
 		}
 		else{
 			changeGenes(parents, &geneticArray[i], geneticP);
+			geneticArray[i].wasParent = false;
 		} 
 	}
 

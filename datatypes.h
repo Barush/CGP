@@ -59,7 +59,7 @@ typedef struct individual{
 	TCell** CgpProgram;
 	TCell* output;
 	vector<bool>* activeNodes;
-	int value;
+	double value;
 	int fitness;
 	bool wasParent;
 }TIndividual;
