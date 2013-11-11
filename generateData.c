@@ -1,8 +1,12 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <math.h>
+
+#define E 2.7182818284
+#define PI 3.1415926535
 
 double function(double x, double y){
-	return x*x + y*y - x;
+	return pow(E, x) * PI;
 }
 
 
@@ -14,7 +18,7 @@ int main(){
 	fprintf(newF, "400\n");
 	double y = 20;
 	for(double x = -20; x < 20; x += 0.1){
-			fprintf(newF, "%lf %lf %lf\n", x, y,  function(x, y));
+			fprintf(newF, "%lf %lf\n", x,  function(x, y));
 			y -= 0.1;
 	}
 }

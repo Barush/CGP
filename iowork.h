@@ -16,5 +16,6 @@
 void printUsage();
 TCgpProperties* getParams(char** argv, int argc);
 void printResult(TIndividual* result, TCgpProperties* geneticP);
+void printReadableResult(TIndividual* result, TCgpProperties* geneticP);
 int getDataCount(FILE* data);
 void getNextData(FILE* data, double* dataArray, int ioCount);

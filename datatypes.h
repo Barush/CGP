@@ -13,6 +13,7 @@
 #pragma once
 
 #include <iostream>
+#include <sstream>
 #include <fstream>
 #include <cstdlib>
 #include <cstring>
@@ -34,6 +35,11 @@ typedef enum function {
 	PLUS,
 	MINUS
 }TFunction;
+
+typedef enum stackFlag {
+	TERM = 0,
+	NONTERM
+}TStackFlag;
 
 //one cell of a CGP matrix
 typedef struct cell {
@@ -63,3 +69,12 @@ typedef struct individual{
 	int fitness;
 	bool wasParent;
 }TIndividual;
+
+//struct for recursive descent
+typedef struct stackItem {
+	int isTerm;
+	int value;
+	char printable[10];
+	struct stackItem* next;
+	struct stackItem* prev;
+}TStackItem;

@@ -52,6 +52,7 @@ int main(int argc, char** argv){
 	}*/
 	TIndividual* solution = getParents(geneticParams, geneticArray);
 	printResult(solution, geneticParams);
+	printReadableResult(solution, geneticParams);
 	cout << "Counted nodes: " << geneticParams->countedNodes << endl;
 
     destroyGeneration(&geneticArray, geneticParams);

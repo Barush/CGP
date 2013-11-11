@@ -16,7 +16,7 @@ cocgp: cocgp.cpp $(OBJ)
 	$(CC) -o cocgp cocgp.cpp $(OBJ)
 
 generateData: generateData.c
-	gcc -std=c99 -Wall -pedantic -g -o generateData generateData.c
+	gcc -std=c99 -Wall -pedantic -g -o generateData generateData.c -lm
 
 creategen.o: creategen.h creategen.cpp
 	$(CC) -c creategen.cpp

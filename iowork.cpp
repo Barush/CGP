@@ -14,14 +14,14 @@
 
 
 /***************** TEMPORARILY DEFINES ********************/
-#define INCOUNT 2
+#define INCOUNT 1
 #define OUTCOUNT 1
 #define COMPINCOUNT 2
 #define FUNCTIONCOUNT 6
-#define ROW 3
-#define COL 3
+#define ROW 20
+#define COL 20
 #define L_BACK 25
-#define GENER 10
+#define GENER 5
 
 void printUsage(){
 	cout << "COEVOLUTION IN CGP" << endl;
@@ -82,6 +82,122 @@ TCgpProperties* getParams(char** argv, int argc){
 	return params;
 }
 
+void printReadableResult(TIndividual* result, TCgpProperties* geneticP){
+	TStackItem* stack;
+	TStackItem* node = (TStackItem*)malloc(sizeof(struct stackItem));
+	bool change;
+	int row, col;
+
+	node->isTerm = NONTERM;
+	node->value = result->output->input1;
+	strcpy(node->printable, "x");
+	node->next = NULL;
+	node->prev = NULL;
+	stack = node;
+	
+	do{
+		change = false;
+		for(TStackItem* tmp = stack; tmp != NULL; tmp = tmp->next){
+			if(tmp->isTerm == NONTERM){
+				change = true;
+				//get value
+				row = (tmp->value - geneticP->inCount) % geneticP->rows;
+				col = (tmp->value - geneticP->inCount) / geneticP->rows;
+
+				//insert (
+				TStackItem* lBracket = (TStackItem*)malloc(sizeof(struct stackItem));
+				lBracket->isTerm = TERM;
+				strcpy(lBracket->printable, "(");
+
+				//get first operand - NONTERM?
+				TStackItem* op1 = (TStackItem*)malloc(sizeof(struct stackItem));
+				if(result->CgpProgram[row][col].input1 < geneticP->inCount){
+					op1->isTerm = TERM;
+					//conversion int to string
+					stringstream intStr;
+					intStr << result->CgpProgram[row][col].input1;
+					string tmp = intStr.str();
+					strcpy(op1->printable, tmp.c_str()); 
+				}
+				else {
+					op1->isTerm = NONTERM;
+					strcpy(op1->printable, "x");
+				}
+				op1->value = result->CgpProgram[row][col].input1;
+
+				//get operation - TERM
+				TStackItem* func = (TStackItem*)malloc(sizeof(struct stackItem));
+				func->isTerm = TERM;
+				switch (result->CgpProgram[row][col].function) {
+					case MUL:	strcpy(func->printable, "*");
+								break;
+					case DIV:	strcpy(func->printable, "/");
+								break;
+					case AND:	strcpy(func->printable, "&");
+								break;
+					case OR:	strcpy(func->printable, "|");
+								break;
+					case PLUS:	strcpy(func->printable, "+");
+								break;
+					case MINUS: strcpy(func->printable, "-");
+								break;
+					default: cout << "blbost" << endl;
+				}
+
+				//get second operand - NONTERM?
+				TStackItem* op2 = (TStackItem*)malloc(sizeof(struct stackItem));
+				if(result->CgpProgram[row][col].input2 < geneticP->inCount){
+					op2->isTerm = TERM;
+					ostringstream intStr;
+					intStr << result->CgpProgram[row][col].input2;
+					string tmp = intStr.str();
+					strcpy(op2->printable, tmp.c_str()); 
+				}
+				else{
+					op2->isTerm = NONTERM;
+					strcpy(op2->printable, "x");
+				}
+				op2->value = result->CgpProgram[row][col].input2;
+
+				//insert (
+				TStackItem* rBracket = (TStackItem*)malloc(sizeof(struct stackItem));
+				rBracket->isTerm = TERM;
+				strcpy(rBracket->printable, ")");
+
+				//connect stack into list
+				if(tmp->prev != NULL){
+					tmp->prev->next = lBracket;
+				}
+				lBracket->prev = tmp->prev;
+				lBracket->next = op1;
+				op1->prev = lBracket;
+				op1->next = func;
+				func->prev = op1;
+				func->next = op2;
+				op2->prev = func;
+				op2->next = rBracket;
+				rBracket->prev = op2;
+				rBracket->next = tmp->next;
+				if(rBracket->next != NULL){
+					rBracket->next->prev = rBracket;
+				}
+				if(tmp == stack)
+					stack = lBracket;
+				free(tmp);
+				tmp = rBracket;
+			}
+		}
+	}while(change);
+
+	for(TStackItem* tmp = stack; tmp != NULL; tmp = tmp->next){
+		cout << tmp->printable;
+	}
+	cout << endl;
+
+	return;
+}
+
+
 void printResult(TIndividual* result, TCgpProperties* geneticP){
 	cout << "====================================================================" << endl;
 	for(int i = 0; i < geneticP->rows; i++){
@@ -119,8 +235,10 @@ int getDataCount(FILE* data){
 }
 
 void getNextData(FILE* data, double* dataArray, int ioCount){
-	int i = 0, j = 0;
-	char num[20], c;
+	int i = 0;
+	int j = 0;
+	char num[20];
+	char c;
 
 	while((c = fgetc(data)) != '\n'){
 		if(c == ' '){
