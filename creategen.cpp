@@ -30,6 +30,7 @@ TIndividual* createIndividual(TCgpProperties* geneticP, TIndividual *subject){
 	subject->fitness = 0;
 	subject->wasParent = false;
 	vector<bool> *vect = new vector<bool>(geneticP->rows * geneticP->cols);	
+	subject->activeNodesCount = 0;
 	subject->activeNodes = vect;
 
 	for(int i = 0; i < geneticP->rows; i++){

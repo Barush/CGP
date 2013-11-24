@@ -12,22 +12,65 @@
 
 #include "evolution.h"
 
-TIndividual* getParents(TCgpProperties* geneticP, TIndividual* geneticArray){
-	int max = 0;
-	int index = -1;
+void destroyList(TIndivList* first){
+	TIndivList* tmp;
+	for(TIndivList* j = first; j != NULL; ){
+		tmp = j->next;
+		free(j);
+		j = tmp;
+	}	
+}
 
-	for(int i = 0; i < geneticP->individCount; i++){
-		if(geneticArray[i].fitness > max){
-			max = geneticArray[i].fitness;
-			index = i;
-		}
-		else if((geneticArray[i].fitness == max) && (!geneticArray[i].wasParent)){
-			max = geneticArray[i].fitness;
-			index = i;
+TIndividual* getLowNodesParent(TIndivList* first, TCgpProperties* geneticP){
+	TIndividual* parent;
+	int min = geneticP->rows * geneticP->cols;
+
+	for(TIndivList* i = first; i != NULL; i = i->next){
+		if(i->node->activeNodesCount < min){
+			parent = i->node;
+			min = i->node->activeNodesCount;
 		}
 	}
 
-	return &geneticArray[index];
+	return parent;
+}
+
+TIndividual* getParents(TCgpProperties* geneticP, TIndividual* geneticArray){
+	int max = 0;
+	TIndivList* act = NULL;
+	TIndivList* first = NULL;
+	TIndividual* parent;
+
+	//get list of best valued programs
+	for(int i = 0; i < geneticP->individCount; i++){
+		if(geneticArray[i].fitness > max){
+			max = geneticArray[i].fitness;
+			//destroy the linked list
+			destroyList(first);	
+			//list is always empty
+			TIndivList* node = (TIndivList*)malloc(sizeof(TIndivList));
+			node->node = &geneticArray[i];	
+			node->next = NULL;
+			first = node;
+			act = node;
+		}
+		else if((geneticArray[i].fitness == max) && (!geneticArray[i].wasParent)){
+			max = geneticArray[i].fitness;		
+			TIndivList* node = (TIndivList*)malloc(sizeof(TIndivList));
+			node->node = &geneticArray[i];	
+			node->next = NULL;
+			//list is never empty
+			act->next = node;
+			act = node;
+		}
+	}
+
+	//get the individual with maximal fitness and lowest count of active nodes
+	parent = getLowNodesParent(first, geneticP);
+	//destroy the linked list
+	destroyList(first);	
+
+	return parent;
 } 
 
 void copyFenotype(TIndividual* parent, TIndividual* individ, TCgpProperties* geneticP){
@@ -127,7 +170,7 @@ TIndividual* evolutionStep(char* filename, TCgpProperties* geneticP, TIndividual
 
 	// open the data source file
 	if((data = fopen(filename, "r")) == NULL){
-		cout << "Error in opening file: " << filename << endl;
+		cerr << "Error in opening file: " << filename << endl;
 		exit(1);
 	}
 

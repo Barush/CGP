@@ -65,6 +65,7 @@ typedef struct individual{
 	TCell** CgpProgram;
 	TCell* output;
 	vector<bool>* activeNodes;
+	int activeNodesCount;
 	double value;
 	int fitness;
 	bool wasParent;
@@ -78,3 +79,8 @@ typedef struct stackItem {
 	struct stackItem* next;
 	struct stackItem* prev;
 }TStackItem;
+
+typedef struct indivList {
+	TIndividual* node;
+	struct indivList* next;
+}TIndivList;

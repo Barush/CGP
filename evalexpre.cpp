@@ -34,6 +34,7 @@ void getActiveNodes(TIndividual* geneticArray, TCgpProperties* geneticP){
 			actualCell -= geneticP->inCount;
 			//set actual components bit for true
 			geneticArray[i].activeNodes->at(actualCell) = true;	
+			geneticArray[i].activeNodesCount++;
 			//set temp variables	
 			col = (actualCell) / geneticP->rows;
 			row = (actualCell) % geneticP->rows;
@@ -118,8 +119,10 @@ void getValue(TIndividual* geneticArray, TCgpProperties* geneticP, double* dataA
 }
 
 void resetFitness(TIndividual* geneticArray, TCgpProperties* geneticP){
-	for(int i = 0; i < geneticP->individCount; i++)
+	for(int i = 0; i < geneticP->individCount; i++){
 		geneticArray[i].fitness = 0;
+		geneticArray[i].activeNodesCount = 0;
+	}
 
 	return;
 }

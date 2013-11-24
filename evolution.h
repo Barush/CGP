@@ -14,6 +14,8 @@
 #include "iowork.h"
 #include "evalexpre.h"
 
+void destroyList(TIndivList* first);
+TIndividual* getLowNodesParent(TIndivList* first, TCgpProperties* geneticP);
 TIndividual* getParents(TCgpProperties* geneticP, TIndividual* geneticArray);
 void copyFenotype(TIndividual* parent, TIndividual* individ, TCgpProperties* geneticP);
 void changeGenes(TIndividual* parent, TIndividual* individ, TCgpProperties* geneticP);

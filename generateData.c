@@ -6,7 +6,7 @@
 #define PI 3.1415926535
 
 double function(double x, double y){
-	return pow(E, x) * PI;
+	return x*x*x - x*x;
 }
 
 
@@ -16,7 +16,7 @@ int main(){
 	newF = fopen("testdata.txt", "w+");
 	//fprintf(newF, "%s\n", "400");
 	fprintf(newF, "400\n");
-	double y = 20;
+	double y = 0;
 	for(double x = -20; x < 20; x += 0.1){
 			fprintf(newF, "%lf %lf\n", x,  function(x, y));
 			y -= 0.1;
