@@ -45,6 +45,7 @@ TIndividual* getParents(TCgpProperties* geneticP, TIndividual* geneticArray){
 
 	//get list of best valued programs
 	for(int i = 0; i < geneticP->individCount; i++){
+		cout << "Current fitness is: " << geneticArray[i].fitness << endl;
 		if(geneticArray[i].fitness > max){
 			max = geneticArray[i].fitness;
 			//destroy the linked list
@@ -60,8 +61,7 @@ TIndividual* getParents(TCgpProperties* geneticP, TIndividual* geneticArray){
 			first = node;
 			act = node;
 		}
-		else if((geneticArray[i].fitness == max) && (!geneticArray[i].wasParent)){
-			max = geneticArray[i].fitness;		
+		else if((geneticArray[i].fitness == max) && (!geneticArray[i].wasParent)){	
 			TIndivList* node = (TIndivList*)malloc(sizeof(TIndivList));
 			node->node = &(geneticArray[i]);	
 			node->next = NULL;
@@ -170,8 +170,7 @@ TIndividual* mutateGeneration(TIndividual* geneticArray, TIndividual* parents, T
 	for(int i = 0; i < geneticP->individCount; i++){
 		if( parents == &(geneticArray[i]) ){
 			geneticArray[i].wasParent = true;
-			cout << " " << geneticArray[i].fitness << endl;
-			continue;
+			cout << " " << geneticArray[i].fitness << endl;\
 		}
 		else{
 			changeGenes(parents, &(geneticArray[i]), geneticP);

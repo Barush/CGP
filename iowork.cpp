@@ -99,6 +99,23 @@ char* intToStr(int val){
 	return result;
 }
 
+char* getPrintable(int ind){
+	char* str = (char*)malloc(sizeof(char) * 10);
+
+	switch(ind){
+		case 0: str = strdup("3.141592");
+				break;
+		case 1: str = strdup("2.718281");
+				break;
+		case 2: str = strdup("1");
+				break;
+		case 3: str = strdup("0");
+				break;
+	}
+
+	return str;
+}
+
 void expandNode(TStackItem** tmp, TIndividual* result, TStackItem** stack, TCgpProperties* geneticP){
 	int row, col;
 
@@ -169,7 +186,9 @@ void expandNode(TStackItem** tmp, TIndividual* result, TStackItem** stack, TCgpP
 
 	//connect stack into list
 	if(!strcmp(func->printable, "const")){
-		if((*tmp)->prev != NULL){
+		op1->isTerm = TERM;
+		op1->printable = getPrintable(result->CgpProgram[row][col].input1);
+ 		if((*tmp)->prev != NULL){
 			(*tmp)->prev->next = op1;
 		}		
 		op1->prev = (*tmp)->prev;
@@ -177,8 +196,8 @@ void expandNode(TStackItem** tmp, TIndividual* result, TStackItem** stack, TCgpP
 		if(op1->next != NULL){
 			op1->next->prev = op1;
 		}
-		//free(lBracket);
-		//free(rBracket);
+		free(lBracket);
+		free(rBracket);
 		free(op2);
 		free(func);	
 		if((*tmp) == (*stack))
@@ -288,12 +307,12 @@ int getDataCount(FILE* data){
 	int count, i = 0;
 	char line[20], c;
 
-	cout << "iowork@291: got into while" << endl;
+	//cout << "iowork@291: got into while" << endl;
   	while((c = fgetc(data)) != '\n'){
 		line[i] = c;
 		i++;
 	}
-	cout << "iowork@296: got out of while" << endl;
+	//cout << "iowork@296: got out of while" << endl;
 	count = atoi(line);
 
 	return count;

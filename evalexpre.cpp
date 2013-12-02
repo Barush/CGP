@@ -39,9 +39,9 @@ void getActiveNodes(TIndividual* geneticArray, TCgpProperties* geneticP){
 		}
 		myStack.push(geneticArray[i].output->input1);
 		solved[geneticArray[i].output->input1] = 1;
-		cout << "evalexpre@27: got into while" << endl;
+		//cout << "evalexpre@27: got into while" << endl;
 		while(!myStack.empty()){
-			printVal(myStack);
+			//printVal(myStack);
 			//get the index of actual component
 			actualCell = myStack.top();
 			myStack.pop();
@@ -71,7 +71,7 @@ void getActiveNodes(TIndividual* geneticArray, TCgpProperties* geneticP){
 				}
 			}
 		}
-		cout << "evalexpre@51: got out of while" << endl;
+		//cout << "evalexpre@51: got out of while" << endl;
 	}
 
 	return;
