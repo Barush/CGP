@@ -35,20 +35,26 @@ TIndividual* createIndividual(TCgpProperties* geneticP, TIndividual *subject){
 
 	for(int i = 0; i < geneticP->rows; i++){
 		for(int j = 0; j < geneticP->cols; j++){
-			int index = j * geneticP->rows + i;		//in which cell we are
-			if((index / geneticP->rows - geneticP->l_back) < 0){
-				subject->CgpProgram[i][j].input1 = rand() % ((index / geneticP->rows) * 
-					geneticP->rows + geneticP->inCount);
-				subject->CgpProgram[i][j].input2 = rand() % ((index / geneticP->rows) * 
-					geneticP->rows + geneticP->inCount);
+			subject->CgpProgram[i][j].function = rand() % geneticP->functionCount;
+			if(subject->CgpProgram[i][j].function == CONST){
+				subject->CgpProgram[i][j].input1 = rand() % CONSTCOUNT;
+				subject->CgpProgram[i][j].input2 = 0;
 			}
 			else {
-				subject->CgpProgram[i][j].input1 = 
-					(rand() % (geneticP->rows * geneticP->l_back)) + (index / geneticP->rows - geneticP->l_back) * geneticP->rows + geneticP->inCount;
-				subject->CgpProgram[i][j].input2 = 
-					(rand() % (geneticP->rows * geneticP->l_back)) + (index / geneticP->rows - geneticP->l_back) * geneticP->rows + geneticP->inCount;
+				int index = j * geneticP->rows + i;		//in which cell we are
+				if((index / geneticP->rows - geneticP->l_back) < 0){
+					subject->CgpProgram[i][j].input1 = rand() % ((index / geneticP->rows) * 
+						geneticP->rows + geneticP->inCount);
+					subject->CgpProgram[i][j].input2 = rand() % ((index / geneticP->rows) * 
+						geneticP->rows + geneticP->inCount);
+				}
+				else {
+					subject->CgpProgram[i][j].input1 = 
+						(rand() % (geneticP->rows * geneticP->l_back)) + (index / geneticP->rows - geneticP->l_back) * geneticP->rows + geneticP->inCount;
+					subject->CgpProgram[i][j].input2 = 
+						(rand() % (geneticP->rows * geneticP->l_back)) + (index / geneticP->rows - geneticP->l_back) * geneticP->rows + geneticP->inCount;
+				}
 			}
-			subject->CgpProgram[i][j].function = rand() % geneticP->functionCount;
 		} //end of one row
 	} // end of whole matrix
 	if((geneticP->cols - geneticP->l_back) <= 0){

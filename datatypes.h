@@ -25,6 +25,7 @@
 
 using namespace std;
 
+#define CONSTCOUNT 4
 
 //Possible operations in CGP matrix, will be modified from program input
 typedef enum function {
@@ -33,8 +34,19 @@ typedef enum function {
 	AND,
 	OR,
 	PLUS,
-	MINUS
+	MINUS,
+	POW,
+	SIN,
+	COS,
+	CONST
 }TFunction;
+
+typedef enum constants {
+	PI = 0,
+	EULER,
+	ONE,
+	ZERO
+}TConstants;
 
 typedef enum stackFlag {
 	TERM = 0,
@@ -57,6 +69,7 @@ typedef struct cgpProperties {
 	int cols;			//count of columns in the matrix
 	int l_back; 		//l-back param of the matrix
 	int individCount;	//count of individuals in the generation
+	double constants[CONSTCOUNT];
 	double countedNodes;
 }TCgpProperties;
 
@@ -75,7 +88,7 @@ typedef struct individual{
 typedef struct stackItem {
 	int isTerm;
 	int value;
-	char printable[10];
+	char* printable;
 	struct stackItem* next;
 	struct stackItem* prev;
 }TStackItem;

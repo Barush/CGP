@@ -6,7 +6,7 @@
 # Vytvoreno: brezen 2013
 ######################################
 
-CPPFLAGS = --std=c++98 -Wall -pedantic -g
+CPPFLAGS = --std=c++98 -Wall -pedantic -g -lm
 CC = g++ $(CPPFLAGS)
 OBJ = creategen.o iowork.o evalexpre.o evolution.o
 

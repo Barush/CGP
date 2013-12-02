@@ -12,18 +12,36 @@
 
 #include "evalexpre.h"
 
+void printVal(stack<int> s){
+	int x = 0;
+	cout << "Stav zasobniku: " << endl;
+	for(unsigned i = 0; i < s.size(); i++){
+		x = s.top();
+		cout << i << " : " << x << endl;
+		s.pop();
+	}
+	return;
+}
 
 void getActiveNodes(TIndividual* geneticArray, TCgpProperties* geneticP){
 	stack<int> myStack;
 	TCell tmpCell;
 	int actualCell, row, col;
+	bool solved[geneticP->cols*geneticP->rows];
+
+	for(int i = 0; i < (geneticP->rows * geneticP->cols); i++){
+		solved[i] = 0;
+	}
 
 	for(int i = 0; i < geneticP->individCount; i++){
 		for(int j = 0; j < (geneticP->rows * geneticP->cols); j++){
 			geneticArray[i].activeNodes->at(j) = false;
 		}
 		myStack.push(geneticArray[i].output->input1);
+		solved[geneticArray[i].output->input1] = 1;
+		cout << "evalexpre@27: got into while" << endl;
 		while(!myStack.empty()){
+			printVal(myStack);
 			//get the index of actual component
 			actualCell = myStack.top();
 			myStack.pop();
@@ -40,22 +58,28 @@ void getActiveNodes(TIndividual* geneticArray, TCgpProperties* geneticP){
 			row = (actualCell) % geneticP->rows;
 			tmpCell = geneticArray[i].CgpProgram[row][col];
 			//push inputs of actual component
-			//if(!geneticArray[i].activeNodes[tmpCell.input1 - geneticP->inCount])
-				myStack.push(tmpCell.input1);
-			//if(!geneticArray[i].activeNodes[tmpCell.input2 - geneticP->inCount])
-				myStack.push(tmpCell.input2);
-
+			if(tmpCell.function != CONST){
+				if(!solved[tmpCell.input1]){
+					myStack.push(tmpCell.input1);
+					solved[tmpCell.input1] = 1;
+				}
+				if((tmpCell.function != SIN) && (tmpCell.function != COS)){
+					if(!solved[tmpCell.input2]){
+						myStack.push(tmpCell.input2);
+						solved[tmpCell.input2] = 1;
+					}
+				}
+			}
 		}
+		cout << "evalexpre@51: got out of while" << endl;
 	}
 
 	return;
 }
 
 void getValue(TIndividual* geneticArray, TCgpProperties* geneticP, double* dataArray){
-
-
 	int row, col;
-	double compIn1, compIn2;
+	double compIn1 = 0, compIn2 = 0;
 
 	for(int i = 0; i < geneticP->individCount; i++){
 
@@ -65,24 +89,29 @@ void getValue(TIndividual* geneticArray, TCgpProperties* geneticP, double* dataA
 			col = j / geneticP->rows;
 			if(geneticArray[i].activeNodes->at(j)){
 				geneticP->countedNodes++;
+				if(geneticArray[i].CgpProgram[row][col].function == CONST){
+					compIn1 = geneticArray[i].CgpProgram[row][col].input1;
+				}
+				else {
+					if(geneticArray[i].CgpProgram[row][col].input1 < geneticP->inCount){
+						for(int k = 0; k < geneticP->inCount; k++){
+							if(geneticArray[i].CgpProgram[row][col].input1 == k)
+								compIn1 = dataArray[k];
+						}					}
+					else{
+						compIn1 = values->at(geneticArray[i].CgpProgram[row][col].input1 - geneticP->inCount);
+					}
 
-				if(geneticArray[i].CgpProgram[row][col].input1 < geneticP->inCount){
-					for(int k = 0; k < geneticP->inCount; k++){
-						if(geneticArray[i].CgpProgram[row][col].input1 == k)
-							compIn1 = dataArray[k];
+					if(geneticArray[i].CgpProgram[row][col].input2 < geneticP->inCount){
+						for(int k = 0; k < geneticP->inCount; k++){
+							if(geneticArray[i].CgpProgram[row][col].input2 == k)
+								compIn2 = dataArray[k];
+						}
+					}
+					else {
+						compIn2 = values->at(geneticArray[i].CgpProgram[row][col].input2 - geneticP->inCount);
 					}
 				}
-				else
-					compIn1 = values->at(geneticArray[i].CgpProgram[row][col].input1 - geneticP->inCount);
-
-				if(geneticArray[i].CgpProgram[row][col].input2 < geneticP->inCount){
-					for(int k = 0; k < geneticP->inCount; k++){
-						if(geneticArray[i].CgpProgram[row][col].input2 == k)
-							compIn2 = dataArray[k];
-					}
-				}
-				else
-					compIn2 = values->at(geneticArray[i].CgpProgram[row][col].input2 - geneticP->inCount);
 
 				switch (geneticArray[i].CgpProgram[row][col].function) {
 					case MUL:	values->at(j) = compIn1 * compIn2;
@@ -106,6 +135,14 @@ void getValue(TIndividual* geneticArray, TCgpProperties* geneticP, double* dataA
 								break;
 					case MINUS: values->at(j) = compIn1 - compIn2;
 								//cout << compIn1 << "-" << compIn2 << "=" << values->at(j) << endl;
+								break;
+					case POW:	values->at(j) = pow(compIn1, compIn2);
+								break;
+					case SIN: 	values->at(j) = sin(compIn1);
+								break;
+					case COS:	values->at(j) = cos(compIn1);
+								break;
+					case CONST:	values->at(j) = geneticP->constants[(int)(compIn1)];
 								break;
 				} //switch
 
@@ -131,7 +168,7 @@ void resetFitness(TIndividual* geneticArray, TCgpProperties* geneticP){
 void getFitness(TIndividual* geneticArray, TCgpProperties* geneticP, double* dataArray){
 
 	for(int i = 0; i < geneticP->individCount; i++){
-		if(abs(geneticArray[i].value - dataArray[geneticP->inCount]) < 1){
+		if(abs(geneticArray[i].value - dataArray[geneticP->inCount]) < 0.1){
 			geneticArray[i].fitness++; //HIT
 		//	cout << "Fitness of fenotype " << i << " increased." << endl;
 		}

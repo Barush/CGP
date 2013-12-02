@@ -34,12 +34,11 @@ int main(int argc, char** argv){
 	geneticParams = getParams(argv, argc);
 	geneticArray = createGeneration(geneticParams);
 
-
 	geneticArray = evolutionStep(argv[1], geneticParams, geneticArray, false);
-
 	for(int i = 0; i < 100000; i++){
 		cout << i;
 		geneticArray = evolutionStep(argv[1], geneticParams, geneticArray, true);
+		cout << "got out of evolution step" << endl;
 		actual = getParents(geneticParams, geneticArray);
 		if(actual->fitness == 400){
 			cout << i + 1 << " 400" << endl;

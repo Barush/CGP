@@ -22,7 +22,9 @@ void destroyList(TIndivList* first){
 }
 
 TIndividual* getLowNodesParent(TIndivList* first, TCgpProperties* geneticP){
-	TIndividual* parent;
+	if(first == NULL)
+		cout << "evolution@26: first is null" << endl;
+	TIndividual* parent = first->node;
 	int min = geneticP->rows * geneticP->cols;
 
 	for(TIndivList* i = first; i != NULL; i = i->next){
@@ -48,8 +50,12 @@ TIndividual* getParents(TCgpProperties* geneticP, TIndividual* geneticArray){
 			//destroy the linked list
 			destroyList(first);	
 			//list is always empty
-			TIndivList* node = (TIndivList*)malloc(sizeof(TIndivList));
-			node->node = &geneticArray[i];	
+			TIndivList* node;
+			if((node = (TIndivList*)malloc(sizeof(TIndivList))) == NULL){
+				cerr << "Chyba pri alokaci pameti" << endl;
+				exit(2);
+			}
+			node->node = &(geneticArray[i]);	
 			node->next = NULL;
 			first = node;
 			act = node;
@@ -57,16 +63,21 @@ TIndividual* getParents(TCgpProperties* geneticP, TIndividual* geneticArray){
 		else if((geneticArray[i].fitness == max) && (!geneticArray[i].wasParent)){
 			max = geneticArray[i].fitness;		
 			TIndivList* node = (TIndivList*)malloc(sizeof(TIndivList));
-			node->node = &geneticArray[i];	
+			node->node = &(geneticArray[i]);	
 			node->next = NULL;
-			//list is never empty
-			act->next = node;
+			if(act != NULL){
+				act->next = node;
+			}
+			if(first == NULL)
+				first = node;
 			act = node;
 		}
 	}
 
 	//get the individual with maximal fitness and lowest count of active nodes
 	parent = getLowNodesParent(first, geneticP);
+	if(parent == NULL)
+		cout << "evolution@72: didnt get any lowNodesParent" << endl;
 	//destroy the linked list
 	destroyList(first);	
 
@@ -76,6 +87,13 @@ TIndividual* getParents(TCgpProperties* geneticP, TIndividual* geneticArray){
 void copyFenotype(TIndividual* parent, TIndividual* individ, TCgpProperties* geneticP){
 	for(int i = 0; i < geneticP->rows; i++){
 		for(int j = 0; j < geneticP->cols; j++){
+
+//HERE COMES RANDOM NULL POINTERS.....WTF??
+
+			if(individ == NULL)
+				cout << "evolution:81: individ is null" << endl;
+			else if(parent == NULL)
+				cout << "evolution:86: Parent is null" << endl;
 			individ->CgpProgram[i][j].input1 = parent->CgpProgram[i][j].input1;
 			individ->CgpProgram[i][j].input2 = parent->CgpProgram[i][j].input2;
 			individ->CgpProgram[i][j].function = parent->CgpProgram[i][j].function;
@@ -112,8 +130,11 @@ void changeGenes(TIndividual* parent, TIndividual* individ, TCgpProperties* gene
 			col = index / geneticP->rows;
 			if(((col - geneticP->l_back) < 0) && (change < 2)){
 				if(change == 0){
-					individ->CgpProgram[row][col].input1 = rand() % ((index / geneticP->rows) * 
-						geneticP->rows + geneticP->inCount);
+					if(individ->CgpProgram[row][col].function == CONST)
+						individ->CgpProgram[row][col].input1 = rand() % CONSTCOUNT;
+					else
+						individ->CgpProgram[row][col].input1 = rand() % ((index / geneticP->rows) * 
+							geneticP->rows + geneticP->inCount);
 				}
 				else if(change == 1){
 					individ->CgpProgram[row][col].input2 = rand() % ((index / geneticP->rows) * 
@@ -122,8 +143,11 @@ void changeGenes(TIndividual* parent, TIndividual* individ, TCgpProperties* gene
 			}
 			else if (change < 2){
 				if(change == 0){
-					individ->CgpProgram[row][col].input1 = 
-						(rand() % (geneticP->rows * geneticP->l_back)) + (index / geneticP->rows - geneticP->l_back) * geneticP->rows + geneticP->inCount;
+					if(individ->CgpProgram[row][col].function == CONST)
+						individ->CgpProgram[row][col].input1 = rand() % CONSTCOUNT;
+					else
+						individ->CgpProgram[row][col].input1 = 
+							(rand() % (geneticP->rows * geneticP->l_back)) + (index / geneticP->rows - geneticP->l_back) * geneticP->rows + geneticP->inCount;
 				}
 				else if(change == 1){
 					individ->CgpProgram[row][col].input2 = 
@@ -132,6 +156,8 @@ void changeGenes(TIndividual* parent, TIndividual* individ, TCgpProperties* gene
 			}
 			else{
 				individ->CgpProgram[row][col].function = rand() % geneticP->functionCount;
+				if(individ->CgpProgram[row][col].function == CONST)
+					individ->CgpProgram[row][col].input1 = rand() % CONSTCOUNT;
 			}
 		}
 	}// for 5% of genes
@@ -148,7 +174,7 @@ TIndividual* mutateGeneration(TIndividual* geneticArray, TIndividual* parents, T
 			continue;
 		}
 		else{
-			changeGenes(parents, &geneticArray[i], geneticP);
+			changeGenes(parents, &(geneticArray[i]), geneticP);
 			geneticArray[i].wasParent = false;
 		} 
 	}
@@ -158,6 +184,8 @@ TIndividual* mutateGeneration(TIndividual* geneticArray, TIndividual* parents, T
 
 TIndividual* mutation(TCgpProperties* geneticP, TIndividual* geneticArray){	
 	TIndividual* parents = getParents(geneticP, geneticArray);
+	if(parents == NULL)
+		cout << "evolution@178: didnt get any parents..." << endl;
 	geneticArray = mutateGeneration(geneticArray, parents, geneticP);
 
 	return geneticArray;
@@ -184,15 +212,14 @@ TIndividual* evolutionStep(char* filename, TCgpProperties* geneticP, TIndividual
 
 	resetFitness(geneticArray, geneticP);
 	getActiveNodes(geneticArray, geneticP);  
-
 	dataCount = getDataCount(data);
 	for(int i = 0; i < dataCount; i++){
-		getNextData(data, dataArray, geneticP->inCount + 1);
-
+		getNextData(data, dataArray, geneticP->inCount + geneticP->outCount);
 		// each runs on whole geneticArray
 		getValue(geneticArray, geneticP, dataArray);
 		getFitness(geneticArray, geneticP, dataArray);
 	}//test of all data inputs
+
 
 	free(dataArray);
 	fclose(data);

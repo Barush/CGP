@@ -14,13 +14,13 @@
 
 
 /***************** TEMPORARILY DEFINES ********************/
-#define INCOUNT 2
+#define INCOUNT 1
 #define OUTCOUNT 1
 #define COMPINCOUNT 2
-#define FUNCTIONCOUNT 6
+#define FUNCTIONCOUNT 10
 #define ROW 16
 #define COL 10
-#define L_BACK 25
+#define L_BACK 20
 #define GENER 5
 
 void printUsage(){
@@ -32,7 +32,7 @@ void printUsage(){
 	cout << "Usage: " << endl;
 	cout << "./cocgp testfile [-r rows -c cols -l L-back -g generation]" << endl << endl;
 	cout << "\t testfile looks like: " << endl;
-	cout << "\t\t number_of_test_points" << endl;
+	cout << "\t\t number_of_test_vectors" << endl;
 	cout << "\t\t in1 in2 in3 .. inN out" << endl;
 	cout << "\t rows - sets number of rows in cgp program" << endl;
 	cout << "\t cols - sets number of cols in cgp program" << endl;
@@ -79,41 +79,47 @@ TCgpProperties* getParams(char** argv, int argc){
 		}
 	}
 
+	params->constants[PI] = 3.141592;
+	params->constants[EULER] = 2.718281;
+	params->constants[ONE] = 1;
+	params->constants[ZERO] = 0;
+
 	return params;
 }
 
-const char* intToStr(int val){
+char* intToStr(int val){
 	//conversion int to string
 	stringstream intStr;
 	intStr << val;
 	string tmp = intStr.str();
 	tmp = "x" + tmp;
-	const char* result = tmp.c_str();
+	char* result = (char*)malloc(sizeof(tmp.length()));
+	strcpy(result, tmp.c_str());
 
 	return result;
 }
 
-void expandNode(TStackItem* tmp, TIndividual* result, TStackItem* stack, TCgpProperties* geneticP){
+void expandNode(TStackItem** tmp, TIndividual* result, TStackItem** stack, TCgpProperties* geneticP){
 	int row, col;
 
 	//get value
-	row = (tmp->value - geneticP->inCount) % geneticP->rows;
-	col = (tmp->value - geneticP->inCount) / geneticP->rows;
+	row = ((*tmp)->value - geneticP->inCount) % geneticP->rows;
+	col = ((*tmp)->value - geneticP->inCount) / geneticP->rows;
 
 	//insert (
 	TStackItem* lBracket = (TStackItem*)malloc(sizeof(struct stackItem));
 	lBracket->isTerm = TERM;
-	strcpy(lBracket->printable, "(");
+	lBracket->printable = strdup("(");
 
 	//get first operand - NONTERM?
 	TStackItem* op1 = (TStackItem*)malloc(sizeof(struct stackItem));
 	if(result->CgpProgram[row][col].input1 < geneticP->inCount){
 		op1->isTerm = TERM;
-		strcpy(op1->printable, intToStr(result->CgpProgram[row][col].input1)); 
+		op1->printable = strdup(intToStr(result->CgpProgram[row][col].input1)); 
 	}
 	else {
 		op1->isTerm = NONTERM;
-		strcpy(op1->printable, "x");
+		op1->printable = strdup("nonterm");
 	}
 	op1->value = result->CgpProgram[row][col].input1;
 
@@ -121,17 +127,25 @@ void expandNode(TStackItem* tmp, TIndividual* result, TStackItem* stack, TCgpPro
 	TStackItem* func = (TStackItem*)malloc(sizeof(struct stackItem));
 	func->isTerm = TERM;
 	switch (result->CgpProgram[row][col].function) {
-		case MUL:	strcpy(func->printable, "*");
+		case MUL:	func->printable =  strdup("*");
 					break;
-		case DIV:	strcpy(func->printable, "/");
+		case DIV:	func->printable =  strdup("/");
 					break;
-		case AND:	strcpy(func->printable, "&");
+		case AND:	func->printable =  strdup("&");
 					break;
-		case OR:	strcpy(func->printable, "|");
+		case OR:	func->printable =  strdup("|");
 					break;
-		case PLUS:	strcpy(func->printable, "+");
+		case PLUS:	func->printable =  strdup("+");
 					break;
-		case MINUS: strcpy(func->printable, "-");
+		case MINUS: func->printable =  strdup("-");
+					break;
+		case POW:	func->printable =  strdup("^");
+					break;
+		case SIN:	func->printable =  strdup("sin");
+					break;
+		case COS:	func->printable =  strdup("cos");
+					break;
+		case CONST:	func->printable =  strdup("const");
 					break;
 		default: cout << "blbost" << endl;
 	}
@@ -140,40 +154,81 @@ void expandNode(TStackItem* tmp, TIndividual* result, TStackItem* stack, TCgpPro
 	TStackItem* op2 = (TStackItem*)malloc(sizeof(struct stackItem));
 	if(result->CgpProgram[row][col].input2 < geneticP->inCount){
 		op2->isTerm = TERM;
-		strcpy(op1->printable, intToStr(result->CgpProgram[row][col].input2)); 
+		op2->printable = strdup(intToStr(result->CgpProgram[row][col].input2)); 
 	}
 	else{
 		op2->isTerm = NONTERM;
-		strcpy(op2->printable, "x");
+		op2->printable = strdup("nonterm");
 	}
 	op2->value = result->CgpProgram[row][col].input2;
 
 	//insert (
 	TStackItem* rBracket = (TStackItem*)malloc(sizeof(struct stackItem));
 	rBracket->isTerm = TERM;
-	strcpy(rBracket->printable, ")");
+	rBracket->printable = strdup(")");
 
 	//connect stack into list
-	if(tmp->prev != NULL){
-		tmp->prev->next = lBracket;
+	if(!strcmp(func->printable, "const")){
+		if((*tmp)->prev != NULL){
+			(*tmp)->prev->next = op1;
+		}		
+		op1->prev = (*tmp)->prev;
+		op1->next = (*tmp)->next;
+		if(op1->next != NULL){
+			op1->next->prev = op1;
+		}
+		//free(lBracket);
+		//free(rBracket);
+		free(op2);
+		free(func);	
+		if((*tmp) == (*stack))
+			(*stack) = op1;
+		free((*tmp));
+		(*tmp) = op1;
 	}
-	lBracket->prev = tmp->prev;
-	lBracket->next = op1;
-	op1->prev = lBracket;
-	op1->next = func;
-	func->prev = op1;
-	func->next = op2;
-	op2->prev = func;
-	op2->next = rBracket;
-	rBracket->prev = op2;
-	rBracket->next = tmp->next;
-	if(rBracket->next != NULL){
-		rBracket->next->prev = rBracket;
+	else if((!strcmp(func->printable,"sin")) || (!strcmp(func->printable, "cos"))){
+		if((*tmp)->prev != NULL){
+			(*tmp)->prev->next = func;
+		}
+		func->prev = (*tmp)->prev;
+		func->next = lBracket;
+		lBracket->prev = func;
+		lBracket->next = op1;
+		op1->prev = lBracket;
+		op1->next = rBracket;
+		rBracket->prev = op1;
+		rBracket->next = (*tmp)->next;	
+		if(rBracket->next != NULL){
+			rBracket->next->prev = rBracket;
+		}
+		free(op2);			
+		if((*tmp) == (*stack))
+			(*stack) = func;
+		free((*tmp));
+		(*tmp) = rBracket;
 	}
-	if(tmp == stack)
-		stack = lBracket;
-	free(tmp);
-	tmp = rBracket;
+	else {
+		if((*tmp)->prev != NULL){
+			(*tmp)->prev->next = lBracket;
+		}
+		lBracket->prev = (*tmp)->prev;
+		lBracket->next = op1;
+		op1->prev = lBracket;
+		op1->next = func;
+		func->prev = op1;
+		func->next = op2;
+		op2->prev = func;
+		op2->next = rBracket;
+		rBracket->prev = op2;
+		rBracket->next = (*tmp)->next;	
+		if(rBracket->next != NULL){
+			rBracket->next->prev = rBracket;
+		}	
+		if((*tmp) == (*stack))
+			(*stack) = lBracket;
+		free((*tmp));
+		(*tmp) = rBracket;
+	}
 }
 
 void printReadableResult(TIndividual* result, TCgpProperties* geneticP){
@@ -183,7 +238,7 @@ void printReadableResult(TIndividual* result, TCgpProperties* geneticP){
 
 	node->isTerm = NONTERM;
 	node->value = result->output->input1;
-	strcpy(node->printable, "x");
+	node->printable = strdup("nonterm");
 	node->next = NULL;
 	node->prev = NULL;
 	stack = node;
@@ -193,7 +248,7 @@ void printReadableResult(TIndividual* result, TCgpProperties* geneticP){
 		for(TStackItem* tmp = stack; tmp != NULL; tmp = tmp->next){
 			if(tmp->isTerm == NONTERM){
 				change = true;
-				expandNode(tmp, result, stack, geneticP);
+				expandNode(&tmp, result, &stack, geneticP);
 			}
 		}
 	}while(change);
@@ -233,11 +288,12 @@ int getDataCount(FILE* data){
 	int count, i = 0;
 	char line[20], c;
 
-	
+	cout << "iowork@291: got into while" << endl;
   	while((c = fgetc(data)) != '\n'){
 		line[i] = c;
 		i++;
 	}
+	cout << "iowork@296: got out of while" << endl;
 	count = atoi(line);
 
 	return count;
@@ -249,6 +305,7 @@ void getNextData(FILE* data, double* dataArray, int ioCount){
 	char num[20];
 	char c;
 
+//	cout << "iowork@308: got into while" << endl;
 	while((c = fgetc(data)) != '\n'){
 		if(c == ' '){
 			if(j < ioCount){
@@ -267,6 +324,7 @@ void getNextData(FILE* data, double* dataArray, int ioCount){
 			i++;
 		}
 	}
+//	cout << "iowork@327: got out of while" << endl;
 
 	// store the last number of a line - 'while' ended with endl
 	if(j < ioCount){
