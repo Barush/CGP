@@ -30,6 +30,9 @@ evalexpre.o: evalexpre.h evalexpre.cpp
 evolution.o: evolution.h evolution.cpp
 	$(CC) -c evolution.cpp
 
+run:
+	./cocgp testdata.txt
+
 clean: 
 	rm -f *.o
 	rm cocgp

@@ -16,19 +16,21 @@
 #include "creategen.h"
 #include "evolution.h"
 
+int lastFit = 0;
 
 int main(int argc, char** argv){
 
 	if(!strcmp(argv[1], "-h")){
+		//parameter help
 		printUsage();
 		return EXIT_SUCCESS;
 	}
 
-	TIndividual* geneticArray;
-	TIndividual* actual;
-	TCgpProperties* geneticParams;
+	TIndividual* geneticArray;		//array for one generation
+	TIndividual* actual;			//ptr to geneticArray - best fitness in the generation
+	TCgpProperties* geneticParams;	//parameters of CGP
 
-	//make argv controls
+	// TODO: make argv controls
 
 	srand(time(NULL)); // initiate random generator
 	geneticParams = getParams(argv, argc);

@@ -24,13 +24,18 @@ void destroyList(TIndivList* first){
 TIndividual* getLowNodesParent(TIndivList* first, TCgpProperties* geneticP){
 	if(first == NULL)
 		cout << "evolution@26: first is null" << endl;
-	TIndividual* parent = first->node;
+	TIndividual* parent = NULL;
 	int min = geneticP->rows * geneticP->cols;
 
 	for(TIndivList* i = first; i != NULL; i = i->next){
 		if(i->node->activeNodesCount < min){
 			parent = i->node;
 			min = i->node->activeNodesCount;
+		}
+		else if(i->node->activeNodesCount == min){
+			if(parent->wasParent){
+				parent = i->node;				
+			}
 		}
 	}
 
@@ -45,7 +50,7 @@ TIndividual* getParents(TCgpProperties* geneticP, TIndividual* geneticArray){
 
 	//get list of best valued programs
 	for(int i = 0; i < geneticP->individCount; i++){
-		cout << "Current fitness is: " << geneticArray[i].fitness << endl;
+		//cout << "Current fitness is: " << geneticArray[i].fitness << endl;
 		if(geneticArray[i].fitness > max){
 			max = geneticArray[i].fitness;
 			//destroy the linked list
@@ -61,7 +66,7 @@ TIndividual* getParents(TCgpProperties* geneticP, TIndividual* geneticArray){
 			first = node;
 			act = node;
 		}
-		else if((geneticArray[i].fitness == max) && (!geneticArray[i].wasParent)){	
+		else if(geneticArray[i].fitness == max){	
 			TIndivList* node = (TIndivList*)malloc(sizeof(TIndivList));
 			node->node = &(geneticArray[i]);	
 			node->next = NULL;
@@ -74,10 +79,17 @@ TIndividual* getParents(TCgpProperties* geneticP, TIndividual* geneticArray){
 		}
 	}
 
+	for(TIndivList* i = first; i != NULL; i = i->next){
+		cout << " " << i << ": " << i->node->fitness;
+	}
+	cout << " .. ";
+
 	//get the individual with maximal fitness and lowest count of active nodes
 	parent = getLowNodesParent(first, geneticP);
-	if(parent == NULL)
+	if(parent == NULL){
 		cout << "evolution@72: didnt get any lowNodesParent" << endl;
+		exit(1);
+	}
 	//destroy the linked list
 	destroyList(first);	
 
@@ -170,7 +182,7 @@ TIndividual* mutateGeneration(TIndividual* geneticArray, TIndividual* parents, T
 	for(int i = 0; i < geneticP->individCount; i++){
 		if( parents == &(geneticArray[i]) ){
 			geneticArray[i].wasParent = true;
-			cout << " " << geneticArray[i].fitness << endl;\
+			cout << " " << geneticArray[i].fitness << endl;
 		}
 		else{
 			changeGenes(parents, &(geneticArray[i]), geneticP);
@@ -191,9 +203,9 @@ TIndividual* mutation(TCgpProperties* geneticP, TIndividual* geneticArray){
 }
 
 TIndividual* evolutionStep(char* filename, TCgpProperties* geneticP, TIndividual* geneticArray, bool mutate){
-	int dataCount = 0;
-	FILE* data;
-	double* dataArray;
+	int dataCount = 0;	//input + output count
+	FILE* data;			//input file
+	double* dataArray;	//one line of file
 
 	// open the data source file
 	if((data = fopen(filename, "r")) == NULL){
@@ -201,8 +213,8 @@ TIndividual* evolutionStep(char* filename, TCgpProperties* geneticP, TIndividual
 		exit(1);
 	}
 
-	// create array of data = one line of source file
-	dataArray = (double*)malloc((geneticP->inCount + 1) * sizeof(double));
+	// create array of data = one line of input file
+	dataArray = (double*)malloc((geneticP->inCount + geneticP->outCount) * sizeof(double));
 
 	if(mutate){
 		mutation(geneticP, geneticArray);
