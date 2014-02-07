@@ -17,7 +17,7 @@
 #define INCOUNT 1
 #define OUTCOUNT 1
 #define COMPINCOUNT 2
-#define FUNCTIONCOUNT 10
+#define FUNCTIONCOUNT 8
 #define ROW 16
 #define COL 10
 #define L_BACK 20
@@ -147,10 +147,6 @@ void expandNode(TStackItem** tmp, TIndividual* result, TStackItem** stack, TCgpP
 		case MUL:	func->printable =  strdup("*");
 					break;
 		case DIV:	func->printable =  strdup("/");
-					break;
-		case AND:	func->printable =  strdup("&");
-					break;
-		case OR:	func->printable =  strdup("|");
 					break;
 		case PLUS:	func->printable =  strdup("+");
 					break;

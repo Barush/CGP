@@ -12,103 +12,43 @@
 
 #include "evolution.h"
 
-void destroyList(TIndivList* first){
-	TIndivList* tmp;
-	for(TIndivList* j = first; j != NULL; ){
-		tmp = j->next;
-		free(j);
-		j = tmp;
-	}	
-}
-
-TIndividual* getLowNodesParent(TIndivList* first, TCgpProperties* geneticP){
-	if(first == NULL)
-		cout << "evolution@26: first is null" << endl;
-	TIndividual* parent = NULL;
-	int min = geneticP->rows * geneticP->cols;
-
-	for(TIndivList* i = first; i != NULL; i = i->next){
-		if(i->node->activeNodesCount < min){
-			parent = i->node;
-			min = i->node->activeNodesCount;
-		}
-		else if(i->node->activeNodesCount == min){
-			if(parent->wasParent){
-				parent = i->node;				
-			}
-		}
-	}
-
-	return parent;
-}
-
 TIndividual* getParents(TCgpProperties* geneticP, TIndividual* geneticArray){
-	int max = 0;
-	TIndivList* act = NULL;
-	TIndivList* first = NULL;
-	TIndividual* parent;
+	int max = geneticArray[0].fitness;
+	TIndividual* parent = &(geneticArray[0]);
 
-	for(int i = 0; i < geneticP->individCount; i++){
-		if(geneticArray[i].fitness > max){
-			max = geneticArray[i].fitness;
+	cerr << max;
+
+	//for all fenotypes except parent (first)
+	for(int i = 1; i < geneticP->individCount; i++){
+		cerr << " " << geneticArray[i].fitness;
+
+		if(geneticArray[i].fitness == max){
+			// max is the parent of last generation
+			if(parent == &(geneticArray[0])){
+				parent = &(geneticArray[i]);
+			}
+			else{
+				//new parent has less active nodes and same fitness
+				if(geneticArray[i].activeNodesCount < parent->activeNodesCount){
+					parent = &(geneticArray[i]);
+				}
+			} 
+		}
+
+		else if(geneticArray[i].fitness > max){
 			parent = &(geneticArray[i]);
-		}
-	}
-
-/*	//get list of best valued programs
-	for(int i = 0; i < geneticP->individCount; i++){
-		//cout << "Current fitness is: " << geneticArray[i].fitness << endl;
-		if(geneticArray[i].fitness > max){
 			max = geneticArray[i].fitness;
-			//destroy the linked list
-			destroyList(first);	
-			//list is always empty
-			TIndivList* node;
-			if((node = (TIndivList*)malloc(sizeof(TIndivList))) == NULL){
-				cerr << "Chyba pri alokaci pameti" << endl;
-				exit(2);
-			}
-			node->node = &(geneticArray[i]);	
-			node->next = NULL;
-			first = node;
-			act = node;
-		}
-		else if(geneticArray[i].fitness == max){	
-			TIndivList* node = (TIndivList*)malloc(sizeof(TIndivList));
-			node->node = &(geneticArray[i]);	
-			node->next = NULL;
-			if(act != NULL){
-				act->next = node;
-			}
-			if(first == NULL)
-				first = node;
-			act = node;
 		}
 	}
 
-	for(TIndivList* i = first; i != NULL; i = i->next){
-		cout << " " << i << ": " << i->node->fitness;
-	}
-	cout << " .. ";
-
-	//get the individual with maximal fitness and lowest count of active nodes
-	parent = getLowNodesParent(first, geneticP);
-	if(parent == NULL){
-		cout << "evolution@72: didnt get any lowNodesParent" << endl;
-		exit(1);
-	}
-	//destroy the linked list
-	destroyList(first);	*/
-
+	cerr << "->" << parent->fitness << endl;
 	return parent;
 } 
 
 void copyFenotype(TIndividual* parent, TIndividual* individ, TCgpProperties* geneticP){
+	//copy the cgp program
 	for(int i = 0; i < geneticP->rows; i++){
 		for(int j = 0; j < geneticP->cols; j++){
-
-//HERE COMES RANDOM NULL POINTERS.....WTF??
-
 			if(individ == NULL)
 				cout << "evolution:81: individ is null" << endl;
 			else if(parent == NULL)
@@ -118,7 +58,12 @@ void copyFenotype(TIndividual* parent, TIndividual* individ, TCgpProperties* gen
 			individ->CgpProgram[i][j].function = parent->CgpProgram[i][j].function;
 		}
 	}
+	//copy output
 	individ->output->input1 = parent->output->input1;
+	//copy integer values
+	individ->fitness = parent->fitness;
+	individ->value = parent->value;
+	individ->activeNodesCount = parent->activeNodesCount;
 
 	return;
 }
@@ -129,7 +74,7 @@ void changeGenes(TIndividual* parent, TIndividual* individ, TCgpProperties* gene
 
 	copyFenotype(parent, individ, geneticP);
 
-	for(int i = 0; i < (int)(0.05 * geneticP->rows * geneticP->cols * (geneticP->compInCount + 1)); i++){
+	for(int i = 0; i < (int)(0.05 * geneticP->rows * geneticP->cols * (geneticP->compInCount + 1) + 0.5); i++){
 		index = rand() % (geneticP->rows * geneticP->cols + 1);
 		change = rand() % (geneticP->compInCount + 1);
 
@@ -186,14 +131,13 @@ void changeGenes(TIndividual* parent, TIndividual* individ, TCgpProperties* gene
 
 TIndividual* mutateGeneration(TIndividual* geneticArray, TIndividual* parents, TCgpProperties* geneticP){
 	//parent is always first in the array
+	cerr << parents->fitness;
 	copyFenotype(parents, &(geneticArray[0]), geneticP);
-	geneticArray[0].wasParent = true;
-	cout << " " << parents->fitness << endl;
+	cerr << " " << geneticArray[0].fitness;
 
 	//others in the array are mutants
 	for(int i = 1; i < geneticP->individCount; i++){
 		changeGenes(&(geneticArray[0]), &(geneticArray[i]), geneticP);
-		geneticArray[i].wasParent = false;
 	}
 
 	return geneticArray;
@@ -204,6 +148,7 @@ TIndividual* mutation(TCgpProperties* geneticP, TIndividual* geneticArray){
 	if(parents == NULL)
 		cout << "evolution@178: didnt get any parents..." << endl;
 	geneticArray = mutateGeneration(geneticArray, parents, geneticP);
+	cerr << " " << geneticArray[0].fitness;
 
 	return geneticArray;
 }
@@ -226,17 +171,27 @@ TIndividual* evolutionStep(char* filename, TCgpProperties* geneticP, TIndividual
 		mutation(geneticP, geneticArray);
 	}
 
+	cerr << " " << geneticArray[0].fitness << endl;
+	printResult(&(geneticArray[0]), geneticP);
+	printReadableResult(&(geneticArray[0]), geneticP);
 
 	resetFitness(geneticArray, geneticP);
 	getActiveNodes(geneticArray, geneticP);  
+
+	//get first line of input file - count of lines
 	dataCount = getDataCount(data);
+
 	for(int i = 0; i < dataCount; i++){
 		getNextData(data, dataArray, geneticP->inCount + geneticP->outCount);
 		// each runs on whole geneticArray
 		getValue(geneticArray, geneticP, dataArray);
-		getFitness(geneticArray, geneticP, dataArray);
-	}//test of all data inputs
+		// counts the fitness value for one line (0 or 1 at each fenotype)
+		getFitness(geneticArray, geneticP, dataArray); 
+	}//test all data inputs
 
+	cerr << " " << geneticArray[0].fitness << endl;
+	printResult(&(geneticArray[0]), geneticP);
+	printReadableResult(&(geneticArray[0]), geneticP);
 
 	free(dataArray);
 	fclose(data);

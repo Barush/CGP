@@ -31,8 +31,6 @@ using namespace std;
 typedef enum function {
 	MUL = 0,
 	DIV,
-	AND,
-	OR,
 	PLUS,
 	MINUS,
 	POW,
@@ -81,7 +79,6 @@ typedef struct individual{
 	int activeNodesCount;
 	double value;
 	int fitness;
-	bool wasParent;
 }TIndividual;
 
 //struct for recursive descent

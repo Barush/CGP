@@ -27,7 +27,6 @@ int main(int argc, char** argv){
 	}
 
 	TIndividual* geneticArray;		//array for one generation
-	TIndividual* actual;			//ptr to geneticArray - best fitness in the generation
 	TCgpProperties* geneticParams;	//parameters of CGP
 
 	// TODO: make argv controls
@@ -38,11 +37,12 @@ int main(int argc, char** argv){
 
 	geneticArray = evolutionStep(argv[1], geneticParams, geneticArray, false);
 	for(int i = 0; i < 100000; i++){
-		cout << i;
 		geneticArray = evolutionStep(argv[1], geneticParams, geneticArray, true);
 		//cout << "got out of evolution step" << endl;
-		actual = getParents(geneticParams, geneticArray);
-		if(actual->fitness == 400){
+
+		if(!(i%100))
+			cout << i << " " << geneticArray[0].fitness << endl;
+		if(geneticArray[0].fitness == 400){
 			cout << i + 1 << " 400" << endl;
 			break;
 		}

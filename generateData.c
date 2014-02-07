@@ -6,7 +6,7 @@
 #define PI 3.1415926535
 
 double function(double x, double y){
-	return x * x + x;
+	return (x + x) * x;
 }
 
 

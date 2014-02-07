@@ -31,7 +31,7 @@ evolution.o: evolution.h evolution.cpp
 	$(CC) -c evolution.cpp
 
 run:
-	./cocgp testdata.txt
+	./cocgp testdata.txt -c 15 -r 1 2>err.txt
 
 clean: 
 	rm -f *.o
