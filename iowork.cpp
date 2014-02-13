@@ -265,6 +265,7 @@ void printReadableResult(TIndividual* result, TCgpProperties* geneticP){
 				change = true;
 				expandNode(&tmp, result, &stack, geneticP);
 			}
+			//cerr << "" << endl;
 		}
 	}while(change);
 

@@ -17,8 +17,7 @@
 void destroyList(TIndivList* first);
 TIndividual* getLowNodesParent(TIndivList* first, TCgpProperties* geneticP);
 TIndividual* getParents(TCgpProperties* geneticP, TIndividual* geneticArray);
-void copyFenotype(TIndividual* parent, TIndividual* individ, TCgpProperties* geneticP);
-void changeGenes(TIndividual* parent, TIndividual* individ, TCgpProperties* geneticP);
-TIndividual* mutateGeneration(TIndividual* geneticArray, TIndividual* parents, TCgpProperties* geneticP);
-TIndividual* mutation(TCgpProperties* geneticP, TIndividual* geneticArray);
+void copyGenotype(TIndividual* parent, TIndividual* individ, TCgpProperties* geneticP);
+void changeGenes(TIndividual* individ, TCgpProperties* geneticP);
+void mutation(TCgpProperties* geneticP, TIndividual* geneticArray);
 TIndividual* evolutionStep(char* filename, TCgpProperties* geneticP, TIndividual* geneticArray, bool mutate);
