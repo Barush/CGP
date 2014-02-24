@@ -26,17 +26,18 @@
 using namespace std;
 
 #define CONSTCOUNT 4
+#define MAXFIT 400
 
 //Possible operations in CGP matrix, will be modified from program input
 typedef enum function {
 	MUL = 0,
-	DIV,
-	PLUS,
-	MINUS,
-	POW,
-	SIN,
-	COS,
-	CONST
+	DIV,	//1
+	PLUS,	//2
+	MINUS,	//3
+	POW,	//4
+	SIN,	//5
+	COS,	//6
+	CONST 	//7
 }TFunction;
 
 typedef enum constants {
@@ -80,6 +81,11 @@ typedef struct individual{
 	double value;
 	int fitness;
 }TIndividual;
+
+typedef struct data{
+	double** data;
+	int dataCount;
+}TData;
 
 //struct for recursive descent
 typedef struct stackItem {

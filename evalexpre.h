@@ -15,5 +15,5 @@
 /******************* FUNCTION PROTOTYPES ***************************************/
 void getActiveNodes(TIndividual* geneticArray, TCgpProperties* geneticP);
 void getValue(TIndividual* geneticArray, TCgpProperties* geneticP, double* dataArray);
-void resetFitness(TIndividual* geneticArray, TCgpProperties* geneticP);
+void resetFitness_ActiveNodes(TIndividual* geneticArray, TCgpProperties* geneticP);
 void getFitness(TIndividual* geneticArray, TCgpProperties* geneticP, double* dataArray);

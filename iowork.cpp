@@ -321,7 +321,6 @@ void getNextData(FILE* data, double* dataArray, int ioCount){
 	char num[20];
 	char c;
 
-//	cout << "iowork@308: got into while" << endl;
 	while((c = fgetc(data)) != '\n'){
 		if(c == ' '){
 			if(j < ioCount){
@@ -340,7 +339,6 @@ void getNextData(FILE* data, double* dataArray, int ioCount){
 			i++;
 		}
 	}
-//	cout << "iowork@327: got out of while" << endl;
 
 	// store the last number of a line - 'while' ended with endl
 	if(j < ioCount){
@@ -352,4 +350,29 @@ void getNextData(FILE* data, double* dataArray, int ioCount){
 	}
 
 	return;
+}
+
+TData* getData(char* filename, TCgpProperties* geneticP){	
+	FILE* data;						//input file
+	TData* input = (TData*)malloc(sizeof(struct data));
+
+	// open the data source file
+	if((data = fopen(filename, "r")) == NULL){
+		cerr << "Error in opening file: " << filename << endl;
+		exit(1);
+	}
+
+	input->dataCount = getDataCount(data);
+	input->data = (double**)malloc(input->dataCount * sizeof(double*));
+
+	for(int i = 0; i < input->dataCount; i++){
+		input->data[i] = (double*)malloc((geneticP->inCount + geneticP->outCount) * sizeof(double));
+	}
+
+	for(int i = 0; i < input->dataCount; i++){
+		getNextData(data, input->data[i], geneticP->inCount + geneticP->outCount);
+	}
+
+	fclose(data);
+	return input;
 }
