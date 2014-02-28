@@ -37,6 +37,7 @@ void getParents(TIndividual** geneticArray, TCgpProperties* geneticP){
 	TIndividual* parent;
 
 	for(int i = 0; i < geneticP->individCount; i++){
+		cerr << (*geneticArray)[i].fitness << " ";
 		if((*geneticArray)[i].fitness > max){
 			max = (*geneticArray)[i].fitness;
 			parent = &((*geneticArray)[i]);
@@ -48,14 +49,99 @@ void getParents(TIndividual** geneticArray, TCgpProperties* geneticP){
 		}
 	}
 
+	cerr << "->" << parent->fitness << endl;
+
 	copyGenotype(parent, &(*geneticArray)[0], geneticP);
+}
+
+void changeGenes(TIndividual* genotype, TCgpProperties* geneticP){
+	//generate percent - 3-10
+	double percent = ((rand() % 7) + 3.5) / 100;	//uniform(3,10) + 0.5 for the round corection
+	int nodesCount = geneticP->rows * geneticP->cols;
+	int index, row, col, part;
+
+	for(int i = 0; i < (percent * (nodesCount * (geneticP->compInCount + 1))); i++){
+		//which gene is to change
+		index = rand() % nodesCount;
+		row = index % geneticP->rows;
+		col = index / geneticP->rows;
+		part = (int)(rand() % geneticP->compInCount + 0.5); // 0=input1, 1=input2, 2=function
+
+		//change the gene
+		if(index == nodesCount){
+			//changing the output fnc
+			genotype->output->input1 = rand() % nodesCount;
+		}
+		else{
+
+			//changing some of nodes
+			if(part == 2){
+				int prevFnc = genotype->CgpProgram[row][col].function;
+				//changing the function
+				genotype->CgpProgram[row][col].function = rand() % geneticP->functionCount;
+				if(genotype->CgpProgram[row][col].function == CONST){
+					//correction needed for constants
+					genotype->CgpProgram[row][col].input1 = rand() % CONSTCOUNT;
+				}
+				else if(prevFnc == CONST){
+					//input1 corrections
+					if(geneticP->l_back < col){
+						genotype->CgpProgram[row][col].input1 = (rand() % (geneticP->rows * geneticP->l_back)) + 
+							((col - geneticP->l_back) * geneticP->rows) + geneticP->inCount;
+					}
+					else{
+						genotype->CgpProgram[row][col].input1 = rand() % (col * geneticP->rows + geneticP->inCount);
+					}
+				}
+			}
+
+			else if(part < 2){
+				//changing input1 or input2
+				if((genotype->CgpProgram[row][col].function == CONST) && (part == 0)){
+					//node function is const
+					genotype->CgpProgram[row][col].input1 = rand() % CONSTCOUNT;
+				}
+				else if(geneticP->l_back < col){
+					//lback is in use
+					if(part == 0){
+						//changing input1
+						genotype->CgpProgram[row][col].input1 = (rand() % (geneticP->rows * geneticP->l_back)) + 
+							((col - geneticP->l_back) * geneticP->rows) + geneticP->inCount;
+					}
+					else{
+						//changing input2
+						genotype->CgpProgram[row][col].input2 = (rand() % (geneticP->rows * geneticP->l_back)) + 
+							((col - geneticP->l_back) * geneticP->rows) + geneticP->inCount;
+					}
+				}
+				else{
+					//lback not used
+					if(part == 0){
+						genotype->CgpProgram[row][col].input1 = rand() % (col * geneticP->rows + geneticP->inCount);
+					}
+					else{
+						genotype->CgpProgram[row][col].input2 = rand() % (col * geneticP->rows + geneticP->inCount);
+					}
+				}
+			}
+		}
+	}
+}
+
+void createChildren(TIndividual** geneticArray, TCgpProperties* geneticP){
+	for(int i = 1; i < geneticP->individCount; i++){
+		//copy parent
+		copyGenotype(&(*geneticArray)[0], &(*geneticArray)[i], geneticP);
+		//change 3-10% of genes
+		changeGenes(&(*geneticArray)[i], geneticP);
+	}
 }
 
 void evolutionStep(TData* input, TCgpProperties* geneticP, TIndividual** geneticArray){
 
 	resetFitness_ActiveNodes(*geneticArray, geneticP);
 	getActiveNodes(*geneticArray, geneticP);
-
+ 
 	for(int i = 0; i < input->dataCount; i++){
 		getValue(*geneticArray, geneticP, input->data[i]);
 		getFitness(*geneticArray, geneticP, input->data[i]);
@@ -65,4 +151,5 @@ void evolutionStep(TData* input, TCgpProperties* geneticP, TIndividual** genetic
 	getParents(geneticArray, geneticP);
 
 	//create new generation
+	createChildren(geneticArray, geneticP);
 }

@@ -40,7 +40,7 @@ void getActiveNodes(TIndividual* geneticArray, TCgpProperties* geneticP){
 
 		//initialize a stack
 		myStack.push(geneticArray[i].output->input1);
-		solved->at(geneticArray[i].output->input1) = true;
+		solved->at(geneticArray[i].output->input1 - geneticP->inCount) = true;
 		while(!myStack.empty()){
 			//get the index of actual node
 			actualCell = myStack.top();
