@@ -50,6 +50,10 @@ void getParents(TIndividual** geneticArray, TCgpProperties* geneticP){
 	}
 
 	cerr << "->" << parent->fitness << endl;
+	for(int i = 0; i < geneticP->individCount; i++){
+		printResult(&(*geneticArray)[i], geneticP);
+		printReadableResult(&(*geneticArray)[i], geneticP);
+	}
 
 	copyGenotype(parent, &(*geneticArray)[0], geneticP);
 }

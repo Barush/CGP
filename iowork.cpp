@@ -18,8 +18,8 @@
 #define OUTCOUNT 1
 #define COMPINCOUNT 2
 #define FUNCTIONCOUNT 8
-#define ROW 16
-#define COL 10
+#define ROW 1
+#define COL 3
 #define L_BACK 20
 #define GENER 5
 
