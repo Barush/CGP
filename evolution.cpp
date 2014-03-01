@@ -46,6 +46,9 @@ void getParents(TIndividual** geneticArray, TCgpProperties* geneticP){
 			if((*geneticArray)[i].activeNodesCount < parent->activeNodesCount){
 				parent = &((*geneticArray)[i]);
 			}
+			else if(i > 0){
+				parent = &((*geneticArray)[i]);
+			}
 		}
 	}
 
@@ -144,10 +147,10 @@ void createChildren(TIndividual** geneticArray, TCgpProperties* geneticP){
 void evolutionStep(TData* input, TCgpProperties* geneticP, TIndividual** geneticArray){
 
 	resetFitness_ActiveNodes(*geneticArray, geneticP);
-	getActiveNodes(*geneticArray, geneticP);
+	getActiveNodes(geneticArray, geneticP);
  
 	for(int i = 0; i < input->dataCount; i++){
-		getValue(*geneticArray, geneticP, input->data[i]);
+		getValue(geneticArray, geneticP, input->data[i]);
 		getFitness(*geneticArray, geneticP, input->data[i]);
 	}
 

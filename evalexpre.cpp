@@ -13,69 +13,52 @@
 #include "evalexpre.h"
 
 /***********************************************************************
-	Function getActiveNodes - makes recursive descent on whole generation
+	Function getActiveNodes - makes marking of active nodes on whole generation
 	and fills the activeNodes vector of each genotype and counts active 
 	nodes into activeNodesCount
 	Takes parameters:
 		@geneticArray - pointer to an array of whole generation
 		@geneticP - pointer to a structure of params of CGP
 ***********************************************************************/
-void getActiveNodes(TIndividual* geneticArray, TCgpProperties* geneticP){
-	stack<int> myStack;		//recursive descent stack
-	TCell tmpCell;
-	int actualCell, row, col;
-	vector<bool> *solved  = new vector<bool>(geneticP->cols*geneticP->rows);
-
-	//initialize the solved vector
-	for(int i = 0; i < (geneticP->rows * geneticP->cols); i++){
-		solved->at(i) = false;
-	}
-
-	for(int i = 0; i < geneticP->individCount; i++){
-		//for all genotypes
-		for(int j = 0; j < (geneticP->rows * geneticP->cols); j++){
-			//set all nodes to inactive
-			geneticArray[i].activeNodes->at(j) = false;
+void getActiveNodes(TIndividual** geneticArray, TCgpProperties* geneticP){
+	for(int ind = 0; ind < geneticP->individCount; ind++){		
+		//reset activenodes vector
+		for(int i = 0; i < (geneticP->cols * geneticP->rows); i++){
+			(*geneticArray)[ind].activeNodes->at(i) = false;
 		}
 
-		//initialize a stack
-		myStack.push(geneticArray[i].output->input1);
-		solved->at(geneticArray[i].output->input1 - geneticP->inCount) = true;
-		while(!myStack.empty()){
-			//get the index of actual node
-			actualCell = myStack.top();
-			myStack.pop();
-			//control for primary inputs
-			if(actualCell < geneticP->inCount)
-				continue;
-			//index correction
-			actualCell -= geneticP->inCount;
-			//set actual node as active
-			geneticArray[i].activeNodes->at(actualCell) = true;	
-			geneticArray[i].activeNodesCount++;
-			//set temp variables	
-			col = (actualCell) / geneticP->rows;
-			row = (actualCell) % geneticP->rows;
-			tmpCell = geneticArray[i].CgpProgram[row][col];
-			//push inputs of actual node
-			if(tmpCell.function != CONST){	
-				//const doesnt have inputs
-				if(!(solved->at(tmpCell.input1))){
-					myStack.push(tmpCell.input1);
-					solved->at(tmpCell.input1) = 1;
-				}
-				if((tmpCell.function != SIN) && (tmpCell.function != COS)){	
-					//sin and cos functions have just one input
-					if(!(solved->at(tmpCell.input2))){
-						myStack.push(tmpCell.input2);
-						solved->at(tmpCell.input2) = 1;
-					}
-				}
-			}//if not const
-		}//while stack is not empty
-	}//for all genotypes
+		//mark output's input as active
+		if((*geneticArray)[ind].output->input1 > geneticP->inCount){
+			(*geneticArray)[ind].activeNodes->
+				at((*geneticArray)[ind].output->input1 - geneticP->inCount) = true;
+		}
 
-	return;
+		for(int i = (geneticP->cols - 1); i >= 0; i--){
+			for(int j = 0; j < geneticP->rows; j++){
+				if((*geneticArray)[ind].activeNodes->at(i*geneticP->rows + j)){	
+				//if node[i][j] is active	
+					if((*geneticArray)[ind].CgpProgram[j][i].function != CONST){			
+					//if node is const --> continue
+						if((*geneticArray)[ind].CgpProgram[j][i].input1 >= geneticP->inCount){
+						//if input1 is not primary
+							(*geneticArray)[ind].activeNodes->
+								at((*geneticArray)[ind].CgpProgram[j][i].input1 - geneticP->inCount) = true;							
+						}
+						if(((*geneticArray)[ind].CgpProgram[j][i].function != SIN) &&
+							((*geneticArray)[ind].CgpProgram[j][i].function != COS)){
+						//if node is SIN/COS, it has one input
+							if((*geneticArray)[ind].CgpProgram[j][i].input2 >= geneticP->inCount){
+							//if input2 is not primary
+								(*geneticArray)[ind].activeNodes->
+									at((*geneticArray)[ind].CgpProgram[j][i].input2 - geneticP->inCount) = true;							
+							}
+						}
+
+					}//if node is not a constant
+				}//if node is active
+			}//for all rows
+		}//for all columns
+	}//for all individuals
 }
 
 /***********************************************************************
@@ -86,76 +69,68 @@ void getActiveNodes(TIndividual* geneticArray, TCgpProperties* geneticP){
 		@geneticP - pointer to a structure of params of CGP
 		@dataArray - pointer to an array of one line of input file
 ***********************************************************************/
-void getValue(TIndividual* geneticArray, TCgpProperties* geneticP, double* dataArray){
-	int row, col;
-	double compIn1 = 0, compIn2 = 0;
+void getValue(TIndividual** geneticArray, TCgpProperties* geneticP, double* dataArray){
+	vector<double> *values = new vector<double>(geneticP->rows * geneticP->cols);
+	double op1, op2;
+	int func;
 
-	for(int i = 0; i < geneticP->individCount; i++){
-		vector<double> *values = new vector<double>(geneticP->rows * geneticP->cols);
-		//for all nodes
-		for(int j = 0; j < (geneticP->rows * geneticP->cols); j++){
-			row = j % geneticP->rows;
-			col = j / geneticP->rows;
-			//if node j is active
-			if(geneticArray[i].activeNodes->at(j)){
-				geneticP->countedNodes++;
-				if(geneticArray[i].CgpProgram[row][col].function == CONST){
-					compIn1 = geneticArray[i].CgpProgram[row][col].input1;
-				}
-				else {
-					//first input
-					if(geneticArray[i].CgpProgram[row][col].input1 < geneticP->inCount){
-						//from primary input
-						compIn1 = dataArray[geneticArray[i].CgpProgram[row][col].input1];					
-					}
-					else{
-						//from previous node
-						compIn1 = values->at(geneticArray[i].CgpProgram[row][col].input1 - geneticP->inCount);
-					}
+	for(int ind = 0; ind < geneticP->individCount; ind++){
+		for(int i = 0; i < geneticP->cols; i++){
+			for(int j = 0; j < geneticP->rows; j++){
+				if((*geneticArray)[ind].activeNodes->at(i*geneticP->rows + j)){
+				//if node is active
+					func = (*geneticArray)[ind].CgpProgram[j][i].function;
 
-					//second input
-					if(geneticArray[i].CgpProgram[row][col].input2 < geneticP->inCount){
-						//from primary input
-						compIn2 = dataArray[geneticArray[i].CgpProgram[row][col].input2];
+					//get inputs
+					if(func == CONST){
+						op1 = geneticP->constants[(*geneticArray)[ind].CgpProgram[j][i].input1];
 					}
 					else {
-						//from previous node
-						compIn2 = values->at(geneticArray[i].CgpProgram[row][col].input2 - geneticP->inCount);
+						if((*geneticArray)[ind].CgpProgram[j][i].input1 >= geneticP->inCount){
+							op1 = values->at((*geneticArray)[ind].CgpProgram[j][i].input1 - geneticP->inCount);
+						}
+						else{
+							op1 = dataArray[(*geneticArray)[ind].CgpProgram[j][i].input1];
+						}	
+						if((func != SIN) && (func != COS)){
+						//sin and cos have one input
+							if((*geneticArray)[ind].CgpProgram[j][i].input2 >= geneticP->inCount){
+								op2 = values->at((*geneticArray)[ind].CgpProgram[j][i].input2 - geneticP->inCount);
+							}
+							else{
+								op2 = dataArray[(*geneticArray)[ind].CgpProgram[j][i].input2];
+							}		
+						}
 					}
-				}
 
-				switch (geneticArray[i].CgpProgram[row][col].function) {
-					case MUL:	values->at(j) = compIn1 * compIn2;
-								break;
-					case DIV:	if(compIn2 == 0){
-									values->at(j) = 1;
-								}
-								else{
-									values->at(j) = compIn1 / compIn2;
-								}
-								break;
-					case PLUS:	values->at(j) = compIn1 + compIn2;
-								break;
-					case MINUS: values->at(j) = compIn1 - compIn2;
-								break;
-					case POW:	values->at(j) = pow(compIn1, compIn2);
-								break;
-					case SIN: 	values->at(j) = sin(compIn1);
-								break;
-					case COS:	values->at(j) = cos(compIn1);
-								break;
-					case CONST:	values->at(j) = geneticP->constants[(int)(compIn1)];
-								break;
-				} //switch
+					//count value
+					switch(func){
+						case MUL:	values->at(i*geneticP->rows + j) = op1 * op2;
+									break;
+						case DIV:	if(op2 != 0)
+										values->at(i*geneticP->rows + j) = op1 / op2;
+									else
+										values->at(i*geneticP->rows + j) = 1;
+									break;
+						case PLUS:	values->at(i*geneticP->rows + j) = op1 + op2;
+									break;
+						case MINUS: values->at(i*geneticP->rows + j) = op1 - op2;
+									break;
+						case POW:	values->at(i*geneticP->rows + j) = pow(op1, op2);
+									break;
+						case SIN:	values->at(i*geneticP->rows + j) = sin(op1);
+									break;
+						case COS:	values->at(i*geneticP->rows + j) = cos(op1);
+									break;
+						case CONST: values->at(i*geneticP->rows + j) = op1;
+									break;
+					}
 
-			} // if node j is active
-			geneticArray[i].value = values->at(geneticArray[i].output->input1 - geneticP->inCount);
-			//cerr << geneticArray[i].value << endl;
-		} //for all nodes
-		delete(values);
-	} //for all genotypes
-
-	return;
+				}//if node is active
+			}//for all rows
+		}//for all columns		
+		(*geneticArray)[ind].value = values->at((*geneticArray)[ind].output->input1 - geneticP->inCount);
+	}//for all genotypes
 }
 
 /***********************************************************************
@@ -166,12 +141,10 @@ void getValue(TIndividual* geneticArray, TCgpProperties* geneticP, double* dataA
 		@geneticP - pointer to a structure of params of CGP
 ***********************************************************************/
 void resetFitness_ActiveNodes(TIndividual* geneticArray, TCgpProperties* geneticP){
-	for(int i = 0; i < geneticP->individCount; i++){
-		geneticArray[i].fitness = 0;
-		geneticArray[i].activeNodesCount = 0;
+	for(int ind = 0; ind < geneticP->individCount; ind++){
+		geneticArray[ind].fitness = 0;
+		geneticArray[ind].activeNodesCount = 0;
 	}
-
-	return;
 }
 
 /***********************************************************************
@@ -183,12 +156,8 @@ void resetFitness_ActiveNodes(TIndividual* geneticArray, TCgpProperties* genetic
 		@dataArray - one line of data input
 ***********************************************************************/
 void getFitness(TIndividual* geneticArray, TCgpProperties* geneticP, double* dataArray){
-	for(int i = 0; i < geneticP->individCount; i++){
-		if(abs(geneticArray[i].value - dataArray[geneticP->inCount]) < 0.5){
-			//cerr << i << "(" << geneticArray[i].fitness << "): " << geneticArray[i].value << " = " << dataArray[geneticP->inCount] << endl;
-			geneticArray[i].fitness++; //HIT
-		}
-	}//for all fenotypes
-
-	return;
+	for(int ind = 0; ind < geneticP->individCount; ind++){
+		if(abs(geneticArray[ind].value - dataArray[geneticP->inCount]) <= 1.0)
+			geneticArray[ind].fitness++;
+	}
 }
