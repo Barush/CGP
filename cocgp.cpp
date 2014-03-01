@@ -16,8 +16,6 @@
 #include "creategen.h"
 #include "evolution.h"
 
-int lastFit = 0;
-
 int main(int argc, char** argv){
 
 	if(!strcmp(argv[1], "-h")){
@@ -28,6 +26,7 @@ int main(int argc, char** argv){
 
 	TIndividual* geneticArray;		//array for one generation
 	TCgpProperties* geneticParams;	//parameters of CGP
+	TData* input;					//matrix of input-output data
 
 	// TODO: make argv controls
 
@@ -35,9 +34,10 @@ int main(int argc, char** argv){
 	geneticParams = getParams(argv, argc);
 	geneticArray = createGeneration(geneticParams);
 
-	geneticArray = evolutionStep(argv[1], geneticParams, geneticArray, false);
+	input = getData(argv[1], geneticParams);
+
 	for(int i = 0; i < 100000; i++){
-		geneticArray = evolutionStep(argv[1], geneticParams, geneticArray, true);
+		evolutionStep(input, geneticParams, &geneticArray);
 		//cout << "got out of evolution step" << endl;
 
 		if(!(i%100))
@@ -53,7 +53,7 @@ int main(int argc, char** argv){
 	            printResult(&geneticArray[i], geneticParams);
 	    }		
 	}*/
-	TIndividual* solution = getParents(geneticParams, geneticArray);
+	TIndividual* solution = &(geneticArray[0]);
 	printResult(solution, geneticParams);
 	printReadableResult(solution, geneticParams);
 	cerr << "Counted nodes: " << geneticParams->countedNodes << endl;
