@@ -15,6 +15,7 @@
 #include "iowork.h"
 #include "creategen.h"
 #include "evolution.h"
+#include "coevolution.h"
 
 int main(int argc, char** argv){
 
@@ -36,11 +37,14 @@ int main(int argc, char** argv){
 
 	input = getData(argv[1], geneticParams);
 
-	for(int i = 0; i < 100; i++){
+	pthread_t *coevolution_var;
+	pthread_create(coevolution_var, NULL, coevolution, NULL);
+
+	for(int i = 0; i < 100000; i++){
 		evolutionStep(input, geneticParams, &geneticArray);
 		//cout << "got out of evolution step" << endl;
 
-		if(!(i%10))
+		if(!(i%100))
 			cout << i << " " << geneticArray[0].fitness << endl;
 		if(geneticArray[0].fitness == 400){
 			cout << i + 1 << " 400" << endl;

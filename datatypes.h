@@ -23,6 +23,14 @@
 #include <string>
 #include <cmath>
 
+#define _POSIX_C_SOURCE 199500L
+#include <limits.h>
+#ifdef _POSIX_THREADS
+#include <pthread.h>
+#else
+#error "POSIX threads are not available"
+#endif
+
 using namespace std;
 
 #define CONSTCOUNT 4

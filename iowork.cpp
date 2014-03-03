@@ -136,7 +136,7 @@ void expandNode(TStackItem** tmp, TIndividual* result, TStackItem** stack, TCgpP
 	}
 	else {
 		op1->isTerm = NONTERM;
-		//op1->printable = strdup("nonterm");
+		op1->printable = strdup("nonterm");
 	}
 	op1->value = result->CgpProgram[row][col].input1;
 
@@ -171,7 +171,7 @@ void expandNode(TStackItem** tmp, TIndividual* result, TStackItem** stack, TCgpP
 	}
 	else{
 		op2->isTerm = NONTERM;
-		//op2->printable = strdup("nonterm");
+		op2->printable = strdup("nonterm");
 	}
 	op2->value = result->CgpProgram[row][col].input2;
 
@@ -319,6 +319,8 @@ int getDataCount(FILE* data){
 	int count, i = 0;
 	char line[20], c;
 
+	memset(line, 0, 20);
+
 	//cout << "iowork@291: got into while" << endl;
   	while((c = fgetc(data)) != '\n'){
 		line[i] = c;
@@ -333,8 +335,9 @@ int getDataCount(FILE* data){
 void getNextData(FILE* data, double* dataArray, int ioCount){
 	int i = 0;
 	int j = 0;
-	char num[20];
+	char num[20] = { 0 };
 	char c;
+
 
 	while((c = fgetc(data)) != '\n'){
 		if(c == ' '){

@@ -6,9 +6,9 @@
 # Vytvoreno: brezen 2013
 ######################################
 
-CPPFLAGS = --std=c++98 -Wall -pedantic -g -lm
+CPPFLAGS = --std=c++98 -Wall -pedantic -g -lm -pthread
 CC = g++ $(CPPFLAGS)
-OBJ = creategen.o iowork.o evalexpre.o evolution.o
+OBJ = creategen.o iowork.o evalexpre.o evolution.o coevolution.o
 
 executable: cocgp generateData
 
@@ -29,6 +29,9 @@ evalexpre.o: evalexpre.h evalexpre.cpp
 
 evolution.o: evolution.h evolution.cpp
 	$(CC) -c evolution.cpp
+
+coevolution.o: coevolution.h coevolution.cpp
+	$(CC) -c coevolution.cpp
 
 run:
 	./cocgp testdata.txt -c 5 -r 3 2>err.txt
