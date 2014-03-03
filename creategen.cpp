@@ -81,6 +81,7 @@ TIndividual* createGeneration(TCgpProperties* geneticP){
 void destroyGeneration(TIndividual** geneticArray, TCgpProperties* geneticP){
 	for(int i = 0; i < geneticP->individCount; i++){
 		for(int j = 0; j < geneticP->rows; j++){
+			//destroy each line
 			free((*geneticArray)[i].CgpProgram[j]);
 		}
 		free((*geneticArray)[i].CgpProgram);

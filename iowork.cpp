@@ -136,7 +136,7 @@ void expandNode(TStackItem** tmp, TIndividual* result, TStackItem** stack, TCgpP
 	}
 	else {
 		op1->isTerm = NONTERM;
-		op1->printable = strdup("nonterm");
+		//op1->printable = strdup("nonterm");
 	}
 	op1->value = result->CgpProgram[row][col].input1;
 
@@ -171,7 +171,7 @@ void expandNode(TStackItem** tmp, TIndividual* result, TStackItem** stack, TCgpP
 	}
 	else{
 		op2->isTerm = NONTERM;
-		op2->printable = strdup("nonterm");
+		//op2->printable = strdup("nonterm");
 	}
 	op2->value = result->CgpProgram[row][col].input2;
 
@@ -192,12 +192,17 @@ void expandNode(TStackItem** tmp, TIndividual* result, TStackItem** stack, TCgpP
 		if(op1->next != NULL){
 			op1->next->prev = op1;
 		}
+		free(lBracket->printable);
 		free(lBracket);
+		free(rBracket->printable);
 		free(rBracket);
+		free(op2->printable);
 		free(op2);
+		free(func->printable);
 		free(func);	
 		if((*tmp) == (*stack))
 			(*stack) = op1;
+		free((*tmp)->printable);
 		free((*tmp));
 		(*tmp) = op1;
 	}
@@ -216,9 +221,11 @@ void expandNode(TStackItem** tmp, TIndividual* result, TStackItem** stack, TCgpP
 		if(rBracket->next != NULL){
 			rBracket->next->prev = rBracket;
 		}
+		free(op2->printable);
 		free(op2);			
 		if((*tmp) == (*stack))
 			(*stack) = func;
+		free((*tmp)->printable);
 		free((*tmp));
 		(*tmp) = rBracket;
 	}
@@ -241,6 +248,7 @@ void expandNode(TStackItem** tmp, TIndividual* result, TStackItem** stack, TCgpP
 		}	
 		if((*tmp) == (*stack))
 			(*stack) = lBracket;
+		free((*tmp)->printable);
 		free((*tmp));
 		(*tmp) = rBracket;
 	}
@@ -274,6 +282,13 @@ void printReadableResult(TIndividual* result, TCgpProperties* geneticP){
 	}
 	cerr << endl;
 
+	TStackItem *pom, *tmp;
+	for(tmp = stack; tmp->next != NULL;){
+		pom = tmp;
+		tmp = tmp->next;
+		free(pom);
+	}
+	free(tmp);
 	return;
 }
 
@@ -375,4 +390,12 @@ TData* getData(char* filename, TCgpProperties* geneticP){
 
 	fclose(data);
 	return input;
+}
+
+void destroyData(TData* input){
+	for(int i = 0; i < input->dataCount; i++){
+		free(input->data[i]);
+	}
+	free(input->data);
+	free(input);
 }

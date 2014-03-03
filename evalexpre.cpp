@@ -131,6 +131,8 @@ void getValue(TIndividual** geneticArray, TCgpProperties* geneticP, double* data
 		}//for all columns		
 		(*geneticArray)[ind].value = values->at((*geneticArray)[ind].output->input1 - geneticP->inCount);
 	}//for all genotypes
+
+	delete(values);
 }
 
 /***********************************************************************

@@ -36,11 +36,11 @@ int main(int argc, char** argv){
 
 	input = getData(argv[1], geneticParams);
 
-	for(int i = 0; i < 100000; i++){
+	for(int i = 0; i < 100; i++){
 		evolutionStep(input, geneticParams, &geneticArray);
 		//cout << "got out of evolution step" << endl;
 
-		if(!(i%100))
+		if(!(i%10))
 			cout << i << " " << geneticArray[0].fitness << endl;
 		if(geneticArray[0].fitness == 400){
 			cout << i + 1 << " 400" << endl;
@@ -59,6 +59,7 @@ int main(int argc, char** argv){
 	cerr << "Counted nodes: " << geneticParams->countedNodes << endl;
 
     destroyGeneration(&geneticArray, geneticParams);
+    destroyData(input);
     free(geneticParams);
 	return EXIT_SUCCESS;
 } 
