@@ -17,7 +17,7 @@ void* coevolution(void *arg){
 	cout << "Im in the coevolution thread" << endl;
 	int i = 0;
 	while(1){
-		sleep(10);
+		sleep(1);
 		if(i == 10){
 			return NULL;
 		}

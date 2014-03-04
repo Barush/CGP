@@ -37,7 +37,7 @@ void getParents(TIndividual** geneticArray, TCgpProperties* geneticP){
 	TIndividual* parent;
 
 	for(int i = 0; i < geneticP->individCount; i++){
-		cerr << (*geneticArray)[i].fitness << " ";
+		//cerr << (*geneticArray)[i].fitness << " ";
 		if((*geneticArray)[i].fitness > max){
 			max = (*geneticArray)[i].fitness;
 			parent = &((*geneticArray)[i]);
@@ -52,7 +52,7 @@ void getParents(TIndividual** geneticArray, TCgpProperties* geneticP){
 		}
 	}
 
-	cerr << "->" << parent->fitness << endl;
+	//cerr << "->" << parent->fitness << endl;
 	/*for(int i = 0; i < geneticP->individCount; i++){
 		printResult(&(*geneticArray)[i], geneticP);
 		printReadableResult(&(*geneticArray)[i], geneticP);
