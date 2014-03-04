@@ -40,11 +40,11 @@ int main(int argc, char** argv){
 	pthread_t *coevolution_var;
 	pthread_create(coevolution_var, NULL, coevolution, NULL);
 
-	for(int i = 0; i < 100000; i++){
+	for(int i = 0; i < 100; i++){
 		evolutionStep(input, geneticParams, &geneticArray);
 		//cout << "got out of evolution step" << endl;
 
-		if(!(i%100))
+		if(!(i%10))
 			cout << i << " " << geneticArray[0].fitness << endl;
 		if(geneticArray[0].fitness == 400){
 			cout << i + 1 << " 400" << endl;

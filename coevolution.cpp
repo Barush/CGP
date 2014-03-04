@@ -13,7 +13,7 @@
 #include "coevolution.h"
 #include <unistd.h>
 
-void* coevolution(){
+void* coevolution(void *arg){
 	cout << "Im in the coevolution thread" << endl;
 	int i = 0;
 	while(1){

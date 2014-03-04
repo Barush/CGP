@@ -22,7 +22,9 @@
 #include <stack>
 #include <string>
 #include <cmath>
+#include <pthread.h>
 
+/*
 #define _POSIX_C_SOURCE 199500L
 #include <limits.h>
 #ifdef _POSIX_THREADS
@@ -30,7 +32,7 @@
 #else
 #error "POSIX threads are not available"
 #endif
-
+*/
 using namespace std;
 
 #define CONSTCOUNT 4

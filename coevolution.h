@@ -12,4 +12,4 @@
 
 #include "datatypes.h"
 
-void* coevolution();
+void* coevolution(void *arg);
