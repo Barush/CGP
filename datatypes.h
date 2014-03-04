@@ -110,3 +110,7 @@ typedef struct indivList {
 	TIndividual* node;
 	struct indivList* next;
 }TIndivList;
+
+typedef struct shared{
+	bool end;
+}TShared;

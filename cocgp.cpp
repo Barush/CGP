@@ -17,6 +17,23 @@
 #include "evolution.h"
 #include "coevolution.h"
 
+#include<sys/mman.h>
+#include<sys/stat.h>
+#include<fcntl.h>
+#include<unistd.h>
+#include<sys/types.h>
+
+TShared* memoryInit(){
+	TShared* mem = NULL;
+	int descriptor;
+
+	descriptor = shm_open("ending", O_RDWR|O_CREAT, 0600);
+	ftruncate(descriptor, sizeof(TShared));
+	mem = mmap(NULL, sizeof(TShared), PROT_READ|PROT_WRITE, MAP_SHARED,descriptor, 0);
+	
+	return mem;
+}
+
 int main(int argc, char** argv){
 
 	if(!strcmp(argv[1], "-h")){
@@ -37,6 +54,8 @@ int main(int argc, char** argv){
 
 	input = getData(argv[1], geneticParams);
 
+	TShared* memory;
+	memory = memoryInit();
 	pthread_t coevolution_var;
 	pthread_create(&coevolution_var, NULL, coevolution, NULL);
 
