@@ -23,20 +23,18 @@
 #include <string>
 #include <cmath>
 #include <pthread.h>
+#include <time.h>
+#include <sys/time.h>
+#include <sys/resource.h>
+#include <sys/types.h>
 
-
-#define _POSIX_C_SOURCE 199500L
-#include <limits.h>
-#ifdef _POSIX_THREADS
-#include <pthread.h>
-#else
-#error "POSIX threads are not available"
-#endif
+#define _XOPEN_SOURCE
+#define _POSIX_SOURCE
+#define _GNU_SOURCE
 
 using namespace std;
 
 #define CONSTCOUNT 4
-#define MAXFIT 400
 
 //Possible operations in CGP matrix, will be modified from program input
 typedef enum function {
@@ -47,7 +45,9 @@ typedef enum function {
 	POW,	//4
 	SIN,	//5
 	COS,	//6
-	CONST 	//7
+	CONST, 	//7
+	LOG,	//8
+	ABS		//9
 }TFunction;
 
 typedef enum constants {
@@ -78,6 +78,7 @@ typedef struct cgpProperties {
 	int cols;			//count of columns in the matrix
 	int l_back; 		//l-back param of the matrix
 	int individCount;	//count of individuals in the generation
+	double fitToleration;
 	double constants[CONSTCOUNT];
 	double countedNodes;
 }TCgpProperties;
@@ -112,5 +113,6 @@ typedef struct indivList {
 }TIndivList;
 
 typedef struct shared{
+	pthread_mutex_t end_sem;
 	bool end;
 }TShared;

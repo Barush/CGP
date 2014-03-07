@@ -6,7 +6,7 @@
 # Vytvoreno: brezen 2013
 ######################################
 
-CPPFLAGS = --std=c++98 -Wall -pedantic -g -lm -pthread
+CPPFLAGS = --std=c++98 -Wall -pedantic -g -lm -lpthread -pthread
 CC = g++ $(CPPFLAGS)
 OBJ = creategen.o iowork.o evalexpre.o evolution.o coevolution.o
 
@@ -34,7 +34,7 @@ coevolution.o: coevolution.h coevolution.cpp
 	$(CC) -c coevolution.cpp
 
 run:
-	./cocgp testdata.txt -c 5 -r 3 
+	./cocgp testdata.txt 
 
 clean: 
 	rm -f *.o

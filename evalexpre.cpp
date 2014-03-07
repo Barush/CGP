@@ -45,7 +45,9 @@ void getActiveNodes(TIndividual** geneticArray, TCgpProperties* geneticP){
 								at((*geneticArray)[ind].CgpProgram[j][i].input1 - geneticP->inCount) = true;							
 						}
 						if(((*geneticArray)[ind].CgpProgram[j][i].function != SIN) &&
-							((*geneticArray)[ind].CgpProgram[j][i].function != COS)){
+							((*geneticArray)[ind].CgpProgram[j][i].function != COS) &&
+							((*geneticArray)[ind].CgpProgram[j][i].function != LOG) &&
+							((*geneticArray)[ind].CgpProgram[j][i].function != ABS)){
 						//if node is SIN/COS, it has one input
 							if((*geneticArray)[ind].CgpProgram[j][i].input2 >= geneticP->inCount){
 							//if input2 is not primary
@@ -92,7 +94,7 @@ void getValue(TIndividual** geneticArray, TCgpProperties* geneticP, double* data
 						else{
 							op1 = dataArray[(*geneticArray)[ind].CgpProgram[j][i].input1];
 						}	
-						if((func != SIN) && (func != COS)){
+						if((func != SIN) && (func != COS) && (func != LOG) && (func != ABS)){
 						//sin and cos have one input
 							if((*geneticArray)[ind].CgpProgram[j][i].input2 >= geneticP->inCount){
 								op2 = values->at((*geneticArray)[ind].CgpProgram[j][i].input2 - geneticP->inCount);
@@ -122,10 +124,14 @@ void getValue(TIndividual** geneticArray, TCgpProperties* geneticP, double* data
 									break;
 						case COS:	values->at(i*geneticP->rows + j) = cos(op1);
 									break;
+						case LOG:	values->at(i*geneticP->rows + j) = log(op1);
+									break;
+						case ABS:	values->at(i*geneticP->rows + j) = (op1 < 0)?(-op1):(op1);
+									break;
 						case CONST: values->at(i*geneticP->rows + j) = op1;
 									break;
 					}
-
+					geneticP->countedNodes++;
 				}//if node is active
 			}//for all rows
 		}//for all columns		
@@ -159,7 +165,7 @@ void resetFitness_ActiveNodes(TIndividual* geneticArray, TCgpProperties* genetic
 ***********************************************************************/
 void getFitness(TIndividual* geneticArray, TCgpProperties* geneticP, double* dataArray){
 	for(int ind = 0; ind < geneticP->individCount; ind++){
-		if(abs(geneticArray[ind].value - dataArray[geneticP->inCount]) <= 1.0)
+		if(abs(geneticArray[ind].value - dataArray[geneticP->inCount]) <= geneticP->fitToleration)
 			geneticArray[ind].fitness++;
 	}
 }

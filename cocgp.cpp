@@ -17,20 +17,21 @@
 #include "evolution.h"
 #include "coevolution.h"
 
-#include<sys/mman.h>
-#include<sys/stat.h>
-#include<fcntl.h>
-#include<unistd.h>
-#include<sys/types.h>
+#include <sys/mman.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <sys/types.h>
 
 TShared* memoryInit(){
 	TShared* mem = NULL;
 	int descriptor;
-
+/*
 	descriptor = shm_open("ending", O_RDWR|O_CREAT, 0600);
 	ftruncate(descriptor, sizeof(TShared));
 	mem = mmap(NULL, sizeof(TShared), PROT_READ|PROT_WRITE, MAP_SHARED,descriptor, 0);
-	
+	//pthread_mutex_init(mem->end_sem, NULL);
+	*/
 	return mem;
 }
 
@@ -54,19 +55,21 @@ int main(int argc, char** argv){
 
 	input = getData(argv[1], geneticParams);
 
+#ifdef COEVOLUTION
 	TShared* memory;
 	memory = memoryInit();
 	pthread_t coevolution_var;
 	pthread_create(&coevolution_var, NULL, coevolution, NULL);
+#endif
 
-	for(int i = 0; i < 100000; i++){
+	for(int i = 0; i < 1000000; i++){
 		evolutionStep(input, geneticParams, &geneticArray);
 		//cout << "got out of evolution step" << endl;
 
 		if(!(i%100))
 			cout << i << " " << geneticArray[0].fitness << endl;
-		if(geneticArray[0].fitness == 400){
-			cout << i + 1 << " 400" << endl;
+		if(geneticArray[0].fitness == input->dataCount){
+			cout << i + 1 << " " << input->dataCount << endl;
 			break;
 		}
 	}

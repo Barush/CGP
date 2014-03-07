@@ -19,7 +19,7 @@ void* coevolution(void *arg){
 	while(1){
 		sleep(1);
 		if(i == 10){
-			return NULL;
+			return NULL; //np
 		}
 		cout << "Coevolution thread is not sleeping!" << endl;
 		i++;

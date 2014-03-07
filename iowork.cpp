@@ -17,9 +17,9 @@
 #define INCOUNT 1
 #define OUTCOUNT 1
 #define COMPINCOUNT 2
-#define FUNCTIONCOUNT 8
+#define FUNCTIONCOUNT 10
 #define ROW 1
-#define COL 3
+#define COL 20
 #define L_BACK 20
 #define GENER 5
 
@@ -27,7 +27,7 @@ void printUsage(){
 	cout << "COEVOLUTION IN CGP" << endl;
 	cout << "BACHELORS THESIS" << endl;
 	cout << "BARBORA SKRIVANKOVA " << endl;
-	cout << "xskri01@stud.fit.vutbr.cz" << endl;
+	cout << "xskriv01@stud.fit.vutbr.cz" << endl;
 
 	cout << "Usage: " << endl;
 	cout << "./cocgp testfile [-r rows -c cols -l L-back -g generation]" << endl << endl;
@@ -53,6 +53,7 @@ TCgpProperties* getParams(char** argv, int argc){
 	params->l_back = L_BACK;
 	params-> individCount = GENER;
 	params->countedNodes = 0;
+	params->fitToleration = 1.0;
 
 	// set custom changes
 	for(int i = 2; i < argc; i++){
@@ -76,6 +77,15 @@ TCgpProperties* getParams(char** argv, int argc){
 		else if(!strcmp(argv[i], "-g")){
 			i++;
 			params->individCount = atoi(argv[i]);
+		}
+		else if(!strcmp(argv[i], "-t")){
+			i++;
+			stringstream ss(argv[i]);
+			ss >> params->fitToleration;
+		}
+		else if(!strcmp(argv[i], "-i")){
+			i++;
+			params->inCount = atoi(argv[i]);
 		}
 	}
 
@@ -158,6 +168,10 @@ void expandNode(TStackItem** tmp, TIndividual* result, TStackItem** stack, TCgpP
 					break;
 		case COS:	func->printable =  strdup("cos");
 					break;
+		case LOG:	func->printable =  strdup("log");
+					break;
+		case ABS:	func->printable =  strdup("abs");
+					break;
 		case CONST:	func->printable =  strdup("const");
 					break;
 		default: cout << "blbost" << endl;
@@ -206,7 +220,7 @@ void expandNode(TStackItem** tmp, TIndividual* result, TStackItem** stack, TCgpP
 		free((*tmp));
 		(*tmp) = op1;
 	}
-	else if((!strcmp(func->printable,"sin")) || (!strcmp(func->printable, "cos"))){
+	else if((!strcmp(func->printable,"sin")) || (!strcmp(func->printable, "cos") || (!strcmp(func->printable, "log"))){
 		if((*tmp)->prev != NULL){
 			(*tmp)->prev->next = func;
 		}
@@ -228,6 +242,31 @@ void expandNode(TStackItem** tmp, TIndividual* result, TStackItem** stack, TCgpP
 		free((*tmp)->printable);
 		free((*tmp));
 		(*tmp) = rBracket;
+	}
+	else if(!strcmp(func->printable, "abs")){
+		if((*tmp)->prev != NULL){
+			(*tmp)->prev->next = lBracket;
+		}
+		free(lBracket->printable);
+		lBracket->printable = strdup("|");
+		free(rBracket->printable);
+		rBracket->printable = strdup("|");
+		lBracket->prev = (*tmp)->prev;
+		lBracket->next = op1;
+		op1->prev = lBracket;
+		op1->next = rBracket;
+		rBracket->prev = op1;
+		rBracket->next = (*tmp)->next;
+		if(rBracket->next != NULL){
+			rBracket->next->prev = rBracket;
+		}
+		free(op2->printable);
+		free(op2);			
+		if((*tmp) == (*stack))
+			(*stack) = func;
+		free((*tmp)->printable);
+		free((*tmp));
+		(*tmp) = rBracket;		
 	}
 	else {
 		if((*tmp)->prev != NULL){
