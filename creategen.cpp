@@ -24,7 +24,7 @@ TCell** alocateProgram(int row, int col){
 }
 
 //fill in the CGP matrix
-TIndividual* createIndividual(TCgpProperties* geneticP, TIndividual *subject){
+TIndividual* createIndividual(TCgpProperties* geneticP, TIndividual *subject, TFuncAvailable* functions){
 	subject->CgpProgram = alocateProgram(geneticP->rows, geneticP->cols);
 	subject->output = (TCell*)malloc(sizeof(struct cell)); 
 	subject->fitness = 0;
@@ -34,7 +34,7 @@ TIndividual* createIndividual(TCgpProperties* geneticP, TIndividual *subject){
 
 	for(int i = 0; i < geneticP->rows; i++){
 		for(int j = 0; j < geneticP->cols; j++){
-			subject->CgpProgram[i][j].function = rand() % geneticP->functionCount;
+			subject->CgpProgram[i][j].function = functions->funArr[rand() % functions->funCnt];
 			if(subject->CgpProgram[i][j].function == CONST){
 				subject->CgpProgram[i][j].input1 = rand() % CONSTCOUNT;
 				subject->CgpProgram[i][j].input2 = 0;
@@ -67,11 +67,11 @@ TIndividual* createIndividual(TCgpProperties* geneticP, TIndividual *subject){
 }
 
 //create an array of individuals as a generation
-TIndividual* createGeneration(TCgpProperties* geneticP){
+TIndividual* createGeneration(TCgpProperties* geneticP, TFuncAvailable* functions){
 	TIndividual* generation = (TIndividual*)malloc(geneticP->individCount * sizeof(struct individual));
 
 	for(int i = 0; i < geneticP->individCount ; i++){
-		generation[i] = *(createIndividual(geneticP, &(generation[i])));
+		generation[i] = *(createIndividual(geneticP, &(generation[i]), functions));
 	}
 
 	return generation;

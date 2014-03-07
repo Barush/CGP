@@ -220,7 +220,7 @@ void expandNode(TStackItem** tmp, TIndividual* result, TStackItem** stack, TCgpP
 		free((*tmp));
 		(*tmp) = op1;
 	}
-	else if((!strcmp(func->printable,"sin")) || (!strcmp(func->printable, "cos") || (!strcmp(func->printable, "log"))){
+	else if((!strcmp(func->printable,"sin")) || (!strcmp(func->printable, "cos")) || (!strcmp(func->printable, "log"))){
 		if((*tmp)->prev != NULL){
 			(*tmp)->prev->next = func;
 		}
@@ -440,4 +440,76 @@ void destroyData(TData* input){
 	}
 	free(input->data);
 	free(input);
+}
+
+int getFunc(FILE* input){
+	int i = 0;
+	char line[6], c;
+
+	memset(line, 0, 6);
+
+  	while((c = fgetc(input)) != '\n'){
+		line[i] = c;
+		i++;
+	}
+
+	if(!strcmp(line, "PLUS")){
+		return PLUS;
+	}
+	else if(!strcmp(line, "MINUS")){
+		return MINUS;
+	}
+	else if(!strcmp(line, "MUL")){
+		return MUL;
+	}
+	else if(!strcmp(line, "DIV")){
+		return DIV;
+	}
+	else if(!strcmp(line, "POW")){
+		return POW;
+	}
+	else if(!strcmp(line, "SIN")){
+		return SIN;
+	}
+	else if(!strcmp(line, "COS")){
+		return COS;
+	}
+	else if(!strcmp(line, "CONST")){
+		return CONST;
+	}
+	else if(!strcmp(line, "LOG")){
+		return LOG;
+	}
+	else if(!strcmp(line, "ABS")){
+		return ABS;
+	}
+	else{
+		cerr << "Error in the functions file." << endl;
+		exit(1);
+	}
+
+}
+
+TFuncAvailable* getFunctions(char* filename){
+	FILE* input;
+	TFuncAvailable* functions = (TFuncAvailable*)malloc(sizeof(struct funcAvailable));
+
+	if((input = fopen(filename, "r")) == NULL){
+		cerr << "Error in opening file: " << filename << endl;
+		exit(1);
+	}
+
+	functions->funCnt = getDataCount(input);
+	functions->funArr = (int*)malloc(functions->funCnt * sizeof(int));
+
+	for(int i = 0; i < functions->funCnt; i++){
+		functions->funArr[i] = getFunc(input);
+	}
+
+	return functions;
+}
+
+void destroyFunctions(TFuncAvailable* fnc){
+	free(fnc->funArr);
+	free(fnc);
 }

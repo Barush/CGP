@@ -46,12 +46,14 @@ int main(int argc, char** argv){
 	TIndividual* geneticArray;		//array for one generation
 	TCgpProperties* geneticParams;	//parameters of CGP
 	TData* input;					//matrix of input-output data
+	TFuncAvailable* funcAv;
 
 	// TODO: make argv controls
 
 	srand(time(NULL)); // initiate random generator
 	geneticParams = getParams(argv, argc);
-	geneticArray = createGeneration(geneticParams);
+	funcAv = getFunctions(argv[2]);
+	geneticArray = createGeneration(geneticParams, funcAv);
 
 	input = getData(argv[1], geneticParams);
 
@@ -86,6 +88,7 @@ int main(int argc, char** argv){
 
     destroyGeneration(&geneticArray, geneticParams);
     destroyData(input);
+    destroyFunctions(funcAv);
     free(geneticParams);
 	return EXIT_SUCCESS;
 } 

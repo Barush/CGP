@@ -98,6 +98,11 @@ typedef struct data{
 	int dataCount;
 }TData;
 
+typedef struct funcAvailable{
+	int* funArr;
+	int funCnt;
+}TFuncAvailable;
+
 //struct for recursive descent
 typedef struct stackItem {
 	int isTerm;

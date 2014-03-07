@@ -34,7 +34,7 @@ coevolution.o: coevolution.h coevolution.cpp
 	$(CC) -c coevolution.cpp
 
 run:
-	./cocgp testdata.txt 
+	./cocgp testdata.txt func.txt
 
 clean: 
 	rm -f *.o

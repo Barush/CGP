@@ -61,7 +61,7 @@ void getParents(TIndividual** geneticArray, TCgpProperties* geneticP){
 	copyGenotype(parent, &(*geneticArray)[0], geneticP);
 }
 
-void changeGenes(TIndividual* genotype, TCgpProperties* geneticP){
+void changeGenes(TIndividual* genotype, TCgpProperties* geneticP, TFuncAvailable* functions){
 	//generate percent - 3-10
 	double percent = ((rand() % 7) + 3.5) / 100;	//uniform(3,10) + 0.5 for the round corection
 	int nodesCount = geneticP->rows * geneticP->cols;
@@ -85,7 +85,7 @@ void changeGenes(TIndividual* genotype, TCgpProperties* geneticP){
 			if(part == 2){
 				int prevFnc = genotype->CgpProgram[row][col].function;
 				//changing the function
-				genotype->CgpProgram[row][col].function = rand() % geneticP->functionCount;
+				genotype->CgpProgram[row][col].function = functions->funArr[rand() % functions->funCnt];
 				if(genotype->CgpProgram[row][col].function == CONST){
 					//correction needed for constants
 					genotype->CgpProgram[row][col].input1 = rand() % CONSTCOUNT;
@@ -135,16 +135,16 @@ void changeGenes(TIndividual* genotype, TCgpProperties* geneticP){
 	}
 }
 
-void createChildren(TIndividual** geneticArray, TCgpProperties* geneticP){
+void createChildren(TIndividual** geneticArray, TCgpProperties* geneticP, TFuncAvailable* functions){
 	for(int i = 1; i < geneticP->individCount; i++){
 		//copy parent
 		copyGenotype(&(*geneticArray)[0], &(*geneticArray)[i], geneticP);
 		//change 3-10% of genes
-		changeGenes(&(*geneticArray)[i], geneticP);
+		changeGenes(&(*geneticArray)[i], geneticP, functions);
 	}
 }
 
-void evolutionStep(TData* input, TCgpProperties* geneticP, TIndividual** geneticArray){
+void evolutionStep(TData* input, TCgpProperties* geneticP, TIndividual** geneticArray, TFuncAvailable* functions){
 
 	resetFitness_ActiveNodes(*geneticArray, geneticP);
 	getActiveNodes(geneticArray, geneticP);
@@ -158,5 +158,5 @@ void evolutionStep(TData* input, TCgpProperties* geneticP, TIndividual** genetic
 	getParents(geneticArray, geneticP);
 
 	//create new generation
-	createChildren(geneticArray, geneticP);
+	createChildren(geneticArray, geneticP, functions);
 }
