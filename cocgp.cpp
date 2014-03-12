@@ -65,7 +65,7 @@ int main(int argc, char** argv){
 #endif
 
 	for(int i = 0; i < 1000000; i++){
-		evolutionStep(input, geneticParams, &geneticArray);
+		evolutionStep(input, geneticParams, &geneticArray, funcAv);
 		//cout << "got out of evolution step" << endl;
 
 		if(!(i%100))

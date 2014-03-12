@@ -506,6 +506,7 @@ TFuncAvailable* getFunctions(char* filename){
 		functions->funArr[i] = getFunc(input);
 	}
 
+	fclose(input);
 	return functions;
 }
 
