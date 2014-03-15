@@ -36,6 +36,10 @@ using namespace std;
 
 #define CONSTCOUNT 4
 
+/***************************************************************************
+									ENUMS
+***************************************************************************/
+
 //Possible operations in CGP matrix, will be modified from program input
 typedef enum function {
 	MUL = 0,
@@ -62,6 +66,10 @@ typedef enum stackFlag {
 	NONTERM
 }TStackFlag;
 
+/***************************************************************************
+									CGP STRUCTS
+***************************************************************************/
+
 //one cell of a CGP matrix
 typedef struct cell {
 	int input1;
@@ -70,17 +78,17 @@ typedef struct cell {
 }TCell;
 
 typedef struct cgpProperties {
-	int inCount;		//count of main inputs
-	int outCount;		//count of main outputs
-	int compInCount;	//count of component inputs
-	int functionCount;	//count of functions
-	int rows;			//count of rows in the matrix
-	int cols;			//count of columns in the matrix
-	int l_back; 		//l-back param of the matrix
-	int individCount;	//count of individuals in the generation
-	double fitToleration;
-	double constants[CONSTCOUNT];
-	double countedNodes;
+	int inCount;			//count of main inputs
+	int outCount;			//count of main outputs
+	int compInCount;		//count of component inputs
+	int functionCount;		//count of functions
+	int rows;				//count of rows in the matrix
+	int cols;				//count of columns in the matrix
+	int l_back;		 		//l-back param of the matrix
+	int individCount;		//count of individuals in the generation
+	double fitToleration;	//toleration of hits
+	double constants[CONSTCOUNT];//constants array
+	double countedNodes;	//countednodes during whole run
 }TCgpProperties;
 
 //whole CGP struct
@@ -93,11 +101,13 @@ typedef struct individual{
 	int fitness;
 }TIndividual;
 
+//input file data matrix
 typedef struct data{
 	double** data;
 	int dataCount;
 }TData;
 
+//functions file data struct
 typedef struct funcAvailable{
 	int* funArr;
 	int funCnt;
@@ -112,12 +122,17 @@ typedef struct stackItem {
 	struct stackItem* prev;
 }TStackItem;
 
-typedef struct indivList {
-	TIndividual* node;
-	struct indivList* next;
-}TIndivList;
+/***************************************************************************
+								COEVOLUTION STRUCTS
+***************************************************************************/
 
+//struct for shared memory between threads						
 typedef struct shared{
 	pthread_mutex_t end_sem;
 	bool end;
 }TShared;
+
+typedef struct coevIndividual{
+	int fitness;
+	vector<int> value;
+}TCoevIndividual;

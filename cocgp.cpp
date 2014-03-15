@@ -15,7 +15,6 @@
 #include "iowork.h"
 #include "creategen.h"
 #include "evolution.h"
-#include "coevolution.h"
 
 #include <sys/mman.h>
 #include <sys/stat.h>
@@ -47,6 +46,7 @@ int main(int argc, char** argv){
 	TCgpProperties* geneticParams;	//parameters of CGP
 	TData* input;					//matrix of input-output data
 	TFuncAvailable* funcAv;
+	int fitness = 0, gener = 0;
 
 	// TODO: make argv controls
 
@@ -64,9 +64,15 @@ int main(int argc, char** argv){
 	pthread_create(&coevolution_var, NULL, coevolution, NULL);
 #endif
 
-	for(int i = 0; i < 1000000; i++){
+	for(int i = 0;; i++){
 		evolutionStep(input, geneticParams, &geneticArray, funcAv);
 		//cout << "got out of evolution step" << endl;
+		if(geneticArray[0].fitness != fitness){
+			fitness = geneticArray[0].fitness;
+			gener = i;
+		}
+		if((i - gener) > 1000000)
+			break;
 
 		if(!(i%100))
 			cout << i << " " << geneticArray[0].fitness << endl;
