@@ -6,7 +6,7 @@
 #define PI 3.1415926535
 
 double function(double x, double y){
-	return pow(E, x) * sin(x);
+	return pow(E, abs(x)) * sin(x);
 }
 
 
@@ -17,7 +17,7 @@ int main(){
 	//fprintf(newF, "%s\n", "400");
 	fprintf(newF, "200\n");
 	double y = 0;
-	for(double x = -3; x < 6; x += 0.045){
+	for(double x = -10; x < 10; x += 0.1){
 			fprintf(newF, "%lf %lf\n", x,  function(x, y));
 			y -= 0.1;
 	}
