@@ -10,6 +10,11 @@
 	creation date:		03/2014
 **/
 
+#include <unistd.h>
+#include <algorithm>
 #include "datatypes.h"
 #include "creategen.h"
 #include "iowork.h"
+#include "evalexpre.h"
+
+void* coevolution(void* par);

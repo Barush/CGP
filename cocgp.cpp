@@ -15,6 +15,7 @@
 #include "iowork.h"
 #include "creategen.h"
 #include "evolution.h"
+#include "coevolution.h"
 
 #include <sys/mman.h>
 #include <sys/stat.h>
@@ -22,15 +23,21 @@
 #include <unistd.h>
 #include <sys/types.h>
 
-TShared* memoryInit(){
-	TShared* mem = NULL;
+void* memoryInit(){
+	void* mem = NULL;
 	int descriptor;
-/*
+
 	descriptor = shm_open("ending", O_RDWR|O_CREAT, 0600);
 	ftruncate(descriptor, sizeof(TShared));
 	mem = mmap(NULL, sizeof(TShared), PROT_READ|PROT_WRITE, MAP_SHARED,descriptor, 0);
-	//pthread_mutex_init(mem->end_sem, NULL);
-	*/
+
+	TShared* a = (TShared*) mem;
+	pthread_mutex_init(&a->end_sem, NULL);
+
+	pthread_mutex_lock(&a->end_sem);
+	a->end = false;
+	pthread_mutex_unlock(&a->end_sem);
+	
 	return mem;
 }
 
@@ -57,12 +64,13 @@ int main(int argc, char** argv){
 
 	input = getData(argv[1], geneticParams);
 
+	void* memory;
 #ifdef COEVOLUTION
-	TShared* memory;
 	memory = memoryInit();
 	pthread_t coevolution_var;
-	pthread_create(&coevolution_var, NULL, coevolution, NULL);
+	pthread_create(&coevolution_var, NULL, coevolution, memory);
 #endif
+	TShared* a = (TShared*) memory;
 
 	for(int i = 0;; i++){
 		evolutionStep(input, geneticParams, &geneticArray, funcAv);
@@ -71,13 +79,24 @@ int main(int argc, char** argv){
 			fitness = geneticArray[0].fitness;
 			gener = i;
 		}
-		if((i - gener) > 1000000)
+		if((i - gener) > 1000000){
+#ifdef COEVOLUTION
+			pthread_mutex_lock(&a->end_sem);
+			a->end = true;
+			pthread_mutex_unlock(&a->end_sem);
+#endif
 			break;
+		}
 
 		if(!(i%100))
 			cout << i << " " << geneticArray[0].fitness << endl;
 		if(geneticArray[0].fitness == input->dataCount){
 			cout << i + 1 << " " << input->dataCount << endl;
+#ifdef COEVOLUTION
+			pthread_mutex_lock(&a->end_sem);
+			a->end = true;
+			pthread_mutex_unlock(&a->end_sem);
+#endif
 			break;
 		}
 	}

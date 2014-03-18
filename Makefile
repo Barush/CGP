@@ -6,17 +6,21 @@
 # Vytvoreno: brezen 2013
 ######################################
 
-CPPFLAGS = --std=c++98 -Wall -pedantic -g -lm -lpthread -pthread
+CPPFLAGS = --std=c++98 -Wall -pedantic -g 
+LIBS = -lm -pthread -lrt
 CC = g++ $(CPPFLAGS)
-OBJ = creategen.o iowork.o evalexpre.o evolution.o 
+OBJ = creategen.o iowork.o evalexpre.o evolution.o coevolution.o
 
-executable: cocgp generateData
+executable: cgp coecgp generateData
 
-cocgp: cocgp.cpp $(OBJ)
-	$(CC) -o cocgp cocgp.cpp $(OBJ)
+cgp: cocgp.cpp $(OBJ)
+	$(CC) -o cocgp cocgp.cpp $(OBJ) $(LIBS)
+
+coecgp: cocgp.cpp $(OBJ)
+	$(CC) -o coecgp cocgp.cpp $(OBJ) -DCOEVOLUTION $(LIBS)
 
 generateData: generateData.c
-	gcc -std=c99 -Wall -pedantic -g -o generateData generateData.c -lm
+	gcc -std=c99 -Wall -pedantic -g -o generateData generateData.c -lm 
 
 creategen.o: creategen.h creategen.cpp
 	$(CC) -c creategen.cpp
@@ -30,6 +34,9 @@ evalexpre.o: evalexpre.h evalexpre.cpp
 evolution.o: evolution.h evolution.cpp
 	$(CC) -c evolution.cpp
 
+coevolution.o: coevolution.h coevolution.cpp
+	$(CC) -c coevolution.cpp
+
 #coevolution.o: coevolution.h coevolution.cpp
 	#$(CC) -c coevolution.cpp
 
@@ -38,5 +45,6 @@ run:
 
 clean: 
 	rm -f *.o
-	rm cocgp
+	rm cgp
 	rm generateData
+	rm coecgp

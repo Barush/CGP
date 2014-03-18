@@ -10,13 +10,7 @@
 	creation date:		03/2014
 **/
 
-//#include "coevolution.h"
-#include <unistd.h>
-#include <algorithm>
-#include "datatypes.h"
-#include "creategen.h"
-#include "iowork.h"
-#include "evalexpre.h"
+#include "coevolution.h"
 
 //these will be params
 #define TRAINEESIZE 200
@@ -136,19 +130,30 @@ vector<TCoevIndividual>* C_getNewGeneration(vector<TCoevIndividual>* oldGen){
 }
 
 
-int main(int argc, char * argv[]){
+void* coevolution(void* par){
 	srand(time(NULL));
+
+	TShared* shared = (TShared*) par;
+
 	vector<TCoevIndividual> *population = generatePopulation();
 
 	//these will be params
-	TCgpProperties* params = getParams(argv, argc);
-	TFuncAvailable* funcAv = getFunctions(argv[2]);
+	char* cmd[3] = {"./coevolution", "testdata.txt", "func.txt"};
+	TCgpProperties* params = getParams(cmd, 3);
+	TFuncAvailable* funcAv = getFunctions("func.txt");
 	TIndividual* archive = createGeneration(params, funcAv);
-	TData* input = getData(argv[1], params);
+	TData* input = getData("testdata.txt", params);
 
 	int i = 0;
 
-	while(i < 1){
+	while(1){	
+		//wait for several generations - 100?	
+		pthread_mutex_lock(&shared->end_sem);
+		if(shared->end){
+			cout << endl << "GOT IT!!" << endl << endl;
+			break;
+		}
+		pthread_mutex_unlock(&shared->end_sem);
 		C_evaluatePopulation(population, input, archive, params);
 		population = C_getNewGeneration(population);
 		i++;
@@ -160,6 +165,4 @@ int main(int argc, char * argv[]){
 	destroyData(input);
 	delete(population);
 	free(params);
-
-	return 0;
 }
