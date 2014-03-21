@@ -32,22 +32,22 @@ void copyGenotype(TIndividual* from, TIndividual* to, TCgpProperties* geneticP){
 	to->fitness = from->fitness;
 }
 
-void getParents(TIndividual** geneticArray, TCgpProperties* geneticP){
+void getParents(TIndividual* geneticArray, TCgpProperties* geneticP){
 	int max = -1;
 	TIndividual* parent;
 
 	for(int i = 0; i < geneticP->individCount; i++){
 		//cerr << (*geneticArray)[i].fitness << " ";
-		if((*geneticArray)[i].fitness > max){
-			max = (*geneticArray)[i].fitness;
-			parent = &((*geneticArray)[i]);
+		if(geneticArray[i].fitness > max){
+			max = geneticArray[i].fitness;
+			parent = &(geneticArray[i]);
 		}
-		else if((*geneticArray)[i].fitness == max){
-			if((*geneticArray)[i].activeNodesCount < parent->activeNodesCount){
-				parent = &((*geneticArray)[i]);
+		else if(geneticArray[i].fitness == max){
+			if(geneticArray[i].activeNodesCount < parent->activeNodesCount){
+				parent = &(geneticArray[i]);
 			}
 			else if(i > 0){
-				parent = &((*geneticArray)[i]);
+				parent = &(geneticArray[i]);
 			}
 		}
 	}
@@ -58,7 +58,7 @@ void getParents(TIndividual** geneticArray, TCgpProperties* geneticP){
 		printReadableResult(&(*geneticArray)[i], geneticP);
 	}*/
 
-	copyGenotype(parent, &(*geneticArray)[0], geneticP);
+	copyGenotype(parent, &geneticArray[0], geneticP);
 }
 
 void changeGenes(TIndividual* genotype, TCgpProperties* geneticP, TFuncAvailable* functions){
@@ -135,24 +135,43 @@ void changeGenes(TIndividual* genotype, TCgpProperties* geneticP, TFuncAvailable
 	}
 }
 
-void createChildren(TIndividual** geneticArray, TCgpProperties* geneticP, TFuncAvailable* functions){
+void createChildren(TIndividual* geneticArray, TCgpProperties* geneticP, TFuncAvailable* functions){
 	for(int i = 1; i < geneticP->individCount; i++){
 		//copy parent
-		copyGenotype(&(*geneticArray)[0], &(*geneticArray)[i], geneticP);
+		copyGenotype(&geneticArray[0], &geneticArray[i], geneticP);
 		//change 3-10% of genes
-		changeGenes(&(*geneticArray)[i], geneticP, functions);
+		changeGenes(&geneticArray[i], geneticP, functions);
 	}
 }
 
-void evolutionStep(TData* input, TCgpProperties* geneticP, TIndividual** geneticArray, TFuncAvailable* functions){
+void evolutionStep(TData* input, TCgpProperties* geneticP, TIndividual* geneticArray, TFuncAvailable* functions, TTest* test){
 
-	resetFitness_ActiveNodes(*geneticArray, geneticP);
+#ifdef COEVOLUTION
+	TCoevIndividual* testVect = NULL;
+	testVect = (TCoevIndividual*)malloc(sizeof(struct test));
+	pthread_mutex_lock(&test->test_sem);
+	testVect->value = new vector<int>(test->test->value);
+	pthread_mutex_unlock(&test->test_sem);
+#endif
+
 	getActiveNodes(geneticArray, geneticP);
  
-	for(int i = 0; i < input->dataCount; i++){
-		getValue(geneticArray, geneticP, input->data[i]);
-		getFitness(*geneticArray, geneticP, input->data[i]);
-	}
+ 	for(int ind = 0; ind < geneticP->individCount; ind++){
+ 		resetFitness_ActiveNodes(&geneticArray[ind], geneticP);
+#ifdef COEVOLUTION
+ 		for(int i = 0; i < 10; i++){
+ 			getValue(&geneticArray[ind], geneticP, input->data[testVect->value->at(i)]);
+			getFitness(&geneticArray[ind], geneticP, input->data[testVect->value->at(i)]);			
+ 		}
+ 		free(testVect);
+#else
+		for(int i = 0; i < input->dataCount; i++){
+			getValue(&geneticArray[ind], geneticP, input->data[i]);
+			getFitness(&geneticArray[ind], geneticP, input->data[i]);
+		}	
+#endif
+ 	}
+
 
 	//get parents
 	getParents(geneticArray, geneticP);

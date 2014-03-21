@@ -51,7 +51,8 @@ typedef enum function {
 	COS,	//6
 	CONST, 	//7
 	LOG,	//8
-	ABS		//9
+	ABS,	//9
+	EXP		//10
 }TFunction;
 
 typedef enum constants {
@@ -125,14 +126,34 @@ typedef struct stackItem {
 /***************************************************************************
 								COEVOLUTION STRUCTS
 ***************************************************************************/
+typedef struct coevIndividual{
+	int fitness;
+	vector<int>* value;
+}TCoevIndividual;
 
 //struct for shared memory between threads						
 typedef struct shared{
+	pthread_mutex_t cont_sem;
+	bool cont;
 	pthread_mutex_t end_sem;
 	bool end;
 }TShared;
 
-typedef struct coevIndividual{
-	int fitness;
-	vector<int> value;
-}TCoevIndividual;
+typedef struct archive{
+	pthread_mutex_t arch_sem;
+	TIndividual* arch;
+}TArchive;
+
+typedef struct test{
+	pthread_mutex_t test_sem;
+	TCoevIndividual test;
+}TTest;
+
+typedef struct coevParams{
+	TShared* memory;
+	TCgpProperties* CGPparams;
+	TFuncAvailable* funcAv;
+	TArchive* archive;
+	TTest* test;
+	TData* input;
+}TCoevParams;

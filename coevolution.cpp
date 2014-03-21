@@ -51,21 +51,22 @@ void C_writeOutPopulation(vector<TCoevIndividual>* population){
 }
 
 void C_evaluatePopulation(vector<TCoevIndividual>* population, TData* input, TIndividual* archive, TCgpProperties* params){
-	//reset fitness
+	//copy archive --> minimalizace kriticke sekce
 	for(int i = 0; i < population->size(); i++){
 		population->at(i).fitness = 0;
 		for(int j = 0; j < population->at(i).value.size(); j++){
-			//reset fitness
-			resetFitness_ActiveNodes(archive, params);
-			//get value
-			getValue(&archive, params, input->data[population->at(i).value[j]]);
-			//get fitness
-			getFitness(archive, params, input->data[population->at(i).value[j]]);
-			//sume fitness
 			for(int k = 0; k < params->individCount; k++){
+				//reset fitness
+				resetFitness_ActiveNodes(&archive[k], params);
+				//get value
+				getValue(&archive[k], params, input->data[population->at(i).value[j]]);
+				//get fitness
+				getFitness(&archive[k], params, input->data[population->at(i).value[j]]);
+				//sume fitness
 				population->at(i).fitness += archive[k].fitness;
 			}//for all elements of archive
 		}//for all vectors of test
+		population->at(i).fitness = population->at(i).fitness / population->at(i).value.size();
 	}//for all tests
 }
 
@@ -133,36 +134,31 @@ vector<TCoevIndividual>* C_getNewGeneration(vector<TCoevIndividual>* oldGen){
 void* coevolution(void* par){
 	srand(time(NULL));
 
-	TShared* shared = (TShared*) par;
-
+	TCoevParams* params = (TCoevParams*) par;
 	vector<TCoevIndividual> *population = generatePopulation();
-
-	//these will be params
-	char* cmd[3] = {"./coevolution", "testdata.txt", "func.txt"};
-	TCgpProperties* params = getParams(cmd, 3);
-	TFuncAvailable* funcAv = getFunctions("func.txt");
-	TIndividual* archive = createGeneration(params, funcAv);
-	TData* input = getData("testdata.txt", params);
 
 	int i = 0;
 
 	while(1){	
-		//wait for several generations - 100?	
-		pthread_mutex_lock(&shared->end_sem);
-		if(shared->end){
-			cout << endl << "GOT IT!!" << endl << endl;
+		//presun na konec --> aby byl test
+		while(1){
+			//zrusit aktivni cekani
+			if(params->memory->cont)
+				break;
+		}
+		pthread_mutex_lock(&params->memory->cont_sem);
+		params->memory->cont = false;
+		pthread_mutex_unlock(&params->memory->cont_sem);
+
+		pthread_mutex_lock(&params->memory->end_sem);
+		if(params->memory->end){
 			break;
 		}
-		pthread_mutex_unlock(&shared->end_sem);
-		C_evaluatePopulation(population, input, archive, params);
+		pthread_mutex_unlock(&params->memory->end_sem);
+		C_evaluatePopulation(population, params->input, params->archive->arch, params->CGPparams);
 		population = C_getNewGeneration(population);
 		i++;
 	}
 
 	C_writeOutPopulation(population);
-	destroyGeneration(&archive, params);
-	destroyFunctions(funcAv);
-	destroyData(input);
-	delete(population);
-	free(params);
 }

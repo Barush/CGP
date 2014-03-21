@@ -53,7 +53,7 @@ TCgpProperties* getParams(char** argv, int argc){
 	params->l_back = L_BACK;
 	params-> individCount = GENER;
 	params->countedNodes = 0;
-	params->fitToleration = 1.0;
+	params->fitToleration = 0.1;
 
 	// set custom changes
 	for(int i = 2; i < argc; i++){
@@ -174,6 +174,8 @@ void expandNode(TStackItem** tmp, TIndividual* result, TStackItem** stack, TCgpP
 					break;
 		case CONST:	func->printable =  strdup("const");
 					break;
+		case EXP:	func->printable = strdup("exp");
+					break;
 		default: cout << "blbost" << endl;
 	}
 
@@ -220,7 +222,8 @@ void expandNode(TStackItem** tmp, TIndividual* result, TStackItem** stack, TCgpP
 		free((*tmp));
 		(*tmp) = op1;
 	}
-	else if((!strcmp(func->printable,"sin")) || (!strcmp(func->printable, "cos")) || (!strcmp(func->printable, "log"))){
+	else if((!strcmp(func->printable,"sin")) || (!strcmp(func->printable, "cos"))
+	 || (!strcmp(func->printable, "log")) || (!strcmp(func->printable, "exp"))){
 		if((*tmp)->prev != NULL){
 			(*tmp)->prev->next = func;
 		}
@@ -482,6 +485,9 @@ int getFunc(FILE* input){
 	}
 	else if(!strcmp(line, "ABS")){
 		return ABS;
+	}
+	else if(!strcmp(line, "EXP")){
+		return EXP;
 	}
 	else{
 		cerr << "Error in the functions file." << endl;

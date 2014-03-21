@@ -13,24 +13,26 @@
 #include "creategen.h"
 
 //alocation of a single subject of CGP
-TCell** alocateProgram(int row, int col){
-	TCell** subject = (TCell**)malloc(row * sizeof(TCell*));
+TIndividual* alocateIndividual(int row, int col, TIndividual* subject, TCgpProperties* geneticP){
+	TCell** program = (TCell**)malloc(row * sizeof(TCell*));
 
 	for(int i = 0; i < row; i++){
-		subject[i] = (TCell*)malloc(col * sizeof(TCell));
+		program[i] = (TCell*)malloc(col * sizeof(TCell));
 	}
-
-	return subject;
-}
-
-//fill in the CGP matrix
-TIndividual* createIndividual(TCgpProperties* geneticP, TIndividual *subject, TFuncAvailable* functions){
-	subject->CgpProgram = alocateProgram(geneticP->rows, geneticP->cols);
+	
 	subject->output = (TCell*)malloc(sizeof(struct cell)); 
 	subject->fitness = 0;
 	vector<bool> *vect = new vector<bool>(geneticP->rows * geneticP->cols);	
 	subject->activeNodesCount = 0;
 	subject->activeNodes = vect;
+	subject->CgpProgram = program;
+	
+	return subject;
+}
+
+//fill in the CGP matrix
+TIndividual* createIndividual(TCgpProperties* geneticP, TIndividual *subject, TFuncAvailable* functions){
+	alocateIndividual(geneticP->rows, geneticP->cols, subject, geneticP);
 
 	for(int i = 0; i < geneticP->rows; i++){
 		for(int j = 0; j < geneticP->cols; j++){

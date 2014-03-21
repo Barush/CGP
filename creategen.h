@@ -13,7 +13,7 @@
 #include "datatypes.h"
 
 /******************* FUNCTION PROTOTYPES ***************************************/
-TCell** alocateProgram(int row, int col);
+TIndividual* alocateIndividual(int row, int col, TIndividual* subject, TCgpProperties* geneticP);
 TIndividual* createIndividual(TCgpProperties* geneticP, TIndividual *subject, TFuncAvailable* functions);
 TIndividual* createGeneration(TCgpProperties* geneticP, TFuncAvailable* functions);
 void destroyGeneration(TIndividual** geneticArray, TCgpProperties* geneticP);

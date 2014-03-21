@@ -6,14 +6,14 @@
 #define PI 3.1415926535
 
 double function(double x, double y){
-	return pow(E, abs(x)) * sin(x);
+	return x*x - x*x*x;
 }
 
 
 int main(){
 	
 	FILE *newF;
-	newF = fopen("ex_sin.txt", "w+");
+	newF = fopen("x_2_3.txt", "w+");
 	//fprintf(newF, "%s\n", "400");
 	fprintf(newF, "200\n");
 	double y = 0;
@@ -21,4 +21,5 @@ int main(){
 			fprintf(newF, "%lf %lf\n", x,  function(x, y));
 			y -= 0.1;
 	}
+	fclose(newF);
 }
