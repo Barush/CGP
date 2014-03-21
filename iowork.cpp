@@ -54,18 +54,24 @@ TCgpProperties* getParams(char** argv, int argc){
 	params-> individCount = GENER;
 	params->countedNodes = 0;
 	params->fitToleration = 0.1;
+	params->hybridPoints = 1;
+	params->testSize = 10;
+	params->coevICnt = 20;
 
 	// set custom changes
 	for(int i = 2; i < argc; i++){
 		if(!strcmp(argv[i], "-r")){
+			//rows of cgp
 			i++;
 			params->rows = atoi(argv[i]);
 		}
 		else if(!strcmp(argv[i], "-c")){
+			//columns of cgp
 			i++;
 			params->cols = atoi(argv[i]);
 		}
 		else if(!strcmp(argv[i], "-l")){
+			//lback of cgp
 			i++;
 			int lb = atoi(argv[i]);
 			if(lb < 1){
@@ -75,17 +81,38 @@ TCgpProperties* getParams(char** argv, int argc){
 				params->l_back = lb;
 		}
 		else if(!strcmp(argv[i], "-g")){
+			//cnt of individs in generation
 			i++;
 			params->individCount = atoi(argv[i]);
 		}
 		else if(!strcmp(argv[i], "-t")){
+			//toleration of hit
 			i++;
 			stringstream ss(argv[i]);
 			ss >> params->fitToleration;
 		}
 		else if(!strcmp(argv[i], "-i")){
+			//cnt of primary inputs
 			i++;
 			params->inCount = atoi(argv[i]);
+		}
+		else if(!strcmp(argv[i], "-h")){
+			//number of crossing points in coevolution
+
+			// TODO: add control to max 3 crossing pts
+
+			i++;
+			params->hybridPoints = atoi(argv[i]);
+		}
+		else if(!strcmp(argv[i], "-s")){
+			//size of test vector in coevolution
+			i++;
+			params->testSize = atoi(argv[i]);
+		}
+		else if(!strcmp(argv[i], "-cg")){
+			//count of individs in coevolution generation
+			i++;
+			params->coevICnt = atoi(argv[i]);
 		}
 	}
 

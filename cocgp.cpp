@@ -74,7 +74,7 @@ TArchive* archiveInit(TCgpProperties* geneticP, TIndividual* genArray, TFuncAvai
 	return archive;
 }
 
-TTest* testInit(TData* input){
+TTest* testInit(TData* input, TCgpProperties* params){
 	TTest* test = NULL;
 	int descriptor;
 
@@ -84,11 +84,11 @@ TTest* testInit(TData* input){
 
 	pthread_mutex_init(&test->test_sem, NULL);
 
-	vector<int>* a = new vector<int>(10);
+	vector<int>* a = new vector<int>(params->testSize);
 	pthread_mutex_lock(&test->test_sem);
 		test->test.fitness = 0;
 		test->test.value = a;
-		for(int i = 0; i < 10; i++)
+		for(int i = 0; i < params->testSize; i++)
 			test->test.value->at(i) = rand() % input->dataCount;
 	pthread_mutex_unlock(&test->test_sem);
 
@@ -109,7 +109,7 @@ TCoevParams* paramsInit(TCgpProperties* geneticP, TIndividual* geneticArray, TFu
 	params->CGPparams = geneticP;
 	params->funcAv = funcAv;
 	params->archive = archiveInit(geneticP, geneticArray, funcAv);
-	params->test = testInit(input);
+	params->test = testInit(input, geneticP);
 	params->input = input;
 
 	return params;
@@ -117,7 +117,7 @@ TCoevParams* paramsInit(TCgpProperties* geneticP, TIndividual* geneticArray, TFu
 
 int main(int argc, char** argv){
 
-	if(!strcmp(argv[1], "-h")){
+	if(!strcmp(argv[1], "--help")){
 		//parameter help
 		printUsage();
 		return EXIT_SUCCESS;

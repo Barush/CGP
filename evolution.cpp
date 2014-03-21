@@ -159,7 +159,7 @@ void evolutionStep(TData* input, TCgpProperties* geneticP, TIndividual* geneticA
  	for(int ind = 0; ind < geneticP->individCount; ind++){
  		resetFitness_ActiveNodes(&geneticArray[ind], geneticP);
 #ifdef COEVOLUTION
- 		for(int i = 0; i < 10; i++){
+ 		for(int i = 0; i < geneticP->testSize; i++){
  			getValue(&geneticArray[ind], geneticP, input->data[testVect->value->at(i)]);
 			getFitness(&geneticArray[ind], geneticP, input->data[testVect->value->at(i)]);			
  		}

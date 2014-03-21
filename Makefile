@@ -44,7 +44,7 @@ run:
 	./cgp testdata.txt func.txt -r 1 -c 30 -t 0.1 -l 30
 
 coev:
-	./coecgp testdata.txt func.txt -r 1 -c 30 -t 0.1 -l 30
+	./coecgp testdata.txt func.txt -r 1 -c 30 -t 0.1 -l 30 -h 1 -s 5 -cg 20
 
 clean: 
 	rm -f *.o

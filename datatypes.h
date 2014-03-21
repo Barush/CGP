@@ -90,6 +90,9 @@ typedef struct cgpProperties {
 	double fitToleration;	//toleration of hits
 	double constants[CONSTCOUNT];//constants array
 	double countedNodes;	//countednodes during whole run
+	int hybridPoints;
+	int testSize;
+	int coevICnt;
 }TCgpProperties;
 
 //whole CGP struct
