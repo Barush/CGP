@@ -18,3 +18,4 @@
 #include "evalexpre.h"
 
 void* coevolution(void* par);
+bool C_testGlobalSolution(TIndividual* solution, TData* input, TCgpProperties* geneticP);

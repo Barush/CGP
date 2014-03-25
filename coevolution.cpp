@@ -16,20 +16,42 @@
 #define BESTCNT 8
 #define CHLDCNT 8
 
+bool C_testGlobalSolution(TIndividual* solution, TData* input, TCgpProperties* geneticP){
+	resetFitness_ActiveNodes(solution, geneticP);
+	for(int i = 0; i < input->dataCount; i++){
+		getValue(solution, geneticP, input->data[i]);
+		getFitness(solution, geneticP, input->data[i]);
+	}
+
+	if(solution->fitness == input->dataCount)
+		return true;
+	return false;
+}
+
+TCoevIndividual C_controlDuplicities(vector<int>* test, TData* input){
+	sort(test->begin(), test->end());
+	int last = test->at(0);
+	for(int i = 1; i < test->size(); i++){
+		if(last == test->at(i)){
+			test->at(i) = rand() % input->dataCount;
+		}
+		else{
+			last = test->at(i);
+		}
+	}
+}
+
 vector<TCoevIndividual>* generatePopulation(TCgpProperties* CGPparams, TData* input){
-		cout << "generate population I" << endl;
 	vector<TCoevIndividual>* population = new vector<TCoevIndividual>(CGPparams->coevICnt);
 
 	for(int i = 0; i < CGPparams->coevICnt; i++){
 		population->at(i).fitness = 0;
-		cout << "generate population II" << endl;
 		vector<int>* a = new vector<int>(CGPparams->testSize);
 		population->at(i).value = a;
 		for(int j = 0; j < CGPparams->testSize; j++){
 			population->at(i).value->at(j) = rand() % input->dataCount;
 		}
-
-		// TODO: check for duplicities
+		C_controlDuplicities(population->at(i).value, input);
 	}
 
 	return population;
@@ -75,28 +97,24 @@ bool comp(TCoevIndividual i, TCoevIndividual j){
 
 vector<TCoevIndividual>* C_getBest(vector<TCoevIndividual>* oldGen, TCgpProperties* CGPparams){
 	sort(oldGen->begin(), oldGen->end(), comp);
-	cout << "get best" << endl;
 	vector<TCoevIndividual>* newGen = new vector<TCoevIndividual>(CGPparams->coevICnt);
-	cout << "after new" << endl;
-	for(int i = 0; i < BESTCNT; i++){
+	for(int i = 0; i < CGPparams->coevICnt; i++){
 		newGen->at(i) = oldGen->at(i);
 	}
-	cout << "after getbest" << endl;
 	return newGen;
 }
 
-TCoevIndividual* C_getParent(vector<TCoevIndividual>* population, TCgpProperties* CGPparams){
+int C_getParent(vector<TCoevIndividual>* population, TCgpProperties* CGPparams){
 	int ind1, ind2;
 
 	ind1 = rand() % CGPparams->coevICnt;
 	ind2 = rand() % CGPparams->coevICnt;
 
-	return (population->at(ind1).fitness < population->at(ind2).fitness)?&population->at(ind1):&population->at(ind2);
+	return (population->at(ind1).fitness < population->at(ind2).fitness)?ind1:ind2;
 }
 
-void C_getChildren(vector<TCoevIndividual>* oldGen, vector<TCoevIndividual>* newGen, TCgpProperties* CGPparams){
-	TCoevIndividual* parent1, *parent2;
-	cout << "get children" << endl;
+void C_getChildren(vector<TCoevIndividual>* oldGen, vector<TCoevIndividual>* newGen, TCgpProperties* CGPparams, TData* input){
+	int parent1, parent2;
 	vector<int> crossPts;
 	for(int i = BESTCNT; i < (BESTCNT + CHLDCNT); i += 2){
 		parent1 = C_getParent(oldGen, CGPparams);
@@ -104,41 +122,37 @@ void C_getChildren(vector<TCoevIndividual>* oldGen, vector<TCoevIndividual>* new
 		for(int j = 0; j < CGPparams->hybridPoints; j++){
 			crossPts.push_back(rand() % CGPparams->testSize);
 		}
-		cout << "sort" << endl;
 		sort(crossPts.begin(), crossPts.end());
-		cout << "after" << endl;
 		newGen->at(i) = oldGen->at(i);
 		newGen->at(i+1) = oldGen->at(i+1);
-		cout << "before for" << endl;
 		for(int j = 0; j < CGPparams->testSize; j++){
 			if(CGPparams->hybridPoints == 1){
-				cout << "hybridPoints == 1" << endl;
 				if(j > crossPts[0]){
-					newGen->at(i).value[j] = parent2->value[j];
-					newGen->at(i+1).value[j] = parent1->value[j];	
+					newGen->at(i).value->at(j) = oldGen->at(parent2).value->at(j);
+					newGen->at(i+1).value->at(j) = oldGen->at(parent1).value->at(j);	
 				}
 			}
 			else {
 				if(j > crossPts[0] && j < crossPts[1]){
-					newGen->at(i).value[j] = parent2->value[j];
-					newGen->at(i+1).value[j] = parent1->value[j];	
+					newGen->at(i).value->at(j) = oldGen->at(parent2).value->at(j);
+					newGen->at(i+1).value->at(j) = oldGen->at(parent1).value->at(j);	
 				}
 				if(CGPparams->hybridPoints == 3){
 					if(j > crossPts[2]){
-						newGen->at(i).value[j] = parent2->value[j];
-						newGen->at(i+1).value[j] = parent1->value[j];							
+						newGen->at(i).value->at(j) = oldGen->at(parent2).value->at(j);
+						newGen->at(i+1).value->at(j) = oldGen->at(parent1).value->at(j);							
 					}
 				}
 			}
+			C_controlDuplicities(newGen->at(i).value, input);
+			C_controlDuplicities(newGen->at(i + 1).value, input);
 		}//for all components of tests
-		cout << "after for" << endl;
 	}//for all tests
 }
 
 void C_getMutants(vector<TCoevIndividual>* newGen, TCgpProperties* CGPparams, TData* input){
 	for(int i = (BESTCNT + CHLDCNT); i < CGPparams->coevICnt; i++){
 		newGen->at(i).fitness = 0;
-		cout << "get mutants" << endl;
 		vector<int> *a = new vector<int>(CGPparams->testSize);
 		newGen->at(i).value = a;
 		for(int j = 0; j < CGPparams->testSize; j++){
@@ -149,11 +163,23 @@ void C_getMutants(vector<TCoevIndividual>* newGen, TCgpProperties* CGPparams, TD
 
 vector<TCoevIndividual>* C_getNewGeneration(vector<TCoevIndividual>* oldGen, TCgpProperties* CGPparams, TData* input){
 	vector<TCoevIndividual>* newGen = C_getBest(oldGen, CGPparams);
-	C_getChildren(oldGen, newGen, CGPparams);
+	C_getChildren(oldGen, newGen, CGPparams, input);
 	C_getMutants(newGen, CGPparams, input);
 
 	delete(oldGen);
 	return newGen;
+}
+
+void C_changeTest(TTest* test, TCoevIndividual* newTest, TCgpProperties* CGPparams){
+	vector<int>* a = new vector<int>(*newTest->value);
+
+
+	pthread_mutex_lock(&test->test_sem);
+	delete(test->test.value);
+	test->test.value = a;
+	pthread_mutex_unlock(&test->test_sem);
+
+	return;
 }
 
 
@@ -183,8 +209,9 @@ void* coevolution(void* par){
 		pthread_mutex_unlock(&params->memory->end_sem);
 		C_evaluatePopulation(population, params->input, params->archive->arch, params->CGPparams);
 		population = C_getNewGeneration(population, params->CGPparams, params->input);
+		C_changeTest(params->test, &population->at(0), params->CGPparams);
 		i++;
 	}
 
-	C_writeOutPopulation(population);
+	//C_writeOutPopulation(population);
 }

@@ -150,7 +150,7 @@ void evolutionStep(TData* input, TCgpProperties* geneticP, TIndividual* geneticA
 	TCoevIndividual* testVect = NULL;
 	testVect = (TCoevIndividual*)malloc(sizeof(struct test));
 	pthread_mutex_lock(&test->test_sem);
-	testVect->value = new vector<int>(test->test->value);
+	testVect->value = new vector<int>(*test->test.value);
 	pthread_mutex_unlock(&test->test_sem);
 #endif
 
@@ -163,7 +163,6 @@ void evolutionStep(TData* input, TCgpProperties* geneticP, TIndividual* geneticA
  			getValue(&geneticArray[ind], geneticP, input->data[testVect->value->at(i)]);
 			getFitness(&geneticArray[ind], geneticP, input->data[testVect->value->at(i)]);			
  		}
- 		free(testVect);
 #else
 		for(int i = 0; i < input->dataCount; i++){
 			getValue(&geneticArray[ind], geneticP, input->data[i]);
@@ -172,10 +171,13 @@ void evolutionStep(TData* input, TCgpProperties* geneticP, TIndividual* geneticA
 #endif
  	}
 
+ #ifdef COEVOLUTION
+ 	delete(testVect->value);
+ 	free(testVect);
+ #endif
 
 	//get parents
 	getParents(geneticArray, geneticP);
-
 	//create new generation
 	createChildren(geneticArray, geneticP, functions);
 }

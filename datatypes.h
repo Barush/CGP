@@ -130,7 +130,7 @@ typedef struct stackItem {
 								COEVOLUTION STRUCTS
 ***************************************************************************/
 typedef struct coevIndividual{
-	int fitness;
+	double fitness;
 	vector<int>* value;
 }TCoevIndividual;
 

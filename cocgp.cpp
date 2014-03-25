@@ -27,7 +27,7 @@ TShared* memoryInit(){
 	TShared* mem = NULL;
 	int descriptor;
 
-	descriptor = shm_open("ending", O_RDWR|O_CREAT, 0600);
+	descriptor = shm_open("ending01", O_RDWR|O_CREAT, 0600);
 	ftruncate(descriptor, sizeof(TShared));
 	mem = (TShared*)mmap(NULL, sizeof(TShared), PROT_READ|PROT_WRITE, MAP_SHARED,descriptor, 0);
 
@@ -49,7 +49,7 @@ TArchive* archiveInit(TCgpProperties* geneticP, TIndividual* genArray, TFuncAvai
 	int descriptor;
 	TIndividual* secArray;
 
-	descriptor = shm_open("archive", O_RDWR|O_CREAT, 0600);
+	descriptor = shm_open("archive01", O_RDWR|O_CREAT, 0600);
 	ftruncate(descriptor, sizeof(TArchive));
 	archive = (TArchive*)mmap(NULL, sizeof(TArchive), PROT_READ|PROT_WRITE, MAP_SHARED, descriptor, 0);
 
@@ -78,18 +78,19 @@ TTest* testInit(TData* input, TCgpProperties* params){
 	TTest* test = NULL;
 	int descriptor;
 
-	descriptor = shm_open("test", O_RDWR|O_CREAT, 0600);
+	descriptor = shm_open("test01", O_RDWR|O_CREAT, 0600);
 	ftruncate(descriptor, sizeof(TTest));
 	test = (TTest*)mmap(NULL, sizeof(TTest), PROT_READ|PROT_WRITE, MAP_SHARED, descriptor, 0);
 
 	pthread_mutex_init(&test->test_sem, NULL);
 
 	vector<int>* a = new vector<int>(params->testSize);
+	for(int i = 0; i < params->testSize; i++)
+		a->at(i) = rand() % input->dataCount;
+
 	pthread_mutex_lock(&test->test_sem);
 		test->test.fitness = 0;
 		test->test.value = a;
-		for(int i = 0; i < params->testSize; i++)
-			test->test.value->at(i) = rand() % input->dataCount;
 	pthread_mutex_unlock(&test->test_sem);
 
 	return test;
@@ -156,7 +157,7 @@ int main(int argc, char** argv){
 		evolutionStep(input, geneticParams, geneticArray, funcAv, NULL);
 #endif
 		//every hundred generations write out actual state,
-		//let second thread to do a step and save ind. to archive
+		//COEV: let second thread to do a step and save ind. to archive
 		if(!(i%100)){
 			cout << i << " " << geneticArray[0].fitness << endl;
 #ifdef COEVOLUTION
@@ -169,7 +170,8 @@ int main(int argc, char** argv){
 #endif
 		}
 
-		//if fitness changed, save it and change archive
+		//if fitness changed, save it
+		//COEV: change archive
 		if(geneticArray[0].fitness != fitness){
 			fitness = geneticArray[0].fitness;
 			gener = i;
@@ -182,11 +184,20 @@ int main(int argc, char** argv){
 		if((i - gener) > 1000000){
 			break;
 		}
+
+#ifdef COEVOLUTION
+		//if reached maximal fitness, test if has global solution
+		if(geneticArray[0].fitness == geneticParams->testSize){
+			if(C_testGlobalSolution(&geneticArray[0], input, geneticParams))
+				break;
+		}
+#else
 		//if reached maximal fitness, end it
 		if(geneticArray[0].fitness == input->dataCount){
 			cout << i + 1 << " " << input->dataCount << endl;
 			break;
 		}
+#endif
 	}
 
 #ifdef COEVOLUTION

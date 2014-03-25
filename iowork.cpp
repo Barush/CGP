@@ -140,14 +140,14 @@ char* getPrintable(int ind){
 	char* str = (char*)malloc(sizeof(char) * 10);
 
 	switch(ind){
-		case 0: str = strdup("3.141592");
-				break;
-		case 1: str = strdup("2.718281");
-				break;
-		case 2: str = strdup("1");
-				break;
-		case 3: str = strdup("0");
-				break;
+		case PI: 	str = strdup("3.141592");
+					break;
+		case EULER: str = strdup("2.718281");
+					break;
+		case ONE: 	str = strdup("1");
+					break;
+		case ZERO:	str = strdup("0");
+					break;
 	}
 
 	return str;
@@ -156,7 +156,7 @@ char* getPrintable(int ind){
 void expandNode(TStackItem** tmp, TIndividual* result, TStackItem** stack, TCgpProperties* geneticP){
 	int row, col;
 
-	//get value
+	//get position
 	row = ((*tmp)->value - geneticP->inCount) % geneticP->rows;
 	col = ((*tmp)->value - geneticP->inCount) / geneticP->rows;
 
@@ -165,7 +165,7 @@ void expandNode(TStackItem** tmp, TIndividual* result, TStackItem** stack, TCgpP
 	lBracket->isTerm = TERM;
 	lBracket->printable = strdup("(");
 
-	//get first operand - NONTERM?
+	//get first operand
 	TStackItem* op1 = (TStackItem*)malloc(sizeof(struct stackItem));
 	if(result->CgpProgram[row][col].input1 < geneticP->inCount){
 		op1->isTerm = TERM;
@@ -177,7 +177,7 @@ void expandNode(TStackItem** tmp, TIndividual* result, TStackItem** stack, TCgpP
 	}
 	op1->value = result->CgpProgram[row][col].input1;
 
-	//get operation - TERM
+	//get operation - always TERM
 	TStackItem* func = (TStackItem*)malloc(sizeof(struct stackItem));
 	func->isTerm = TERM;
 	switch (result->CgpProgram[row][col].function) {
@@ -206,7 +206,7 @@ void expandNode(TStackItem** tmp, TIndividual* result, TStackItem** stack, TCgpP
 		default: cout << "blbost" << endl;
 	}
 
-	//get second operand - NONTERM?
+	//get second operand
 	TStackItem* op2 = (TStackItem*)malloc(sizeof(struct stackItem));
 	if(result->CgpProgram[row][col].input2 < geneticP->inCount){
 		op2->isTerm = TERM;
@@ -218,7 +218,7 @@ void expandNode(TStackItem** tmp, TIndividual* result, TStackItem** stack, TCgpP
 	}
 	op2->value = result->CgpProgram[row][col].input2;
 
-	//insert (
+	//insert )
 	TStackItem* rBracket = (TStackItem*)malloc(sizeof(struct stackItem));
 	rBracket->isTerm = TERM;
 	rBracket->printable = strdup(")");
@@ -293,7 +293,7 @@ void expandNode(TStackItem** tmp, TIndividual* result, TStackItem** stack, TCgpP
 		free(op2->printable);
 		free(op2);			
 		if((*tmp) == (*stack))
-			(*stack) = func;
+			(*stack) = lBracket;
 		free((*tmp)->printable);
 		free((*tmp));
 		(*tmp) = rBracket;		
@@ -342,7 +342,6 @@ void printReadableResult(TIndividual* result, TCgpProperties* geneticP){
 				change = true;
 				expandNode(&tmp, result, &stack, geneticP);
 			}
-			//cerr << "" << endl;
 		}
 	}while(change);
 
