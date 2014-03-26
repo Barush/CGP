@@ -24,20 +24,47 @@
 #define GENER 5
 
 void printUsage(){
-	cout << "COEVOLUTION IN CGP" << endl;
+	cout << endl << "COEVOLUTION IN CGP" << endl;
 	cout << "BACHELORS THESIS" << endl;
 	cout << "BARBORA SKRIVANKOVA " << endl;
 	cout << "xskriv01@stud.fit.vutbr.cz" << endl;
 
 	cout << "Usage: " << endl;
-	cout << "./cocgp testfile [-r rows -c cols -l L-back -g generation]" << endl << endl;
+	cout << "./cgp testfile funcfile [-r rows -c cols -l L-back -g generation -i inputs_count] (standard CGP)" << endl << endl;
+	cout << "./coecgp testfile funcfile [-r rows -c cols -l L-back -g generation -i inputs_count -h crossing_pts" <<
+		"-s c_individual_size -cg c_generation_size] (coevolutionary CGP)" << endl << endl;
 	cout << "\t testfile looks like: " << endl;
 	cout << "\t\t number_of_test_vectors" << endl;
 	cout << "\t\t in1 in2 in3 .. inN out" << endl;
+	cout << "\t funcfile looks like:" << endl;
+	cout << "\t\t number_of_used_functions" << endl;
+	cout << "\t\t function1" << endl << "\t\t function2" << endl;
 	cout << "\t rows - sets number of rows in cgp program" << endl;
 	cout << "\t cols - sets number of cols in cgp program" << endl;
 	cout << "\t L-back - sets L-backindividuals in each generation" << endl;
+	cout << "\t generation - number of individuals in each generation" << endl;
+	cout << "\t inputs_count - number of primary inputs of whole CGP program" << endl;
+	cout << "\t crossing_pts - number of points of crossing in coevolution" << endl;
+	cout << "\t c_individual_size - size of each test in coevolution" << endl;
+	cout << "\t c_generation_size - number of individuals in each generation in coevolution" << endl;
 	return;
+}
+
+void printError(TErrCode code){
+	if(code == ECMD){
+		cerr << "Invalid params of cmd." << endl;
+		printUsage();
+	}
+	else if(code == EFILE){
+		cerr << "Error in opening file." << endl;
+		printUsage();
+	}
+	else if(code == EALLOC){
+		cerr << "Error during allocating memory." << endl;
+	}
+	else{
+		cerr << "Unknown error occured. This is weird." << endl;
+	}
 }
 
 TCgpProperties* getParams(char** argv, int argc){
@@ -57,9 +84,10 @@ TCgpProperties* getParams(char** argv, int argc){
 	params->hybridPoints = 1;
 	params->testSize = 10;
 	params->coevICnt = 20;
+	params->ecode = EOK;
 
 	// set custom changes
-	for(int i = 2; i < argc; i++){
+	for(int i = 3; i < argc; i++){
 		if(!strcmp(argv[i], "-r")){
 			//rows of cgp
 			i++;
@@ -113,6 +141,10 @@ TCgpProperties* getParams(char** argv, int argc){
 			//count of individs in coevolution generation
 			i++;
 			params->coevICnt = atoi(argv[i]);
+		}
+		else{
+			params->ecode = ECMD;
+			break;
 		}
 	}
 
@@ -444,8 +476,8 @@ TData* getData(char* filename, TCgpProperties* geneticP){
 
 	// open the data source file
 	if((data = fopen(filename, "r")) == NULL){
-		cerr << "Error in opening file: " << filename << endl;
-		exit(1);
+		geneticP->ecode = EFILE;
+		return input;
 	}
 
 	input->dataCount = getDataCount(data);
@@ -522,13 +554,13 @@ int getFunc(FILE* input){
 
 }
 
-TFuncAvailable* getFunctions(char* filename){
+TFuncAvailable* getFunctions(char* filename, TCgpProperties* params){
 	FILE* input;
 	TFuncAvailable* functions = (TFuncAvailable*)malloc(sizeof(struct funcAvailable));
 
 	if((input = fopen(filename, "r")) == NULL){
-		cerr << "Error in opening file: " << filename << endl;
-		exit(1);
+		params->ecode = EFILE;
+		return functions;
 	}
 
 	functions->funCnt = getDataCount(input);

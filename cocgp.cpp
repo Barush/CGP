@@ -117,34 +117,57 @@ TCoevParams* paramsInit(TCgpProperties* geneticP, TIndividual* geneticArray, TFu
 }
 
 int main(int argc, char** argv){
+	TIndividual* geneticArray;		//array for one generation
+	TCgpProperties* geneticParams;	//parameters of CGP
+	TData* input;					//matrix of input-output data
+	TFuncAvailable* funcAv;			//array of used functions
+	int fitness = 0, gener = 0;		//vars used to know how good cgp works
+#ifdef COEVOLUTION
+	int fitCh_ind = 0, nGen_ind = 0;//variables for archive indexes
+#endif
 
+	srand(time(NULL));			 	// initiate random generator
 	if(!strcmp(argv[1], "--help")){
 		//parameter help
 		printUsage();
 		return EXIT_SUCCESS;
 	}
 
-	TIndividual* geneticArray;		//array for one generation
-	TCgpProperties* geneticParams;	//parameters of CGP
-	TData* input;					//matrix of input-output data
-	TFuncAvailable* funcAv;
-	int fitness = 0, gener = 0;
-
-#ifdef COEVOLUTION
-	//variables for archive indexes
-	int fitCh_ind = 0, nGen_ind = 0;
-#endif
-
-	// TODO: make argv controls
-
-	srand(time(NULL)); // initiate random generator
 	geneticParams = getParams(argv, argc);
-	funcAv = getFunctions(argv[2]);
+	if(geneticParams->ecode != EOK){
+		free(geneticParams);
+		printError(geneticParams->ecode);
+		return geneticParams->ecode;
+	}
+
+	funcAv = getFunctions(argv[2], geneticParams);
+	if(geneticParams->ecode != EOK){
+		destroyFunctions(funcAv);
+		free(geneticParams);
+		printError(geneticParams->ecode);
+		return geneticParams->ecode;
+	}
+
 	geneticArray = createGeneration(geneticParams, funcAv);
+	if(geneticParams->ecode != EOK){
+		destroyFunctions(funcAv);
+		free(geneticParams);
+		printError(geneticParams->ecode);
+		return geneticParams->ecode;		
+	}	
 
 	input = getData(argv[1], geneticParams);
+	if(geneticParams->ecode != EOK){
+		destroyData(input);
+		destroyGeneration(&geneticArray, geneticParams);
+		destroyFunctions(funcAv);
+		free(geneticParams);
+		printError(geneticParams->ecode);
+		return geneticParams->ecode;
+	}
 
 #ifdef COEVOLUTION
+	//COEV: initiate the second thread
 	TCoevParams* params = paramsInit(geneticParams, geneticArray, funcAv, input);
 	pthread_t coevolution_var;
 	pthread_create(&coevolution_var, NULL, coevolution, (void *)params);
@@ -180,16 +203,18 @@ int main(int argc, char** argv){
 			fitCh_ind++;
 #endif
 		}
-		//if fitness didnt change for milion gens, end it
+		//if fitness didnt change for milion geners, end it
 		if((i - gener) > 1000000){
 			break;
 		}
 
 #ifdef COEVOLUTION
-		//if reached maximal fitness, test if has global solution
+		//COEV: if reached maximal fitness, test if has global solution
 		if(geneticArray[0].fitness == geneticParams->testSize){
-			if(C_testGlobalSolution(&geneticArray[0], input, geneticParams))
+			if(C_testGlobalSolution(&geneticArray[0], input, geneticParams)){
+				cout << i + 1 << " " << input->dataCount << endl;
 				break;
+			}
 		}
 #else
 		//if reached maximal fitness, end it

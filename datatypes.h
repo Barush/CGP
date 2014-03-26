@@ -67,6 +67,14 @@ typedef enum stackFlag {
 	NONTERM
 }TStackFlag;
 
+typedef enum errCodes{
+	EOK = 0,
+	ECMD,
+	EFILE,
+	EALLOC,
+	EUNKNOWN
+}TErrCode;
+
 /***************************************************************************
 									CGP STRUCTS
 ***************************************************************************/
@@ -93,6 +101,7 @@ typedef struct cgpProperties {
 	int hybridPoints;
 	int testSize;
 	int coevICnt;
+	TErrCode ecode;
 }TCgpProperties;
 
 //whole CGP struct

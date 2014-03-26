@@ -14,6 +14,7 @@
 
 /******************* FUNCTION PROTOTYPES ***************************************/
 void printUsage();
+void printError(TErrCode code);
 TCgpProperties* getParams(char** argv, int argc);
 void printResult(TIndividual* result, TCgpProperties* geneticP);
 void printReadableResult(TIndividual* result, TCgpProperties* geneticP);
@@ -21,5 +22,5 @@ int getDataCount(FILE* data);
 void getNextData(FILE* data, double* dataArray, int ioCount);
 TData* getData(char* filename, TCgpProperties* geneticP);
 void destroyData(TData* input);
-TFuncAvailable* getFunctions(char* filename);
+TFuncAvailable* getFunctions(char* filename, TCgpProperties* params);
 void destroyFunctions(TFuncAvailable* fnc);

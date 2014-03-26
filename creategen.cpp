@@ -15,12 +15,28 @@
 //alocation of a single subject of CGP
 TIndividual* alocateIndividual(int row, int col, TIndividual* subject, TCgpProperties* geneticP){
 	TCell** program = (TCell**)malloc(row * sizeof(TCell*));
+	if(program == NULL){
+		geneticP->ecode = EALLOC;
+		return NULL;
+	}
+
+	subject->output = (TCell*)malloc(sizeof(struct cell));
+	if(subject->output == NULL){
+		geneticP->ecode = EALLOC;
+		free(program);
+		return NULL;
+	}
 
 	for(int i = 0; i < row; i++){
 		program[i] = (TCell*)malloc(col * sizeof(TCell));
+		if(program[i] == NULL){
+			geneticP->ecode = EALLOC;
+			free(subject->output);
+			free(program);
+			return NULL;
+		}
 	}
 	
-	subject->output = (TCell*)malloc(sizeof(struct cell)); 
 	subject->fitness = 0;
 	vector<bool> *vect = new vector<bool>(geneticP->rows * geneticP->cols);	
 	subject->activeNodesCount = 0;
@@ -33,6 +49,8 @@ TIndividual* alocateIndividual(int row, int col, TIndividual* subject, TCgpPrope
 //fill in the CGP matrix
 TIndividual* createIndividual(TCgpProperties* geneticP, TIndividual *subject, TFuncAvailable* functions){
 	alocateIndividual(geneticP->rows, geneticP->cols, subject, geneticP);
+	if(geneticP->ecode != EOK)
+		return NULL;
 
 	for(int i = 0; i < geneticP->rows; i++){
 		for(int j = 0; j < geneticP->cols; j++){
@@ -70,7 +88,11 @@ TIndividual* createIndividual(TCgpProperties* geneticP, TIndividual *subject, TF
 
 //create an array of individuals as a generation
 TIndividual* createGeneration(TCgpProperties* geneticP, TFuncAvailable* functions){
-	TIndividual* generation = (TIndividual*)malloc(geneticP->individCount * sizeof(struct individual));
+	TIndividual* generation = NULL;
+	if((generation = (TIndividual*)malloc(geneticP->individCount * sizeof(struct individual))) == NULL){
+		geneticP->ecode == EALLOC;
+		return NULL;
+	}
 
 	for(int i = 0; i < geneticP->individCount ; i++){
 		generation[i] = *(createIndividual(geneticP, &(generation[i]), functions));
