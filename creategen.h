@@ -15,5 +15,5 @@
 /******************* FUNCTION PROTOTYPES ***************************************/
 TIndividual* alocateIndividual(int row, int col, TIndividual* subject, TCgpProperties* geneticP);
 TIndividual* createIndividual(TCgpProperties* geneticP, TIndividual *subject, TFuncAvailable* functions);
-TIndividual* createGeneration(TCgpProperties* geneticP, TFuncAvailable* functions);
-void destroyGeneration(TIndividual** geneticArray, TCgpProperties* geneticP);
+vector<TIndividual>* createGeneration(TCgpProperties* geneticP, TFuncAvailable* functions);
+void destroyGeneration(vector<TIndividual>* geneticArray, TCgpProperties* geneticP);

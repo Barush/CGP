@@ -14,27 +14,19 @@
 
 //alocation of a single subject of CGP
 TIndividual* alocateIndividual(int row, int col, TIndividual* subject, TCgpProperties* geneticP){
-	TCell** program = (TCell**)malloc(row * sizeof(TCell*));
+	vector< vector<TCell> >* program = new vector< vector<TCell> >(row);
 	if(program == NULL){
 		geneticP->ecode = EALLOC;
 		return NULL;
 	}
 
-	subject->output = (TCell*)malloc(sizeof(struct cell));
-	if(subject->output == NULL){
-		geneticP->ecode = EALLOC;
-		free(program);
-		return NULL;
-	}
-
 	for(int i = 0; i < row; i++){
-		program[i] = (TCell*)malloc(col * sizeof(TCell));
-		if(program[i] == NULL){
+		program->at(i).resize(col);
+		/*if(program->at(i) == NULL){
 			geneticP->ecode = EALLOC;
-			free(subject->output);
-			free(program);
+			delete(program);
 			return NULL;
-		}
+		}*/
 	}
 	
 	subject->fitness = 0;
@@ -54,64 +46,59 @@ TIndividual* createIndividual(TCgpProperties* geneticP, TIndividual *subject, TF
 
 	for(int i = 0; i < geneticP->rows; i++){
 		for(int j = 0; j < geneticP->cols; j++){
-			subject->CgpProgram[i][j].function = functions->funArr[rand() % functions->funCnt];
-			if(subject->CgpProgram[i][j].function == CONST){
-				subject->CgpProgram[i][j].input1 = rand() % CONSTCOUNT;
-				subject->CgpProgram[i][j].input2 = 0;
+			subject->CgpProgram->at(i)[j].function = functions->funArr->at(rand() % functions->funCnt);
+			if(subject->CgpProgram->at(i)[j].function == CONST){
+				subject->CgpProgram->at(i)[j].input1 = rand() % CONSTCOUNT;
+				subject->CgpProgram->at(i)[j].input2 = 0;
 			}
 			else {
 				int index = j * geneticP->rows + i;		//in which cell we are
 				if((index / geneticP->rows - geneticP->l_back) < 0){
-					subject->CgpProgram[i][j].input1 = rand() % ((index / geneticP->rows) * 
+					subject->CgpProgram->at(i)[j].input1 = rand() % ((index / geneticP->rows) * 
 						geneticP->rows + geneticP->inCount);
-					subject->CgpProgram[i][j].input2 = rand() % ((index / geneticP->rows) * 
+					subject->CgpProgram->at(i)[j].input2 = rand() % ((index / geneticP->rows) * 
 						geneticP->rows + geneticP->inCount);
 				}
 				else {
-					subject->CgpProgram[i][j].input1 = 
+					subject->CgpProgram->at(i)[j].input1 = 
 						(rand() % (geneticP->rows * geneticP->l_back)) + (index / geneticP->rows - geneticP->l_back) * geneticP->rows + geneticP->inCount;
-					subject->CgpProgram[i][j].input2 = 
+					subject->CgpProgram->at(i)[j].input2 = 
 						(rand() % (geneticP->rows * geneticP->l_back)) + (index / geneticP->rows - geneticP->l_back) * geneticP->rows + geneticP->inCount;
 				}
 			}
 		} //end of one row
 	} // end of whole matrix
 	if((geneticP->cols - geneticP->l_back) <= 0){
-		subject->output->input1 = rand() % (geneticP->cols * geneticP->rows) + geneticP->inCount;
+		subject->output.input1 = rand() % (geneticP->cols * geneticP->rows) + geneticP->inCount;
 	}
 	else{
-		subject->output->input1 = (rand() % (geneticP->rows * geneticP->l_back)) + (geneticP->cols - geneticP->l_back) * geneticP->rows + geneticP->inCount;
+		subject->output.input1 = (rand() % (geneticP->rows * geneticP->l_back)) + (geneticP->cols - geneticP->l_back) * geneticP->rows + geneticP->inCount;
 	}
 
 	return subject;
 }
 
 //create an array of individuals as a generation
-TIndividual* createGeneration(TCgpProperties* geneticP, TFuncAvailable* functions){
-	TIndividual* generation = NULL;
-	if((generation = (TIndividual*)malloc(geneticP->individCount * sizeof(struct individual))) == NULL){
+vector<TIndividual>* createGeneration(TCgpProperties* geneticP, TFuncAvailable* functions){
+	vector<TIndividual>* generation = new vector<TIndividual>(geneticP->individCount);
+	if(generation == NULL){
 		geneticP->ecode == EALLOC;
 		return NULL;
 	}
 
 	for(int i = 0; i < geneticP->individCount ; i++){
-		generation[i] = *(createIndividual(geneticP, &(generation[i]), functions));
+		generation->at(i) = *(createIndividual(geneticP, &generation->at(i), functions));
 	}
 
 	return generation;
 }
 
 
-void destroyGeneration(TIndividual** geneticArray, TCgpProperties* geneticP){
+void destroyGeneration(vector<TIndividual>* geneticArray, TCgpProperties* geneticP){
 	for(int i = 0; i < geneticP->individCount; i++){
-		for(int j = 0; j < geneticP->rows; j++){
-			//destroy each line
-			free((*geneticArray)[i].CgpProgram[j]);
-		}
-		free((*geneticArray)[i].CgpProgram);
-		free((*geneticArray)[i].output);
+		delete((*geneticArray)[i].CgpProgram);
 		delete((*geneticArray)[i].activeNodes);
 	}
-	free(*geneticArray);
+	delete(geneticArray);
 	return;
 }

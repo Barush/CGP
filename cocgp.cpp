@@ -44,10 +44,10 @@ TShared* memoryInit(){
 	return mem;
 }
 
-TArchive* archiveInit(TCgpProperties* geneticP, TIndividual* genArray, TFuncAvailable* funcAv){
+TArchive* archiveInit(TCgpProperties* geneticP, vector<TIndividual>* genArray, TFuncAvailable* funcAv){
 	TArchive* archive = NULL;
 	int descriptor;
-	TIndividual* secArray;
+	vector<TIndividual>* secArray;
 
 	descriptor = shm_open("archive01", O_RDWR|O_CREAT, 0600);
 	ftruncate(descriptor, sizeof(TArchive));
@@ -62,15 +62,15 @@ TArchive* archiveInit(TCgpProperties* geneticP, TIndividual* genArray, TFuncAvai
 		for(int i = 0; i < (2*geneticP->individCount); i++){
 			alocateIndividual(geneticP->rows, geneticP->cols, &archive->arch[i], geneticP);
 			if(i < geneticP->individCount){
-				copyGenotype(&genArray[i], &archive->arch[i], geneticP);
+				copyGenotype(&genArray->at(i), &archive->arch[i], geneticP);
 			}
 			else{
-				copyGenotype(&secArray[i - geneticP->individCount], &archive->arch[i], geneticP);
+				copyGenotype(&secArray->at(i - geneticP->individCount), &archive->arch[i], geneticP);
 			}
 		}
 	pthread_mutex_unlock(&archive->arch_sem);
 
-	destroyGeneration(&secArray, geneticP);
+	destroyGeneration(secArray, geneticP);
 	return archive;
 }
 
@@ -104,7 +104,7 @@ void changeArchive(int index, TArchive* archive, TIndividual* genotype, TCgpProp
 	return;
 }
 
-TCoevParams* paramsInit(TCgpProperties* geneticP, TIndividual* geneticArray, TFuncAvailable* funcAv, TData* input){
+TCoevParams* paramsInit(TCgpProperties* geneticP, vector<TIndividual>* geneticArray, TFuncAvailable* funcAv, TData* input){
 	TCoevParams* params = (TCoevParams*)malloc(sizeof(struct coevParams));
 	params->memory = memoryInit();
 	params->CGPparams = geneticP;
@@ -117,13 +117,17 @@ TCoevParams* paramsInit(TCgpProperties* geneticP, TIndividual* geneticArray, TFu
 }
 
 int main(int argc, char** argv){
-	TIndividual* geneticArray;		//array for one generation
+
+/************************** INITIALIZATIONS **********************************/
+
+	vector<TIndividual>* geneticArray;		//array for one generation
 	TCgpProperties* geneticParams;	//parameters of CGP
 	TData* input;					//matrix of input-output data
-	TFuncAvailable* funcAv;			//array of used functions
+	TFuncAvailable* funcAv;			//struct with array of used functions
 	int fitness = 0, gener = 0;		//vars used to know how good cgp works
 #ifdef COEVOLUTION
 	int fitCh_ind = 0, nGen_ind = 0;//variables for archive indexes
+	int c_fitness = 0, tmp_fit;
 #endif
 
 	srand(time(NULL));			 	// initiate random generator
@@ -159,7 +163,7 @@ int main(int argc, char** argv){
 	input = getData(argv[1], geneticParams);
 	if(geneticParams->ecode != EOK){
 		destroyData(input);
-		destroyGeneration(&geneticArray, geneticParams);
+		destroyGeneration(geneticArray, geneticParams);
 		destroyFunctions(funcAv);
 		free(geneticParams);
 		printError(geneticParams->ecode);
@@ -173,19 +177,23 @@ int main(int argc, char** argv){
 	pthread_create(&coevolution_var, NULL, coevolution, (void *)params);
 #endif
 
+/***************************** EVOLUTION *************************************/
+
 	for(int i = 0;; i++){
+		
 #ifdef COEVOLUTION
 		evolutionStep(input, geneticParams, geneticArray, funcAv, params->test);
 #else
 		evolutionStep(input, geneticParams, geneticArray, funcAv, NULL);
 #endif
+
 		//every hundred generations write out actual state,
 		//COEV: let second thread to do a step and save ind. to archive
 		if(!(i%100)){
-			cout << i << " " << geneticArray[0].fitness << endl;
+			cout << i << " " << geneticArray->at(0).fitness << endl;
 #ifdef COEVOLUTION
 			changeArchive((nGen_ind%geneticParams->individCount + geneticParams->individCount),
-			 params->archive, &geneticArray[0], geneticParams);
+			 	params->archive, &geneticArray->at(0), geneticParams);
 			nGen_ind++;
 			pthread_mutex_lock(&params->memory->cont_sem);
 				params->memory->cont = true;
@@ -193,37 +201,56 @@ int main(int argc, char** argv){
 #endif
 		}
 
+#ifdef COEVOLUTION
+		//COEV: every milion generations check and save the global fitness
+		//if it didnt change since last time, end counting
+		if(!(i%1000000) && i > 0){
+			if(c_fitness == (tmp_fit = C_testGlobalSolution(&geneticArray->at(0), input, geneticParams))){
+				cout << "Breaks on 202.." << endl;
+				break;
+			}
+			else{
+				c_fitness = tmp_fit;
+			}
+		}
+#endif
+
 		//if fitness changed, save it
 		//COEV: change archive
-		if(geneticArray[0].fitness != fitness){
-			fitness = geneticArray[0].fitness;
+		if(geneticArray->at(0).fitness != fitness){
+			fitness = geneticArray->at(0).fitness;
 			gener = i;
 #ifdef COEVOLUTION
-			changeArchive(fitCh_ind%geneticParams->individCount, params->archive, &geneticArray[0], geneticParams);
+			changeArchive(fitCh_ind%geneticParams->individCount, params->archive, &geneticArray->at(0), geneticParams);
 			fitCh_ind++;
 #endif
 		}
 		//if fitness didnt change for milion geners, end it
 		if((i - gener) > 1000000){
+			cout << "breaks on 223" << endl;
 			break;
 		}
 
 #ifdef COEVOLUTION
 		//COEV: if reached maximal fitness, test if has global solution
-		if(geneticArray[0].fitness == geneticParams->testSize){
-			if(C_testGlobalSolution(&geneticArray[0], input, geneticParams)){
+		if(geneticArray->at(0).fitness == geneticParams->testSize){
+			if(C_testGlobalSolution(&geneticArray->at(0), input, geneticParams) > (int)(0.98 * input->dataCount)){
 				cout << i + 1 << " " << input->dataCount << endl;
+				cout << "breaks on 232" << endl;
 				break;
 			}
 		}
 #else
 		//if reached maximal fitness, end it
-		if(geneticArray[0].fitness == input->dataCount){
+		if(geneticArray->at(0).fitness > (int)(0.98 * input->dataCount)){
 			cout << i + 1 << " " << input->dataCount << endl;
+			cout << "breaks on 240" << endl;
 			break;
 		}
 #endif
 	}
+
+//**************************** TIDING UP *************************************/
 
 #ifdef COEVOLUTION
 	//ending of second thread
@@ -235,18 +262,18 @@ int main(int argc, char** argv){
 	pthread_mutex_unlock(&params->memory->end_sem);
 #endif
 
-	TIndividual* solution = &(geneticArray[0]);
+	TIndividual* solution = &(geneticArray->at(0));
 	printResult(solution, geneticParams);
 	printReadableResult(solution, geneticParams);
 	cerr << "Counted nodes: " << geneticParams->countedNodes << endl;
 
 #ifdef COEVOLUTION
-	//waiting while second thread doesnt finish
+	//waiting till second thread finishes
 	int retval = 0;
 	while((retval = pthread_tryjoin_np(coevolution_var, NULL)) != 0);
 #endif	
 
-    destroyGeneration(&geneticArray, geneticParams);
+    destroyGeneration(geneticArray, geneticParams);
     destroyData(input);
     destroyFunctions(funcAv);
     free(geneticParams);

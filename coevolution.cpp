@@ -16,16 +16,14 @@
 #define BESTCNT 8
 #define CHLDCNT 8
 
-bool C_testGlobalSolution(TIndividual* solution, TData* input, TCgpProperties* geneticP){
-	resetFitness_ActiveNodes(solution, geneticP);
+int C_testGlobalSolution(TIndividual* solution, TData* input, TCgpProperties* geneticP){
+	resetFitness(solution);
 	for(int i = 0; i < input->dataCount; i++){
 		getValue(solution, geneticP, input->data[i]);
 		getFitness(solution, geneticP, input->data[i]);
 	}
 
-	if(solution->fitness == input->dataCount)
-		return true;
-	return false;
+	return solution->fitness;
 }
 
 TCoevIndividual C_controlDuplicities(vector<int>* test, TData* input){
@@ -78,7 +76,7 @@ void C_evaluatePopulation(vector<TCoevIndividual>* population, TData* input, TIn
 		for(int j = 0; j < population->at(i).value->size(); j++){
 			for(int k = 0; k < params->individCount; k++){
 				//reset fitness
-				resetFitness_ActiveNodes(&archive[k], params);
+				resetFitness(&archive[k]);
 				//get value
 				getValue(&archive[k], params, input->data[population->at(i).value->at(j)]);
 				//get fitness
@@ -186,6 +184,8 @@ void C_changeTest(TTest* test, TCoevIndividual* newTest, TCgpProperties* CGPpara
 void* coevolution(void* par){
 	srand(time(NULL));
 
+	cout << "Coevolution started..." << endl;
+
 	TCoevParams* params = (TCoevParams*) par;
 	vector<TCoevIndividual> *population = generatePopulation(params->CGPparams, params->input);
 
@@ -195,6 +195,7 @@ void* coevolution(void* par){
 		//presun na konec --> aby byl test
 		while(1){
 			//zrusit aktivni cekani
+			//nahradit umelym spozdenim...
 			if(params->memory->cont)
 				break;
 		}

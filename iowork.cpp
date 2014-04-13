@@ -199,20 +199,20 @@ void expandNode(TStackItem** tmp, TIndividual* result, TStackItem** stack, TCgpP
 
 	//get first operand
 	TStackItem* op1 = (TStackItem*)malloc(sizeof(struct stackItem));
-	if(result->CgpProgram[row][col].input1 < geneticP->inCount){
+	if(result->CgpProgram->at(row)[col].input1 < geneticP->inCount){
 		op1->isTerm = TERM;
-		op1->printable = strdup(intToStr(result->CgpProgram[row][col].input1)); 
+		op1->printable = strdup(intToStr(result->CgpProgram->at(row)[col].input1)); 
 	}
 	else {
 		op1->isTerm = NONTERM;
 		op1->printable = strdup("nonterm");
 	}
-	op1->value = result->CgpProgram[row][col].input1;
+	op1->value = result->CgpProgram->at(row)[col].input1;
 
 	//get operation - always TERM
 	TStackItem* func = (TStackItem*)malloc(sizeof(struct stackItem));
 	func->isTerm = TERM;
-	switch (result->CgpProgram[row][col].function) {
+	switch (result->CgpProgram->at(row)[col].function) {
 		case MUL:	func->printable =  strdup("*");
 					break;
 		case DIV:	func->printable =  strdup("/");
@@ -240,15 +240,15 @@ void expandNode(TStackItem** tmp, TIndividual* result, TStackItem** stack, TCgpP
 
 	//get second operand
 	TStackItem* op2 = (TStackItem*)malloc(sizeof(struct stackItem));
-	if(result->CgpProgram[row][col].input2 < geneticP->inCount){
+	if(result->CgpProgram->at(row)[col].input2 < geneticP->inCount){
 		op2->isTerm = TERM;
-		op2->printable = strdup(intToStr(result->CgpProgram[row][col].input2)); 
+		op2->printable = strdup(intToStr(result->CgpProgram->at(row)[col].input2)); 
 	}
 	else{
 		op2->isTerm = NONTERM;
 		op2->printable = strdup("nonterm");
 	}
-	op2->value = result->CgpProgram[row][col].input2;
+	op2->value = result->CgpProgram->at(row)[col].input2;
 
 	//insert )
 	TStackItem* rBracket = (TStackItem*)malloc(sizeof(struct stackItem));
@@ -258,7 +258,7 @@ void expandNode(TStackItem** tmp, TIndividual* result, TStackItem** stack, TCgpP
 	//connect stack into list
 	if(!strcmp(func->printable, "const")){
 		op1->isTerm = TERM;
-		op1->printable = getPrintable(result->CgpProgram[row][col].input1);
+		op1->printable = getPrintable(result->CgpProgram->at(row)[col].input1);
  		if((*tmp)->prev != NULL){
 			(*tmp)->prev->next = op1;
 		}		
@@ -361,7 +361,7 @@ void printReadableResult(TIndividual* result, TCgpProperties* geneticP){
 	bool change;
 
 	node->isTerm = NONTERM;
-	node->value = result->output->input1;
+	node->value = result->output.input1;
 	node->printable = strdup("nonterm");
 	node->next = NULL;
 	node->prev = NULL;
@@ -397,12 +397,12 @@ void printResult(TIndividual* result, TCgpProperties* geneticP){
 	cerr << "====================================================================" << endl;
 	for(int i = 0; i < geneticP->rows; i++){
 		for(int j = 0; j < geneticP->cols; j++){
-			cerr << (*result).CgpProgram[i][j].input1 << " " << (*result).CgpProgram[i][j].input2 << " [" << (*result).CgpProgram[i][j].function << "]   ";
+			cerr << (*result).CgpProgram->at(i)[j].input1 << " " << (*result).CgpProgram->at(i)[j].input2 << " [" << (*result).CgpProgram->at(i)[j].function << "]   ";
 			fflush(stdout);
 		}
 		cerr << endl;
 	}
-	cerr << (*result).output->input1 << " [Y]" << endl;
+	cerr << (*result).output.input1 << " [Y]" << endl;
 	cerr << "Active nodes: ";
 	for(int i = 0; i < (geneticP->rows * geneticP->cols); i++){
 		if(result->activeNodes->at(i))
@@ -564,10 +564,10 @@ TFuncAvailable* getFunctions(char* filename, TCgpProperties* params){
 	}
 
 	functions->funCnt = getDataCount(input);
-	functions->funArr = (int*)malloc(functions->funCnt * sizeof(int));
+	functions->funArr = new vector<int>(functions->funCnt);
 
 	for(int i = 0; i < functions->funCnt; i++){
-		functions->funArr[i] = getFunc(input);
+		functions->funArr->at(i) = getFunc(input);
 	}
 
 	fclose(input);
@@ -575,6 +575,6 @@ TFuncAvailable* getFunctions(char* filename, TCgpProperties* params){
 }
 
 void destroyFunctions(TFuncAvailable* fnc){
-	free(fnc->funArr);
+	delete(fnc->funArr);
 	free(fnc);
 }

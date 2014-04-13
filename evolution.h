@@ -14,6 +14,6 @@
 #include "iowork.h"
 #include "evalexpre.h"
 
-void evolutionStep(TData* input, TCgpProperties* geneticP, TIndividual* geneticArray, TFuncAvailable* functions, TTest* test);
+void evolutionStep(TData* input, TCgpProperties* geneticP, vector<TIndividual>* geneticArray, TFuncAvailable* functions, TTest* test);
 void getParents(TIndividual** geneticArray, TCgpProperties* geneticP);
 void copyGenotype(TIndividual* from, TIndividual* to, TCgpProperties* geneticP);

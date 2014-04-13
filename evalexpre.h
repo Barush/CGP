@@ -13,7 +13,7 @@
 #include "datatypes.h"
 
 /******************* FUNCTION PROTOTYPES ***************************************/
-void getActiveNodes(TIndividual* geneticArray, TCgpProperties* geneticP);
+void getActiveNodes(vector<TIndividual>* geneticArray, TCgpProperties* geneticP);
 void getValue(TIndividual* genotype, TCgpProperties* geneticP, double* dataArray);
-void resetFitness_ActiveNodes(TIndividual* genotype, TCgpProperties* geneticP);
+void resetFitness(TIndividual* genotype);
 void getFitness(TIndividual* genotype, TCgpProperties* geneticP, double* dataArray);

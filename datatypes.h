@@ -106,8 +106,8 @@ typedef struct cgpProperties {
 
 //whole CGP struct
 typedef struct individual{
-	TCell** CgpProgram;
-	TCell* output;
+	vector< vector<TCell> >* CgpProgram;
+	TCell output;
 	vector<bool>* activeNodes;
 	int activeNodesCount;
 	double value;
@@ -122,7 +122,7 @@ typedef struct data{
 
 //functions file data struct
 typedef struct funcAvailable{
-	int* funArr;
+	vector<int>* funArr;
 	int funCnt;
 }TFuncAvailable;
 
