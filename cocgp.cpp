@@ -47,7 +47,7 @@ TShared* memoryInit(){
 TArchive* archiveInit(TCgpProperties* geneticP, vector<TIndividual>* genArray, TFuncAvailable* funcAv){
 	TArchive* archive = NULL;
 	int descriptor;
-	vector<TIndividual>* secArray;
+	vector<TIndividual>* nextArray;
 
 	descriptor = shm_open("archive01", O_RDWR|O_CREAT, 0600);
 	ftruncate(descriptor, sizeof(TArchive));
@@ -55,22 +55,31 @@ TArchive* archiveInit(TCgpProperties* geneticP, vector<TIndividual>* genArray, T
 
 	pthread_mutex_init(&archive->arch_sem, NULL);
 
-	secArray = createGeneration(geneticP, funcAv);
-
 	pthread_mutex_lock(&archive->arch_sem);
-		archive->arch = (TIndividual*)malloc(2 * geneticP->individCount * sizeof(struct individual));
-		for(int i = 0; i < (2*geneticP->individCount); i++){
+		archive->arch = (TIndividual*)malloc(geneticP->archiveSize * geneticP->individCount * sizeof(struct individual));
+		for(int i = 0; i < (geneticP->archiveSize*geneticP->individCount); i++){
 			alocateIndividual(geneticP->rows, geneticP->cols, &archive->arch[i], geneticP);
 			if(i < geneticP->individCount){
 				copyGenotype(&genArray->at(i), &archive->arch[i], geneticP);
 			}
-			else{
-				copyGenotype(&secArray->at(i - geneticP->individCount), &archive->arch[i], geneticP);
+			else if(!(i % geneticP->individCount)){
+				if(i == geneticP->individCount){
+					nextArray = createGeneration(geneticP, funcAv);
+					copyGenotype(&nextArray->at(i%geneticP->individCount), &archive->arch[i], geneticP);
+				}
+				else{
+					destroyGeneration(nextArray, geneticP);
+					nextArray = createGeneration(geneticP, funcAv);
+					copyGenotype(&nextArray->at(i%geneticP->individCount), &archive->arch[i], geneticP);
+				}
+			}
+			else if (i > geneticP->individCount){
+				copyGenotype(&nextArray->at(i%geneticP->individCount), &archive->arch[i], geneticP);
 			}
 		}
 	pthread_mutex_unlock(&archive->arch_sem);
 
-	destroyGeneration(secArray, geneticP);
+	destroyGeneration(nextArray, geneticP);
 	return archive;
 }
 
@@ -206,7 +215,6 @@ int main(int argc, char** argv){
 		//if it didnt change since last time, end counting
 		if(!(i%1000000) && i > 0){
 			if(c_fitness == (tmp_fit = C_testGlobalSolution(&geneticArray->at(0), input, geneticParams))){
-				cout << "Breaks on 202.." << endl;
 				break;
 			}
 			else{
@@ -227,7 +235,6 @@ int main(int argc, char** argv){
 		}
 		//if fitness didnt change for milion geners, end it
 		if((i - gener) > 1000000){
-			cout << "breaks on 223" << endl;
 			break;
 		}
 
@@ -236,7 +243,6 @@ int main(int argc, char** argv){
 		if(geneticArray->at(0).fitness == geneticParams->testSize){
 			if(C_testGlobalSolution(&geneticArray->at(0), input, geneticParams) > (int)(0.98 * input->dataCount)){
 				cout << i + 1 << " " << input->dataCount << endl;
-				cout << "breaks on 232" << endl;
 				break;
 			}
 		}
@@ -244,7 +250,6 @@ int main(int argc, char** argv){
 		//if reached maximal fitness, end it
 		if(geneticArray->at(0).fitness > (int)(0.98 * input->dataCount)){
 			cout << i + 1 << " " << input->dataCount << endl;
-			cout << "breaks on 240" << endl;
 			break;
 		}
 #endif

@@ -151,11 +151,11 @@ void getValue(TIndividual* genotype, TCgpProperties* geneticP, double* dataArray
 				}//not const
 
 				values->at(i*geneticP->rows + j) = countVal(func, op1, op2);
-				geneticP->countedNodes++;
 			}//if node is active
 		}//for all rows
 	}//for all columns	
 	genotype->value = values->at(genotype->output.input1 - geneticP->inCount);
+	geneticP->countedNodes++;
 
 	delete(values);
 }

@@ -17,7 +17,6 @@
 #define INCOUNT 1
 #define OUTCOUNT 1
 #define COMPINCOUNT 2
-#define FUNCTIONCOUNT 10
 #define ROW 1
 #define COL 20
 #define L_BACK 20
@@ -74,7 +73,6 @@ TCgpProperties* getParams(char** argv, int argc){
 	params->inCount = INCOUNT;
 	params->outCount = OUTCOUNT;
 	params->compInCount = COMPINCOUNT;
-	params->functionCount = FUNCTIONCOUNT;
 	params->rows = ROW;
 	params->cols = COL;
 	params->l_back = L_BACK;
@@ -84,6 +82,7 @@ TCgpProperties* getParams(char** argv, int argc){
 	params->hybridPoints = 1;
 	params->testSize = 10;
 	params->coevICnt = 20;
+	params->archiveSize = 2;
 	params->ecode = EOK;
 
 	// set custom changes
@@ -141,6 +140,11 @@ TCgpProperties* getParams(char** argv, int argc){
 			//count of individs in coevolution generation
 			i++;
 			params->coevICnt = atoi(argv[i]);
+		}
+		else if(!strcmp(argv[i], "-a")){
+			//count of individs in coevolution generation
+			i++;
+			params->archiveSize = atoi(argv[i]);
 		}
 		else{
 			params->ecode = ECMD;

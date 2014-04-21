@@ -184,8 +184,6 @@ void C_changeTest(TTest* test, TCoevIndividual* newTest, TCgpProperties* CGPpara
 void* coevolution(void* par){
 	srand(time(NULL));
 
-	cout << "Coevolution started..." << endl;
-
 	TCoevParams* params = (TCoevParams*) par;
 	vector<TCoevIndividual> *population = generatePopulation(params->CGPparams, params->input);
 

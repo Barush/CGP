@@ -90,7 +90,6 @@ typedef struct cgpProperties {
 	int inCount;			//count of main inputs
 	int outCount;			//count of main outputs
 	int compInCount;		//count of component inputs
-	int functionCount;		//count of functions
 	int rows;				//count of rows in the matrix
 	int cols;				//count of columns in the matrix
 	int l_back;		 		//l-back param of the matrix
@@ -98,10 +97,11 @@ typedef struct cgpProperties {
 	double fitToleration;	//toleration of hits
 	double constants[CONSTCOUNT];//constants array
 	double countedNodes;	//countednodes during whole run
-	int hybridPoints;
-	int testSize;
-	int coevICnt;
-	TErrCode ecode;
+	int hybridPoints;		//COEV: number of points use for crossing
+	int testSize;			//COEV: size of one test
+	int coevICnt;			//COEV: number of tests in one generation
+	int archiveSize;		//COEV: size of archive comparing to CGP generation
+	TErrCode ecode;			//actual state of encounting
 }TCgpProperties;
 
 //whole CGP struct
