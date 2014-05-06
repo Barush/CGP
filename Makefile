@@ -59,10 +59,10 @@ c_coevolution.o: coevolution.h coevolution.cpp
 	#$(CC) -c coevolution.cpp
 
 run:
-	./cgp x_2_3.txt func.txt -r 1 -c 20 -t 0.1 -l 30
+	./cgp ./testfiles/testdata.txt func.txt -r 1 -c 32 -t 0.1 -l 32 -g 12
 
 coev:
-	./coecgp x_2_3.txt func.txt -r 1 -c 30 -t 0.1 -l 30 -h 2 -s 10 -cg 20
+	./coecgp ./testfiles/x_2_3.txt func.txt -r 1 -c 30 -t 0.1 -l 30 -h 2 -s 10 -cg 20
 
 clean: 
 	rm -f *.o

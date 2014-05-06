@@ -6,14 +6,14 @@
 #define PI 3.1415926535
 
 double function(double x, double y){
-	return pow(x, 2) * pow(E, sin(x)) + x + sin(PI / pow(x, 3));
+	return x*x;
 }
 
 
 int main(){
 	
 	FILE *newF;
-	newF = fopen("sums.txt", "w+");
+	newF = fopen("testdata.txt", "w+");
 	//fprintf(newF, "%s\n", "400");
 	fprintf(newF, "200\n");
 	double y = 0;

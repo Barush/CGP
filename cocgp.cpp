@@ -140,6 +140,11 @@ int main(int argc, char** argv){
 #endif
 
 	srand(time(NULL));			 	// initiate random generator
+	struct rusage usage;
+	struct timeval start, end;
+	getrusage(RUSAGE_SELF, &usage);
+	start = usage.ru_stime;
+
 	if(!strcmp(argv[1], "--help")){
 		//parameter help
 		printUsage();
@@ -174,9 +179,10 @@ int main(int argc, char** argv){
 		destroyData(input);
 		destroyGeneration(geneticArray, geneticParams);
 		destroyFunctions(funcAv);
-		free(geneticParams);
 		printError(geneticParams->ecode);
-		return geneticParams->ecode;
+		int err = geneticParams->ecode;
+		free(geneticParams);
+		return err;
 	}
 
 #ifdef COEVOLUTION
@@ -271,6 +277,9 @@ int main(int argc, char** argv){
 	printResult(solution, geneticParams);
 	printReadableResult(solution, geneticParams);
 	cerr << "Counted nodes: " << geneticParams->countedNodes << endl;
+	getrusage(RUSAGE_SELF, &usage);
+	end = usage.ru_stime;
+	cerr << "CPU time: " << end.tv_sec - start.tv_sec << "." << end.tv_usec - start.tv_usec << endl;
 
 #ifdef COEVOLUTION
 	//waiting till second thread finishes
