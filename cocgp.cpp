@@ -140,10 +140,7 @@ int main(int argc, char** argv){
 #endif
 
 	srand(time(NULL));			 	// initiate random generator
-	struct rusage usage;
-	struct timeval start, end;
-	getrusage(RUSAGE_SELF, &usage);
-	start = usage.ru_stime;
+	struct rusage usage, childusage;
 
 	if(!strcmp(argv[1], "--help")){
 		//parameter help
@@ -221,13 +218,20 @@ int main(int argc, char** argv){
 		//if it didnt change since last time, end counting
 		if(!(i%1000000) && i > 0){
 			if(c_fitness == (tmp_fit = C_testGlobalSolution(&geneticArray->at(0), input, geneticParams))){
-				break;
+				//break;
 			}
-			else{
+			//else{
 				c_fitness = tmp_fit;
-			}
+			//}
 		}
 #endif
+		//if counting runs for 20M generations, end it
+		if(i > 20000000)
+#ifdef COEVOLUTION
+			cout << i + 1 << " " << C_testGlobalSolution(&geneticArray->at(0), input, geneticParams) > (int)(0.97 * input->dataCount) << endl;
+#endif
+			break;
+
 
 		//if fitness changed, save it
 		//COEV: change archive
@@ -240,21 +244,21 @@ int main(int argc, char** argv){
 #endif
 		}
 		//if fitness didnt change for milion geners, end it
-		if((i - gener) > 1000000){
-			break;
-		}
+		//if((i - gener) > 1000000){
+		//	break;
+		//}
 
 #ifdef COEVOLUTION
 		//COEV: if reached maximal fitness, test if has global solution
 		if(geneticArray->at(0).fitness == geneticParams->testSize){
-			if(C_testGlobalSolution(&geneticArray->at(0), input, geneticParams) > (int)(0.98 * input->dataCount)){
+			if(C_testGlobalSolution(&geneticArray->at(0), input, geneticParams) > (int)(0.97 * input->dataCount)){
 				cout << i + 1 << " " << input->dataCount << endl;
 				break;
 			}
 		}
 #else
 		//if reached maximal fitness, end it
-		if(geneticArray->at(0).fitness > (int)(0.98 * input->dataCount)){
+		if(geneticArray->at(0).fitness > (int)(0.97 * input->dataCount)){
 			cout << i + 1 << " " << input->dataCount << endl;
 			break;
 		}
@@ -278,8 +282,13 @@ int main(int argc, char** argv){
 	printReadableResult(solution, geneticParams);
 	cerr << "Counted nodes: " << geneticParams->countedNodes << endl;
 	getrusage(RUSAGE_SELF, &usage);
-	end = usage.ru_stime;
-	cerr << "CPU time: " << end.tv_sec - start.tv_sec << "." << end.tv_usec - start.tv_usec << endl;
+	double tim = usage.ru_utime.tv_sec + (usage.ru_utime.tv_usec / 1000000.0);
+#ifdef COEVOLUTION
+	getrusage(RUSAGE_CHILDREN, &childusage);
+	double childtime = childusage.ru_utime.tv_sec + (childusage.ru_utime.tv_usec / 1000000.0);
+	tim += childtime;
+#endif
+	cerr << "CPU time (s): " << tim  << endl;
 
 #ifdef COEVOLUTION
 	//waiting till second thread finishes

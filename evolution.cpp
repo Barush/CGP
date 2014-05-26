@@ -52,7 +52,7 @@ void getParents(vector<TIndividual>* geneticArray, TCgpProperties* geneticP){
 
 void changeGenes(TIndividual* genotype, TCgpProperties* geneticP, TFuncAvailable* functions){
 	//generate percent - 3-10
-	double percent = ((rand() % 7) + 3.5) / 100;	//uniform(3,10) + 0.5 for the round corection
+	double percent = ((rand() % 7) + 1.5) / 100;	//uniform(1,8) + 0.5 for the round corection
 	int nodesCount = geneticP->rows * geneticP->cols;
 	int index, row, col, part;
 

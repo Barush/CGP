@@ -193,7 +193,7 @@ void* coevolution(void* par){
 		//presun na konec --> aby byl test
 		while(1){
 			//zrusit aktivni cekani
-			//nahradit umelym spozdenim...
+			//nahradit umelym zpozdenim...
 			if(params->memory->cont)
 				break;
 		}
