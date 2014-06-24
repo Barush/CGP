@@ -20,6 +20,7 @@ TIndividual* alocateIndividual(int row, int col, TIndividual* subject, TCgpPrope
 		return NULL;
 	}
 
+	//make columns in all rows
 	for(int i = 0; i < row; i++){
 		program->at(i).resize(col);
 		/*if(program->at(i) == NULL){
@@ -47,6 +48,7 @@ TIndividual* createIndividual(TCgpProperties* geneticP, TIndividual *subject, TF
 	for(int i = 0; i < geneticP->rows; i++){
 		for(int j = 0; j < geneticP->cols; j++){
 			subject->CgpProgram->at(i)[j].function = functions->funArr->at(rand() % functions->funCnt);
+
 			if(subject->CgpProgram->at(i)[j].function == CONST){
 				subject->CgpProgram->at(i)[j].input1 = rand() % CONSTCOUNT;
 				subject->CgpProgram->at(i)[j].input2 = 0;
@@ -54,12 +56,14 @@ TIndividual* createIndividual(TCgpProperties* geneticP, TIndividual *subject, TF
 			else {
 				int index = j * geneticP->rows + i;		//in which cell we are
 				if((index / geneticP->rows - geneticP->l_back) < 0){
+					//lback is not used
 					subject->CgpProgram->at(i)[j].input1 = rand() % ((index / geneticP->rows) * 
 						geneticP->rows + geneticP->inCount);
 					subject->CgpProgram->at(i)[j].input2 = rand() % ((index / geneticP->rows) * 
 						geneticP->rows + geneticP->inCount);
 				}
 				else {
+					//lback is in usage
 					subject->CgpProgram->at(i)[j].input1 = 
 						(rand() % (geneticP->rows * geneticP->l_back)) + (index / geneticP->rows - geneticP->l_back) * geneticP->rows + geneticP->inCount;
 					subject->CgpProgram->at(i)[j].input2 = 
@@ -68,10 +72,13 @@ TIndividual* createIndividual(TCgpProperties* geneticP, TIndividual *subject, TF
 			}
 		} //end of one row
 	} // end of whole matrix
+
 	if((geneticP->cols - geneticP->l_back) <= 0){
+		//output can be every node
 		subject->output.input1 = rand() % (geneticP->cols * geneticP->rows) + geneticP->inCount;
 	}
 	else{
+		//output has lback restriction
 		subject->output.input1 = (rand() % (geneticP->rows * geneticP->l_back)) + (geneticP->cols - geneticP->l_back) * geneticP->rows + geneticP->inCount;
 	}
 
@@ -88,6 +95,8 @@ vector<TIndividual>* createGeneration(TCgpProperties* geneticP, TFuncAvailable* 
 
 	for(int i = 0; i < geneticP->individCount ; i++){
 		generation->at(i) = *(createIndividual(geneticP, &generation->at(i), functions));
+		/*if(generation->at(i) == NULL)
+			return NULL;*/
 	}
 
 	return generation;

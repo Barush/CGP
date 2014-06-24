@@ -101,6 +101,8 @@ typedef struct cgpProperties {
 	int testSize;			//COEV: size of one test
 	int coevICnt;			//COEV: number of tests in one generation
 	int archiveSize;		//COEV: size of archive comparing to CGP generation
+	int bestCnt;			//COEV: number of best genotypes continuing to the next generation
+	int chldCnt;			//COEV: number of children created for the next generation
 	TErrCode ecode;			//actual state of encounting
 }TCgpProperties;
 

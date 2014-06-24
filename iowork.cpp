@@ -30,8 +30,8 @@ void printUsage(){
 
 	cout << "Usage: " << endl;
 	cout << "./cgp testfile funcfile [-r rows -c cols -l L-back -g generation -i inputs_count] (standard CGP)" << endl << endl;
-	cout << "./coecgp testfile funcfile [-r rows -c cols -l L-back -g generation -i inputs_count -h crossing_pts" <<
-		"-s c_individual_size -cg c_generation_size] (coevolutionary CGP)" << endl << endl;
+	cout << "./coecgp testfile funcfile [-r rows -c cols -l L-back -g generation -i inputs_count -p crossing_pts" <<
+		"-s c_individual_size -cg c_generation_size] (coevolutionary CGP) -b best_cnt -ch child_cnt" << endl << endl;
 	cout << "\t testfile looks like: " << endl;
 	cout << "\t\t number_of_test_vectors" << endl;
 	cout << "\t\t in1 in2 in3 .. inN out" << endl;
@@ -46,6 +46,8 @@ void printUsage(){
 	cout << "\t crossing_pts - number of points of crossing in coevolution" << endl;
 	cout << "\t c_individual_size - size of each test in coevolution" << endl;
 	cout << "\t c_generation_size - number of individuals in each generation in coevolution" << endl;
+	cout << "\t best_cnt - number of best genotype of last gen. in the next gen. in coevolution" << endl;
+	cout << "\t child_cnt - number of children in next generation in coevolution" << endl;
 	return;
 }
 
@@ -83,6 +85,8 @@ TCgpProperties* getParams(char** argv, int argc){
 	params->testSize = 10;
 	params->coevICnt = 20;
 	params->archiveSize = 2;
+	params->bestCnt = 8;
+	params->chldCnt = 8;
 	params->ecode = EOK;
 
 	// set custom changes
@@ -123,13 +127,13 @@ TCgpProperties* getParams(char** argv, int argc){
 			i++;
 			params->inCount = atoi(argv[i]);
 		}
-		else if(!strcmp(argv[i], "-h")){
+		else if(!strcmp(argv[i], "-p")){
 			//number of crossing points in coevolution
-
-			// TODO: add control to max 3 crossing pts
-
 			i++;
 			params->hybridPoints = atoi(argv[i]);
+			if(params->hybridPoints > 3){
+				params->ecode = ECMD;
+			}
 		}
 		else if(!strcmp(argv[i], "-s")){
 			//size of test vector in coevolution
@@ -146,10 +150,25 @@ TCgpProperties* getParams(char** argv, int argc){
 			i++;
 			params->archiveSize = atoi(argv[i]);
 		}
+		else if(!strcmp(argv[i], "-b")){
+			//count of individs in coevolution generation
+			i++;
+			params->bestCnt = atoi(argv[i]);
+		}
+		else if(!strcmp(argv[i], "-ch")){
+			//count of individs in coevolution generation
+			i++;
+			params->chldCnt = atoi(argv[i]);
+		}
 		else{
 			params->ecode = ECMD;
 			break;
 		}
+	}
+
+	if((params->bestCnt + params->chldCnt) > params->coevICnt){
+		cerr << "Be carefull for the size of the coev population and its composition." << endl;
+		params->ecode = ECMD;
 	}
 
 	params->constants[PI] = 3.141592;

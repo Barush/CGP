@@ -79,7 +79,8 @@ TArchive* archiveInit(TCgpProperties* geneticP, vector<TIndividual>* genArray, T
 		}
 	pthread_mutex_unlock(&archive->arch_sem);
 
-	destroyGeneration(nextArray, geneticP);
+	if(geneticP->archiveSize > 1)
+		destroyGeneration(nextArray, geneticP);
 	return archive;
 }
 
@@ -204,8 +205,15 @@ int main(int argc, char** argv){
 		if(!(i%100)){
 			cout << i << " " << geneticArray->at(0).fitness << endl;
 #ifdef COEVOLUTION
-			changeArchive((nGen_ind%geneticParams->individCount + geneticParams->individCount),
-			 	params->archive, &geneticArray->at(0), geneticParams);
+			int arch_index = 0;
+			switch(geneticParams->archiveSize){
+				case 1: arch_index = (nGen_ind%geneticParams->individCount + geneticParams->individCount) / 2;
+						break;
+				case 2: arch_index = (nGen_ind%geneticParams->individCount + geneticParams->individCount);
+						break;
+				case 3: arch_index = (int)((nGen_ind%geneticParams->individCount + geneticParams->individCount) * 1.5);
+			}
+			changeArchive(arch_index,params->archive, &geneticArray->at(0), geneticParams);
 			nGen_ind++;
 			pthread_mutex_lock(&params->memory->cont_sem);
 				params->memory->cont = true;
@@ -226,11 +234,12 @@ int main(int argc, char** argv){
 		}
 #endif
 		//if counting runs for 20M generations, end it
-		if(i > 20000000)
+		if(i > 10000000){
 #ifdef COEVOLUTION
-			cout << i + 1 << " " << C_testGlobalSolution(&geneticArray->at(0), input, geneticParams) > (int)(0.97 * input->dataCount) << endl;
+			cout << i + 1 << " " << C_testGlobalSolution(&geneticArray->at(0), input, geneticParams) << endl;
 #endif
 			break;
+		}
 
 
 		//if fitness changed, save it

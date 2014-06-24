@@ -12,8 +12,6 @@
 
 #include "coevolution.h"
 
-//these will be params
-#define BESTCNT 8
 #define CHLDCNT 8
 
 int C_testGlobalSolution(TIndividual* solution, TData* input, TCgpProperties* geneticP){
@@ -114,7 +112,7 @@ int C_getParent(vector<TCoevIndividual>* population, TCgpProperties* CGPparams){
 void C_getChildren(vector<TCoevIndividual>* oldGen, vector<TCoevIndividual>* newGen, TCgpProperties* CGPparams, TData* input){
 	int parent1, parent2;
 	vector<int> crossPts;
-	for(int i = BESTCNT; i < (BESTCNT + CHLDCNT); i += 2){
+	for(int i = CGPparams->bestCnt; i < (CGPparams->bestCnt + CGPparams->chldCnt); i += 2){
 		parent1 = C_getParent(oldGen, CGPparams);
 		parent2 = C_getParent(oldGen, CGPparams);
 		for(int j = 0; j < CGPparams->hybridPoints; j++){
@@ -149,7 +147,7 @@ void C_getChildren(vector<TCoevIndividual>* oldGen, vector<TCoevIndividual>* new
 }
 
 void C_getMutants(vector<TCoevIndividual>* newGen, TCgpProperties* CGPparams, TData* input){
-	for(int i = (BESTCNT + CHLDCNT); i < CGPparams->coevICnt; i++){
+	for(int i = (CGPparams->bestCnt + CGPparams->chldCnt); i < CGPparams->coevICnt; i++){
 		newGen->at(i).fitness = 0;
 		vector<int> *a = new vector<int>(CGPparams->testSize);
 		newGen->at(i).value = a;
