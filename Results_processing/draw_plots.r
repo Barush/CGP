@@ -11,5 +11,5 @@ pdf(filename)
 #	names=c("F1", "F2", "F3", "F4", "F5"))
 
 boxplot(a[,1], a[,2],  xlab = x_lab, ylab = y_lab, 
-	names=c("test 8", "test 16"))
+	names=c("CGP", "koevoluce"), cex.axis=1, outline=FALSE)
 dev.off()

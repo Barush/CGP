@@ -1,7 +1,7 @@
 #!/bin/bash
 
-#funcs=(../sums_coev ../sums_coev_16)
-funcs=(../sinx_ex ../sinx_ex_coev)
+funcs=(../x_2_3 ../x_2_3_coev)
+#funcs=(../x_2_3 ../x_2_3_coev)
 
 for func in ${funcs[*]}
 #for all generation counts

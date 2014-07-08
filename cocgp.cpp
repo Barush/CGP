@@ -139,8 +139,13 @@ int main(int argc, char** argv){
 	int fitCh_ind = 0, nGen_ind = 0;//variables for archive indexes
 	int c_fitness = 0, tmp_fit;
 #endif
+ 	
+	// initiate random generator
+ 	struct timeval time;
+    gettimeofday(&time,NULL);
+    // nastaveni promene pro generovani nahodnych cisel
+    srand((time.tv_sec * 1000) + (time.tv_usec / 1000));
 
-	srand(time(NULL));			 	// initiate random generator
 	struct rusage usage, childusage;
 
 	if(!strcmp(argv[1], "--help")){
@@ -224,7 +229,7 @@ int main(int argc, char** argv){
 #ifdef COEVOLUTION
 		//COEV: every milion generations check and save the global fitness
 		//if it didnt change since last time, end counting
-		if(!(i%1000000) && i > 0){
+		if(!(i%1600000) && i > 0){
 			if(c_fitness == (tmp_fit = C_testGlobalSolution(&geneticArray->at(0), input, geneticParams))){
 				//break;
 			}
@@ -234,7 +239,7 @@ int main(int argc, char** argv){
 		}
 #endif
 		//if counting runs for 20M generations, end it
-		if(i > 10000000){
+		if(i > 16000000){
 #ifdef COEVOLUTION
 			cout << i + 1 << " " << C_testGlobalSolution(&geneticArray->at(0), input, geneticParams) << endl;
 #endif
@@ -303,6 +308,8 @@ int main(int argc, char** argv){
 	//waiting till second thread finishes
 	int retval = 0;
 	while((retval = pthread_tryjoin_np(coevolution_var, NULL)) != 0);
+	//m_unmap(archive, test)
+	//shm_unlink()
 #endif	
 
     destroyGeneration(geneticArray, geneticParams);

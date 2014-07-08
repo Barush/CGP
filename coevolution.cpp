@@ -68,7 +68,8 @@ void C_writeOutPopulation(vector<TCoevIndividual>* population){
 }
 
 void C_evaluatePopulation(vector<TCoevIndividual>* population, TData* input, TIndividual* archive, TCgpProperties* params){
-	//copy archive --> minimalizace kriticke sekce
+	// TODO: copy archive --> minimalizace kriticke sekce
+	
 	for(int i = 0; i < population->size(); i++){
 		population->at(i).fitness = 0;
 		for(int j = 0; j < population->at(i).value->size(); j++){

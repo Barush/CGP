@@ -573,6 +573,7 @@ int getFunc(FILE* input){
 	else{
 		cerr << "Error in the functions file." << endl;
 		exit(1);
+		// TODO: osetreni chyby
 	}
 
 }
