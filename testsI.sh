@@ -6,11 +6,11 @@
 ############################  e^abs(x) * sin(x)  ##############################
 ###############################################################################
 
-mkdir salustowitz
+mkdir ball
 
-for i in `seq 5 50`
+for i in `seq 30 30`
 do 
-	./cgp testfiles/salustowitz.txt func.txt -r 1 -c 32 -g 12 -t 0.025 -l 32 >> salustowitz/test$i.txt 2> salustowitz/result$i.txt
+	./cgp testfiles/ball_1d.txt func.txt -r 1 -c 32 -g 12 -t 0.025 -l 32 >> ball/test$i.txt 2> ball/result$i.txt
 done
 
 #mkdir sums

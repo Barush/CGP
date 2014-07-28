@@ -8,7 +8,11 @@
 
 CPPFLAGS = --std=c++98 -pedantic -g 
 COECPPFLAGS = --std=c++98 -pedantic -g -DCOEVOLUTION
-LIBS = -lm -pthread -lrt
+LIBS = -lm -pthread
+OS := $(shell uname -s)
+ifeq ($(OS),Linux)
+LIBS += -lrt
+endif
 CC = g++ $(CPPFLAGS)
 COECC = g++ $(COECPPFLAGS)
 OBJ = creategen.o iowork.o evalexpre.o evolution.o coevolution.o

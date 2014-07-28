@@ -307,7 +307,7 @@ int main(int argc, char** argv){
 #ifdef COEVOLUTION
 	//waiting till second thread finishes
 	int retval = 0;
-	while((retval = pthread_tryjoin_np(coevolution_var, NULL)) != 0);
+//	while((retval = pthread_tryjoin_np(coevolution_var, NULL)) != 0);
 	//m_unmap(archive, test)
 	//shm_unlink()
 #endif	
