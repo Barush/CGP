@@ -55,9 +55,6 @@ c_evolution.o: evolution.h evolution.cpp
 c_coevolution.o: coevolution.h coevolution.cpp
 	$(COECC) -c coevolution.cpp -o c_coevolution.o
 
-#coevolution.o: coevolution.h coevolution.cpp
-	#$(CC) -c coevolution.cpp
-
 run:
 	./cgp ./testfiles/x_2_3.txt func.txt -r 1 -c 32 -t 0.1 -l 32 -g 12
 
