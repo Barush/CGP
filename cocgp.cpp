@@ -39,7 +39,7 @@ int main(int argc, char** argv){
 
 	struct rusage usage, childusage;
 
-	if(!strcmp(argv[1], "--help")){
+	if((argc <= 2) || (!strcmp(argv[1], "--help"))){
 		//parameter help
 		printUsage();
 		return EXIT_SUCCESS;
