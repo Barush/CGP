@@ -1,0 +1,73 @@
+\begin{thebibliography}{10}
+\providecommand{\url}[1]{\texttt{#1}}
+\providecommand{\urlprefix}{URL }
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi:\discretionary{}{}{}#1}\else
+  \providecommand{\doi}{doi:\discretionary{}{}{}\begingroup
+  \urlstyle{rm}\Url}\fi
+\providecommand{\selectlanguage}[1]{\relax}
+\providecommand{\eprint}[2][]{\url{#2}}
+
+\bibitem{bidlo2009evolutionary}
+Bidlo, M.: \emph{Evolutionary Design of Generic Structures Using
+  Instruction-Based Development}. Dizertaèní práce, 2008.
+
+\bibitem{chalupnik2012evoluce}
+Chalupn{\'\i}k, V.: Biologick{\'e} algoritmy (1) - Evolu{\v{c}}n{\'i}
+  algoritmy. \emph{root.cz}.
+\newline\urlprefix\url{http://www.root.cz/clanky/biologicke-algoritmy-1-evolucni-algoritmy/}
+
+\bibitem{harding2011self}
+Harding, S.~L.; Miller, J.~F.; Banzhaf, W.; aj.: Self-modifying cartesian
+  genetic programming. In \emph{Proceedings of the 9th annual conference on
+  Genetic and evolutionary computation - GECCO '07}, New York: Springer Berlin
+  Heidelberg, 2007, ISBN 978-3-642-17309-7, s. 133--144.
+
+\bibitem{holland1975adaptation}
+Holland, J.~H.: \emph{Adaptation in natural and artificial systems}. Cambridge:
+  Bradford Book, c1992, ISBN 02-625-8111-6.
+
+\bibitem{janzen1980coevolution}
+Janzen, D.~H.: When is it Coevolution? \emph{Evolution}, roèník~34, è.~3, 1980:
+  s. 611--6, ISSN 0014-3820.
+
+\bibitem{koza1992genetic}
+Koza, J.; Langdon, W.~B.; Miller, J.~F.: \emph{Genetic programming as a means
+  for programming computers by natural selection}. ISBN 978-0-387-25067-0.
+
+\bibitem{lampathreads}
+Lampa, P.: Paraleln{\'i} programov{\'a}n{\'i} s pou{\v{z}}it{\'i}m vl{\'a}ken
+  dle normy POSIX 1003.1.
+\newline\urlprefix\url{http://www.fit.vutbr.cz/~lampa/papers/vlakna96.html.cs}
+
+\bibitem{miller1999empirical}
+Miller, J.~F.: An empirical study of the efficiency of learning boolean
+  functions using a cartesian genetic programming approach. In
+  \emph{Proceedings of the Genetic and Evolutionary Computation Conference},
+  roèník~2, 1999.
+
+\bibitem{miller2000cartesian}
+Miller, J.~F.; Thomson, P.: Cartesian genetic programming. In \emph{Genetic
+  Programming}, Springer, 2000, s. 121--132.
+
+\bibitem{schwefel2000advantages}
+Schwefel, H.-P.: Advantages (and disadvantages) of evolutionary computation
+  over other approaches. \emph{Evolutionary computation}, roèník~1, 2000: s.
+  20--22.
+
+\bibitem{sekanina2009principy}
+Sekanina, L.; Va{\v{s}}{\'i}{\v{c}}ek, Z.; Ru{\v{z}}i{\v{c}}ka, R.; aj.:
+  \emph{Evolu{\v{c}}n{\'i} hardware: Od automatick{\'e}ho generov{\'a}n{\'i}
+  patentovateln{\'y}ch invenc{}\'i k sebemodifikuj{\'i}c{\'i}m se strojum}.
+  Edice Gerstner, Academia, 2009, ISBN 978-80-200-1729-1, 328 s.
+
+\bibitem{vsikulova2012coevolution}
+{\v{S}}ikulov{\'a}, M.; Sekanina, L.: Coevolution in Cartesian Genetic
+  Programming. In \emph{Genetic programming}, New York: Springer, první vydání,
+  2012, ISBN 3642291384.
+
+\bibitem{vladislavleva2011}
+Vladislavleva, K.: Symbolic Regression. 2011.
+\newline\urlprefix\url{http://symbolicregression.com/}
+
+\end{thebibliography}

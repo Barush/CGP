@@ -1,0 +1,1195 @@
+%=========================================================================
+
+
+\tableofcontents
+
+\chapter{Úvod}
+	V~prùbìhu vývoje informaèních technologií byly výpoèetní nástroje schopny øe¹it slo¾itìj¹í a~slo¾itìj¹í 
+	úlohy. A¾ do dne¹ní doby výkon hardwarových komponent stále roste a~tento trend nejspí¹e bude nadále pokraèovat.
+	V~takové situaci je tøeba vìnovat se algoritmùm, které jsou schopny tìchto pokrokù vyu¾ít a~doká¾í
+	hledat øe¹ení problémù ve vìt¹ích a~vìt¹ích prohledávacích prostorech. Jedním z~typù tìchto algoritmù jsou
+	evoluèní algoritmy, kterým je vìnována tato práce. 
+
+	Problematikou, která je za pomoci evoluèních algoritmù v~této práci øe¹ena, je symbo\-lická regrese, tedy
+	hledání pøedpisù funkcí procházejících mno¾inou izolovaných bodù. Kouzlo symbolické regrese je v~tom, 
+	¾e hledání funkèních pøedpisù je provádìno bez rozsáhlých výpoètù. Lze ji tedy uplatnit i~v~laboratoøích,
+	kde není nutná znalost slo¾itých výpoèetních metod. Prostor v¹ech mo¾ných øe¹ení je systematicky
+	prohledáván, dokud není nalezeno dostaèující øe¹ení. Zpùsoby optimalizace prohledávání prostoru øe¹ení
+	jsou v~souèasné dobì pøedmìtem výzkumu
+	a~tato práce je vìnována právì jednomu z~nich -- kartézskému gene\-tickému programování s~vyu¾itím
+	soutì¾ivé koevoluce.
+
+	Cílem této práce je seznámit se s~problematikou evoluèních algoritmù, kartézského genetického programování
+	a~symbolické regrese. Na základì tìchto znalostí navrhnout a~implementovat program øe¹ící symbolickou regresi
+	jak pomocí standardního kartézského genetického programování, tak s~vyu¾itím soutì¾ivé koevoluce. Vytvoøený 
+	program na sadì vybraných funkcí otestovat a~výsledky porovnat s~jinými, døíve vyzkou¹enými, metodami koevoluce
+	v~kartézském genetickém programování.
+
+	Tato práce je èlenìna do ¹esti kapitol. Kapitola \ref{teorie} se zabývá teoretickým základem evoluèních algoritmù.
+	V~práci jsou potom k~øe¹ení problematiky symbolické regrese (\ref{teorie_regrese}) vyu¾ity algoritmy popsané v~této kapitole -- algoritmus kartézského
+	genetického programo\-vání (\ref{teorie_CGP}), genetický algoritmus (\ref{teorie_GA}) a koevoluèní mechanismy (\ref{teorie_koevoluce}).
+
+	Kapitola \ref{navrh} je podrobnì vìnována návrhu praktické èásti této práce -- programu øe¹ícímu symbolickou
+	regresi. Je rozdìlena do dvou èástí -- \ref{navrh_CGP}, která se vìnuje algoritmùm vybraným pro jednotlivé
+	fáze kartézského genetického programování a \ref{navrh_GA}, která se vìnuje výbìru algoritmù pro jednotlivé 
+	fáze genetického algoritmu a koevoluce. Na tuto kapitolu navazuje kapitola \ref{implementace}, která je vìnována 
+	implementaci. Je zde popsáno øe¹ení nìkterých slo¾itìj¹ích otázek v~implementaci zadaného programu.
+
+	Kapitola \ref{experimenty} dokumentuje výbìr co nejvýhodnìj¹ích parametrù pro obì varianty programu. Dále
+	popisuje zpùsob testování, jeho výsledky a~nakonec je zde provedeno srovnání výsledkù soutì¾ivé koevoluce
+	s~výsledky koevoluce prediktorù fitness.
+
+	Závìreèná kapitola \ref{zaver} obsahuje shrnutí dosa¾ených výsledkù a mo¾né smìry dal¹ího vývoje práce.
+
+\chapter{Teoretický základ práce}\label{teorie}
+	Mezi evoluèní algoritmy se øadí mnoho rùzných algoritmù, z~nich¾ jsou v~této práci pou¾ity dva: genetický
+	algoritmus a~kartézské genetické programování. V~této kapitole jsou tyto dva algoritmy uvedeny do ¹ir¹ího
+	kontextu tøíd evoluèních algoritmù a~jejich obecných vlastností.
+
+	V~èásti \ref{teorie_EA} jsou postupnì pøedstaveny základní vlastnosti evoluèních algoritmù, jejich
+	jednotlivé fáze a~rozdíly rùzných pøístupù k~nim. V~èásti \ref{teorie_GA} je potom
+	pøedstaven genetický algoritmus tak, jak je pou¾it v~této práci. V~èásti \ref{teorie_CGP} je pøedstaveno kartézské
+	genetické programování.
+
+	Èást \ref{teorie_koevoluce} pøedstavuje mechanismy pro øe¹ení evoluèních algoritmù s~více populacemi
+	pomocí koevoluce. Následuje èást \ref{teorie_regrese}, která uvádí problematiku symbolické regrese
+	tak, jak je øe¹ena v~této práci.
+
+	\section{Evoluèní algoritmy}\label{teorie_EA}
+		Pod pojmem evoluèní algoritmy se skrývá celá skupina prohledávacích algoritmù, 
+		které jsou inspirovány Darwinovou teorií evoluce a~neodarwinismem. Darwinova evoluèní teorie vysvìtluje 
+		adaptivní zmìny vlastností popisovaných druhù takzvanou pøirozenou selekcí. Dle této teorie 
+		pøe¾ívají (a~dále se rozmno¾ují) pouze jedinci s~nejlep¹ími vlastnostmi vzhle\-dem k~aktuálním
+		okolním podmínkám. V~prùbìhu generací má tento proces za následek postupné zmìny
+		vlastností jedincù a~zlep¹ování jejich schopnosti pøe¾ití v~daném prostøedí.
+
+		Analogický princip jako v~Darwinovì evoluèní teorii je vyu¾íván i~v~evoluèních 
+		algoritmech ve výpoèetní technice. Celý algoritmus probíhá nad generací kandidátních øe¹ení a~v~ka¾dé
+		generaci jsou v¹echna kandidátní øe¹ení ohodnocena fitness funkcí. 
+		Jako rodiè pro dal¹í generaci je vybrán jedinec s~nejlep¹í hodnotou fitness. 
+
+		Evoluèní algoritmy se od tradièních 
+		prohledávacích algoritmù odli¹ují tím, ¾e operují nad celou mno¾inou (populací)
+		kandidátních øe¹ení. Klasické prohledávací algoritmy se oproti tomu zabývají jedním øe¹ením.
+		Evoluèní algoritmy se èasto pou¾ívají pro øe¹ení problémù, jejich¾ prohledávací 
+		prostor je velmi rozsáhlý, pøípadnì pro øe¹ení dynamických problémù, u~kterých se v~prùbìhu výpoètu
+		mìní po¾adavky na øe¹ení \cite{chalupnik2012evoluce, schwefel2000advantages}.
+
+		\subsection{Terminologie}
+			Stejnì jako vìt¹ina specifických oborù, tak i~evoluèní algoritmy mají svoji zavedenou terminologii.
+			Terminologie se v~rùzné literatuøe li¹í, pro tuto práci budou vyu¾ity pojmy definované v~této kapitole
+			a~potom dále v~textu.
+			Terminologie pro tuto práci volnì vychází z~literatury (\cite{bidlo2009evolutionary, sekanina2009principy}).
+			\begin{description}
+			\item[Gen] -- základní stavební jednotka chromozomu. V~biologické evoluci jsou pomocí genù kódovány proteiny.
+			V~evoluèních algoritmech jeho hodnota patøí do abecedy specifické pro danou úlohu (binární èísla, celá èísla apod.). Gen mù¾e
+			reprezentovat napø. hranu nebo uzel v~grafu, logické èleny, propojení apod. 
+			\item[Chromozom] -- obvykle lineární pole genù, v~nìkterých typech úloh mù¾e mít promìnnou délku.
+			\item[Genotyp] -- termín pou¾ívaný v~evoluèních algoritmech pro kódovaný tvar øe¹ení pomocí jednoho 
+			nebo více chromozomù.
+			\item[Fenotyp] -- kandidátní øe¹ení problému, které je (obvykle deterministicky) sestavováno podle
+			genotypu. Mapování genotypù na fenotypy a~naopak je v~jednotlivých evoluèních algoritmech rozdílné.
+			Nìkteré evoluèní algoritmy dokonce mezi genotypem a~fenotypem vùbec nerozli¹ují.
+			\item[Kandidátní øe¹ení] -- jedinec se v¹emi svými vlastnostmi a~projevy.
+			\item[Populace] -- mno¾ina kandidátních øe¹ení, nad kterou pracuje evoluèní algoritmus. Její 
+			velikost (poèet jedincù v~populaci) mù¾e znaènì ovlivnit efektivitu celého výpoètu.
+			\item[Fitness funkce] -- matematické vyjádøení kvality kandidátního øe¹ení vzhledem k~hledaným vlastnostem. 
+			Jedná se o~funkci, která pøiøazuje ka¾dému jedinci hodnotu fitness, na jejím¾ základì se dá porovnat kvalita
+			dvou rùzných genotypù. 
+			\end{description}
+
+		\subsection{Princip evoluèního algoritmu}
+
+			Na obrázku \ref{evol} je znázornìn princip evoluèního algoritmu, jeho¾ jednotlivé fáze budou popsány dále.
+
+			\subsubsection{Vytvoøení poèáteèní populace}
+				Na poèátku algoritmu je vytvoøena poèáteèní populace. K~vytváøení poèáteèní populace
+				e\-xistuje více známých pøístupù závisejících na povaze øe¹ené úlohy. Pokud
+				je cílem evoluèního vývoje optimalizace ji¾ existujícího øe¹ení pro\-blé\-mu,
+				v~poèáteèní populaci se mohou objevit jedinci reprezentující rùzná, ji¾ existující, øe¹ení. Pokud 
+				je v¹ak hledáno zcela nové øe¹ení zatím nevyøe¹ených problémù, poèáteèní populace
+				bývá generována náhodnì \cite{sekanina2009principy}. 
+			\begin{figure}[t]
+				\centering
+				\includegraphics[width=130mm]{fig/evoluce.png}
+				\caption{Evoluèní algoritmus.}
+				\label{evol}
+			\end{figure}
+			\subsubsection{Ohodnocení populace}
+
+				V~dal¹ím kroku jsou jedinci v~populaci ohodnoceni, co¾ znamená, ¾e ka¾dému 
+				je pøiøazena hodnota fitness. Hodnota fitness mù¾e být vyjádøena rùznými zpùsoby, jako jsou:
+				\begin{description}
+					\item[Hrubá fitness] -- pøirozené numerické vyjádøení fitness, kdy 
+					vy¹¹í èíslo znamená lep¹í fitness.
+					\item[Standardizovaná fitness] -- hrubá fitness transformovaná tak, 
+					¾e ¾ádanìj¹í jsou ni¾¹í hodnoty. Øe¹ení, které øe¹í pøesnì zadanou úlohu 
+					má tedy fitness hodnotu 0.
+					\item[Normalizovaná fitness] -- le¾í v~intervalu \textlangle 0, 1\textrangle. Vzniká podílem hrubé hodnoty fitness
+					zkoumaného jedince a~souètu hrubých hodnot fitness v¹ech jedincù.
+				\end{description}
+
+			\subsubsection{Výbìr rodièù}
+				Na základì ohodnocení jednotlivých jedincù jsou dále vybíráni ti nej\-vhod\-nìj\-¹í pro
+				reprodukci. Tomuto výbìru se øíká selekce a~lze k~ní pou¾ít nìkterý z~následujících
+				tøí selekèních mechanismù:
+				\begin{description}
+					\item[Deterministická selekce] -- nejjednodu¹¹í zpùsob selekce. Jde o~pøípad, kdy
+					je v¾dy vybrá\-no $n$ jedincù s~nejvy¹¹í fitness v~generaci.
+					\item[Turnajová selekce] -- selekce pøipomínající turnajová utkání. Z~generace je náhodnì
+					vybrá\-no $n$ jedincù úèastnících se turnaje. Ti jsou potom po dvojicích porovnáváni, vítìz
+					v¾dy postupuje do dal¹ího kola, dokud není získán vítìz turnaje. Algoritmus je opako\-ván
+					tolikrát, kolik rodièù je tøeba pro dal¹í generaci.
+					\item[Proporcionální selekce] -- algoritmus selekce, ve kterém je interval \textlangle 0, 
+					1\textrangle \, rozdìlen 
+					na $n$ podintervalù. Ka¾dý podinterval patøí jednomu jedinci a~má velikost odpovídající
+					jeho normalizované fitness. Pomocí rulety (vygenerování náhodného èísla v~intervalu \textlangle 0, 
+					1\textrangle) je potom vybrán jedinec, do jeho¾ intervalu nále¾í vygenerovaná hodnota. 
+					Tento jedinec se stane rodièem. Je zøejmé, ze jedinci s~vy¹¹í
+					hodnotou fitness mají vy¹¹í ¹anci na výbìr. Pokud má ale nìkterý jedinec fitness pøíli¹ vysokou,
+					hrozí, ¾e dojde k~degeneraci populace.
+				\end{description}
+
+			\subsubsection{Vytvoøení nové generace}
+			V~dal¹ím kroku jsou z~vybraných rodièù vytvoøeni potomci. K~modifikaci rodièù na potomky
+			existují dva základní pøístupy -- mutace a~køí¾ení.
+			\begin{description}
+				\item[Køí¾ení] -- køí¾ení probíhá na principu vyu¾ití èásti genù jednoho rodièe
+				a~èásti genù druhého rodièe. Køí¾ení se dìlí na jednobodové, vícebodové a~uniformní 
+				(viz obrázek \ref{krizeni}).
+				Pøi jednobodovém køí¾ení je náhodnì vygenerován bod køí¾ení a~poté dojde k~prohození
+				genù nacházejících se za bodem køí¾ení. U~vícebodového køí¾ení se vygeneruje více 
+				køí¾icích bodù a~následnì se prohodí ka¾dý druhý podøetìzec ohranièený body køí¾ení.
+				Pøi vyu¾ití uniformního køí¾ení je pro ka¾dý gen zvlá¹» roz\-ho\-do\-vá\-no, zda-li dojde
+				k~jeho prohození nebo ne.
+				\item[Mutace] -- mutace je náhodná zmìna genù chromozomu. V~klasických evoluèních algoritmech
+				se vyu¾ívá spí¹e jako doplòková zmìna pro dosa¾ení vìt¹í rozmanitosti v~generaci ne¾ jako
+				hlavní operátor tvorby potomkù. Pøi mutaci je provedena náhodná zmìna náhodného genu je\-din\-ce.
+
+				\begin{figure}
+					\centering
+					\subfloat[][jednobodové køí¾ení]{\includegraphics[width=60mm]{fig/krizeni_jednobod.jpg}}\hspace{1em}
+					\subfloat[][dvoubodové køí¾ení]{\includegraphics[width=35mm]{fig/krizeni_dvoubod.jpg}}\hspace{1em}
+					\subfloat[][uniformní køí¾ení]{\includegraphics[width=35mm]{fig/krizeni_uni.jpg}}
+					\caption{Køí¾ení.}
+					\label{krizeni}
+				\end{figure}
+
+			\end{description}
+
+			\subsubsection{Ukonèovací podmínka}
+			Ukonèovací podmínkou celého výpoètu bývá buïto dosa¾ení cílených vlastností kandidátní\-ho øe¹ení 
+			nebo provedení urèitého poètu generací. Cílené vlastnosti kandidátních øe¹ení jsou obvykle vyjádøeny
+			urèitou hodnotou fitness. Maximální poèet generací je stanoven staticky a~odvíjí se od nároènosti øe¹eného problému.
+
+			\subsection{Genetický algoritmus}\label{teorie_GA}
+				Jak uvádí \cite{bidlo2009evolutionary}, pùvodní pohled na evoluèní algoritmy se soustøedí
+				pouze na Hollandovy genetické algoritmy (pøedstavené v~\cite{holland1975adaptation} v~roce 1975),
+				Kozovo genetické programování (pøedstaveno v~roce 1992 v~\cite{koza1992genetic}), Fogelovo 
+				evoluèní programování (pøedstaveno v~roce 1966) a~evoluèní strategie podle Bienerta, 
+				Rechenberga a~Schwefela. Tato práce je vìnována genetickým algoritmùm
+a~genetickému programování, které je dále specializováno na kartézské genetické programování.
+
+				Genetický algoritmus (dále \emph{GA}) je principiálnì velmi podobný evoluènímu algoritmu ukázanému na obrázku \ref{evol}.
+				Generování poèáteèní populace je provedeno náhodnì, ka¾dý fenotyp je zakódován øetìzcem, který má pøedem danou 
+				délku. Rodièe vybraní pomocí selekèních algoritmù jsou køí¾eni, pøípadnì mutováni a~z~jejich potomkù
+				je vytvoøena dal¹í generace. Pøi tvorbì nové generace existují dvì mo¾nosti:
+
+				\begin{description}
+					\item[Generaèní varianta] -- celá dal¹í generace je vytvoøena z~potomkù pøedchozí generace. Rodièe, ani ¾ádní 
+					jiní èlenové pøedchozí generace nejsou èleny generace následující.
+					\item[Pøekrývání populací] -- nová populace je vytvoøena ze smìsi novì vy\-ge\-ne\-ro\-va\-ných je\-dincù
+a~jedincù z~pøedcházející generace.
+				\end{description}
+
+				\subsubsection{Pou¾ívané operátory}
+					V~genetických algoritmech jsou vyu¾ívány jak operátory køí¾ení, tak o\-pe\-rá\-to\-ry mutace.
+					Vzhle\-dem k~tomu, ¾e jedinci jsou èasto zakódováni jako binární øetìzce, operace se
+					provádìjí nad binárními èísly. Mutace nad binárním øetìzcem probíhá jako pøepnutí bitu
+					na opaènou hodnotu. Køí¾ení potom jednodu¹e aplikuje na lineární øetìzce mechanismus 
+					køí¾ení definovaný vý¹e obrázkem \ref{krizeni}.
+
+		\subsection{Genetické programování}
+		Genetické programování je modifikovanou variantou genetického algoritmu. Cílem gene\-tického 
+		programování je vyvinout program, který co nejlep¹ím zpùsobem øe¹í zadaný pro\-blém. 
+		Je tedy tvoøena sekvence pøíkazù, která je pøímo proveditelným programem. Dále jsou popsány
+		vlastnosti genetického programování.
+
+			\subsubsection{Reprezentace jedincù}
+				V~genetickém programování jedinci reprezentují programy obvykle ve formì 
+				abstraktních syntaktických stromù. Pøíklad velmi jednoduchého jedince genetického programování
+				je znázornìn na obrázku \ref{strom}.
+				\begin{figure}
+					\centering
+					\includegraphics[width=60mm]{fig/strom.jpg}
+					\caption{Reprezentace programu ve formì binárního stromu.}
+					\label{strom}
+				\end{figure}
+
+			\subsubsection{Mno¾iny terminálù a~funkcí}
+				Ve stromu se mohou vyskytovat dva druhy uzlù -- terminální uzel, který ukonèuje vìtev, ve které se nachází,
+				a~uzel funkèní, který se vyskytuje uvnitø struktury stromu.
+				\begin{description}
+					\item[Terminály] -- mno¾ina terminálù obsahuje v¹echny prvky, které se ve stromové struktuøe vyskytují na 
+					pozici listu. Jde o~vstupy do programu, konstanty a~funkce bez argumentù. Jako konstanty lze
+					pou¾ívat buïto výèet definovaných konstant, nebo je mo¾né pøi pou¾ití konstanty vygenerovat
+					náhodné èíslo.
+					\item[Funkce] -- mno¾ina funkcí obsahuje funkce vhodné k~øe¹ení problému nebo obecné mate\-matické 
+					funkce. Kvùli nároènosti výpoètu není vhodné zaøazovat pøíli¹ nároèné funkce. Aby nedocházelo k~chybám za bìhu, 
+					je tøeba definovat výstupy funkce pro speciální pøípady, jako je na\-pøí\-klad dìlení nulou. 
+				\end{description}
+
+			\subsubsection{Generování poèáteèní populace}
+				Do programu se náhodnì vybírají terminály a~funkce. Pro sestavení stromu se vyu¾ívají tøi metody: Grow (náhodné stromy 
+				nepravidelného tvaru s~terminály i~funkcemi na kterékoliv pozici), Full (stromy maximální hloubky)
+a~Ramped Half-and-Half (polovina stromù meto\-dou grow a~polovina stromù meto\-dou full s~rùznými hloubkami)
+				\cite{sekanina2009principy}.
+
+			\subsubsection{Výpoèet fitness}
+				Pøi výpoètu hodnoty fitness je spou¹tìn kód kan\-di\-dát\-ní\-ho øe¹ení nad referenèními vstupy. 
+				Fitness je potom vypoètena z~rozdílu výstupu kan\-di\-dát\-ní\-ho programu oproti referenènímu výstupu.
+				Skupina referenèních vstupù a~výstupù je nazývána \emph{trénovací mno¾inou}, pomocí které 
+				jsou jedinci hodnoceni bìhem procesu evoluce. Po skonèení evoluce je výsledné øe¹ení ovìøeno
+				pomocí \emph{testovací mno¾iny}.
+
+			\subsubsection{Pou¾ívané operátory}
+				Pou¾ívají se bì¾né operátory køí¾ení a~mutace, lze je ale obohatit
+				o~dal¹í operátory umo¾òující vytváøení podprogramù, vkládání modulù a~podobnì.
+				\begin{description}
+					\item[Køí¾ení] -- køí¾ení je základní operací genetického programování a~funguje tak,
+					¾e z~ka¾dého rodièe je náhodnì vybrán uzel a~jeden jeho podstrom. Tyto podstromy
+					jsou potom mezi rodièi prohozeny, èím¾ vznikají dva potomci (viz obrázek \ref{krizeni_stromu}).
+					\item[Mutace] -- mutace je doplòkovým operátorem a~neprovádí se v¾dy. Provádí se 
+					tím zpùsobem, ¾e v~jedinci je náhodnì vybrán uzel a~jeden jeho podstrom je nahrazen
+					novým, náhodnì vygenerovaným, podstromem.
+				\end{description}
+
+					\begin{figure}[t]
+						\centering
+						\includegraphics[width=130mm]{fig/krizeni_stromu.jpg}
+						\caption{Princip køí¾ení dvou stromù.}
+						\label{krizeni_stromu}
+					\end{figure}
+			
+	\section{Kartézské genetické programování}\label{teorie_CGP}
+	Kartézské genetické programování (dále \emph{CGP} -- Cartesian Genetic Programming) je 
+	varianta genetického programování, která byla poprvé pøedstavena J. F. Millerem
+	v~roce 1999 \cite{miller1999empirical}. V~CGP je jedinec 
+	reprezentován pomocí orientovaných grafù, které jsou zakódovány jako dvourozmìrná 
+	pole výpoèetních uzlù. Tyto uzly se skládají z~nìkolika èísel, která urèují odkud 
+	daný uzel získává svoje data a~jakou operaci nad nimi provádí. 
+
+		\subsection{Definice CGP}
+		Kartézský program je definován svými devíti parametry:
+		\begin{description}
+		\item[] $G$ -- vlastní matice v¹ech uzlù
+		\item[] $n_i$ -- poèet primárních vstupù jedince
+		\item[] $n_o$ -- poèet primárních výstupù jedince
+		\item[] $n_n$ -- arita výpoèetního uzlu 
+		\item[] $F$ -- mno¾ina dostupných funkcí, bývá u¾ivatelsky volena
+		\item[] $n_f$ -- poèet dostupných funkcí
+		\item[] $n_c$ -- poèet sloupcù kartézského programu
+		\item[] $n_r$ -- poèet øádkù kartézského programu
+		\item[] $l$ -- l-back, èíslo oznaèující, z~kolika bezprostøednì pøedcházejících 
+		sloupcù lze vybírat hodnoty pro vstup aktuálního uzlu.
+		\end{description}
+
+		\subsubsection{Reprezentace jedincù}
+		Kartézský program je reprezentován jako matice o~$n_r$ øádcích
+a~$n_c$ sloupcích obsahující jednotlivé výpoèetní uzly. Ty jsou zakódovány jako textové 
+		øetìzce. Na konec genotypu je pøidáno $n_o$ celých èísel oznaèujících které uzly budou
+		primárními výstupy kartézského programu. Ka¾dý výpoèetní uzel se skládá
+z~dvou typù genù, které kódují jednotlivé vlastnosti uzlu.
+		\begin{description}
+			\item[Funkcionální gen] -- gen, který znaèí, jakou operaci bude daný výpoèetní uzel
+			se svými vstupy provádìt. V~ka¾dém výpoèetním uzlu se vyskytuje jen jeden. 
+			\item[Propojovací geny] -- ostatní geny uzlu (mimo funkcionální) jsou tzv. propojovací. 
+			Tyto geny urèují, odkud daný uzel bude naèítat své vstupy. Vstu\-pem výpoèetního uzlu mù¾e
+			být buïto primární vstup kartézského programu, nebo výstup nìkterého uzlu z~pøedcházejících
+			sloupcù. Vstu\-pem uzlu nemù¾e být výstup uzlu ze stejného sloupce, ani uzlu ze sloupcù 
+			následujících. Pøi naèítání výstupu uzlu z~pøedchozího sloupce musí být také splnìna 
+			podmínka pro l-back: 
+			\begin{equation}
+				c_i - c_j \leq l \\
+			\end{equation}
+			kde $c_i$ je aktuální sloupec a $c_j$ je po¾adovaný sloupec.
+		\end{description}
+		Primární vstupy kartézského programu jsou postupnì oèíslovány, výstupy jednotlivých 
+		uzlù jsou potom také oèíslovány. Pomocí tìchto èísel je identifikováno, které hodnoty mají
+		pøijít na vstup jednotlivých uzlù. Názorná ukázka CGP programu je na obrázku \ref{cgp_program},
+		kde je zobrazena maticová reprezentace kadidátního øe¹ení. Reprezentace øetìzce tohoto chromozomu by vypadala
+		následovnì: 0\,1\,0\ 1\,0\,2\ 1\,1\,3\ 4\,2\,3\ 1\,0\,1\ 2\,3\,1\ 3\,6\,0\ 5\,2\,2\ 7\,5\,3\ 10.
+		Uzly, které jsou souèástí výpoètu -- tedy jsou nepøímo pøipojeny na výstup, jsou znázornìny èervenì. Tyto uzly jsou
+		oznaèovány jako aktivní uzly.
+
+		\begin{figure}
+			\centering
+			\includegraphics[width=100mm]{fig/cgp_program.jpg}
+			\caption{Náhodnì vygenerované kandidátní øe¹ení s~následujícími parametry: $n_i$ = 2, $n_o$ = 1, 
+			$n_n$ = 2, $n_f$ = 4, $n_c$ = 3, $n_r$ = 3, l = 2. Mno¾ina dostupných funkcí F mù¾e být jakákoliv 
+			ètyøprvková mno¾ina, napøíklad definovaná výètem: F = \{$AND_0$, $OR_1$, $PLUS_2$, $MINUS_3$\}.}
+			\label{cgp_program}
+		\end{figure}
+
+		\subsubsection{Generování poèáteèní populace}
+		V~kartézském genetickém programování je poèáteèní populace obvykle ná\-hod\-nì generovaná.
+		Hodnoty jednotlivých genù kartézského programu v¹ak nemù¾ou být zcela náhodné, na
+		ka¾dý typ genu jsou kladena urèitá omezení. Hodnota funkcionálního genu $f_i$ musí být 
+		platným indexem do tabulky funkcí, musí pro ni tedy platit vztah:
+		\begin{equation}
+			0 \leq f_i < n_f
+		\end{equation}
+
+		Hodnota propojovacích genù má omezení ponìkud slo¾itìj¹í, je tøeba zajistit, aby
+		nebyla záporná a~aby zároveò splòovala omezení pro l-back.
+		Hodnoty propojovacích genù uzlu $C_{ij}$ musí splòovat následující podmínky: \\
+		\begin{equation}
+			0 \leq C_{ij} \leq j * n_r + n_i \text{ (pro $j < l$)}
+		\end{equation}
+			\begin{equation}
+			(j - l) * n_r + n_i \leq C_{ij} \leq j * n_r + n_i \text{ (pro $j \ge l$)}
+		\end{equation}
+		kde $i$ znaèí èíslo øádku a $j$ znaèí èíslo sloupce.
+
+		\subsubsection{Výpoèet fitness}\label{teorie_fitness}
+		Výpoèet fitness v~CGP je provádìn stejným zpùsobem, jako v~genetickém programování. Pro vývoj
+		populace máme k~dispozici mno¾inu \emph{trénovacích vektorù}, které obsahují vstup\-ní hodnoty a~oèekávaný
+		výstup ìpracují. Nad v¹emi tìmito trénovacími vektory je ka¾dé kandidátní øe¹ení spu¹tìno a~dle rozdílu
+		oèekávaného výstupu a~výstupu kandidátního programu je kandidátnímu øe¹ení pøiøazena fitness. Dva nejznámìj¹í zpùsoby
+		provádìní tohoto vyhodnocení jsou následující:
+		\begin{description}
+			\item[Støední kvadratická odchylka] -- po spu¹tìní kandidátního øe¹ení nad ce\-lou mno¾inou trénovacích
+				vektorù je vypoètena støední kvadratická odchylka získaných øe¹ení od oèekávaných øe¹ení, která se 
+				stane hodnotou fitness.
+			\item[Metoda skóre] -- po spu¹tìní kandidátního øe¹ení nad ka¾dým trénovacím vektorem je vyhodnoceno,
+				zda-li odchylka od oèekávaného øe¹ení je men¹í, ne¾ stanovená tolerance. Pokud ano, je k~hodnotì 
+				fitness pøi\-ète\-na jednièka, jinak se nedìje nic.
+		\end{description}
+
+		\subsubsection{Pou¾ívané operátory}
+		V~CGP je pou¾íváno výluènì mutaèního operátoru, který náhodnì mìní jednotlivé geny programu (funkcionální 
+		nebo propojovací). Poèet genù, které se v~ka¾dé mutaci zmìní, bývá vyjádøen v~procentech 
+		celkového poètu genù v~programu a~standardnì se pohybuje okolo 5\%. Po zmìnì musí být opìt 
+		dodr¾eny pøípustné hodnoty jednotlivých genù. Operátor køí¾ení se ve standardním CGP nevyu¾ívá.
+		V~nìkterých specifických problémech se v¹ak operátor køí\-¾e\-ní ukázal být velmi u¾iteèným 
+		\cite{miller2000cartesian}.
+
+		\subsection{Genotyp-fenotyp mapování}
+		Základní vlastností CGP je mapování genotypù na fenotypy. Zatímco klasické genetické
+		programování mezi genotypy a~fenotypy nerozli¹uje, CGP ano. Genotypem je my¹len celý
+		kartézský program se v¹emi svými vnitøními uzly, a» u¾ jsou pøipojeny na výstup nebo ne.
+		Fenotypem potom jsou pouze uzly, které jsou pøipojeny na výstup (aktivní uzly). 
+		Fenotyp tedy mù¾e mít velikost minimálnì nula uzlù, pokud jsou v¹echny
+		primární výstupy napojeny na primární vstupy kartézského programu. Nejvý¹e mù¾e mít stejný poèet uzlù
+		jako genotyp, pokud se v~kartézském programu nevyskytuje ani jeden nekódový (neaktivní) uzel \cite{harding2011self}.
+
+	\section{Koevoluce}\label{teorie_koevoluce}
+		Koevoluce je mechanismem, který je v~biologii definován jako vzájemné genetické 
+		ovlivòo\-vání mezi dvìma a~více rùznými druhy. Algoritmy vyu¾ívající koevoluci se 
+		nazývají koevoluèní algoritmy (dále \emph{CoEA}). Díky koevoluèním mechanismùm je
+		mo¾né znaènì zkrátit jinak dlouho trvající proces ohodnocení v¹ech kandidátních
+		programù v~genetickém programování \cite{vsikulova2012coevolution}. Vyhodnocení fitness
+		jedincù v~populaci probíhá na základì interakce s~jinými jedinci,
+		co¾ je hlavní rozdíl oproti klasickým evoluèním algoritmùm, kde je fitness
+		odvozována pomocí pøedem definované fitness funkce.
+
+		Navzdory klasické definici z~biologie, podle které koevoluce znamená vzá\-je\-mné ovlivòo\-vání
+		se mezi více ¾ivoèi¹nými druhy, v~CoEA je definována i~koevoluce v~rámci jednoho druhu. 
+		Pøi hodnocení fitness potom jedinci interagují s~jedinci stejné populace. Na základì
+		této pøidané definice je v~umìlé inteligenci rozli¹ována koevoluce jedné populace
+		a~vícepo\-pulaèní koevoluce. Problémem jednopopulaèní koevoluce se blí¾e zabývá D. Jansen 
+		\cite{janzen1980coevolution}. Tato práce je vìnována koevoluci více, konkrétnì
+		dvou, populací.
+
+		\subsection{Problémy øe¹ené s~pomocí koevoluce}
+			Koevoluce se nasazuje hlavnì ve dvou typech problémù, kterými jsou pro\-blé\-my kompozièního charakteru
+			a~problémy zalo¾ené na testech (viz obrázek \ref{koevoluce_types}). Oba pøístupy jsou blí¾e popsány v~této èásti.
+
+			\begin{figure}[t]
+				\centering
+				\subfloat[][Problémy kompozièního charakteru]{\includegraphics[width=60mm]{fig/kompozicni_ulohy.jpg}}\hspace{2em}
+				\subfloat[][Problémy zalo¾ené na testech]{\includegraphics[width=60mm]{fig/testove_ulohy.jpg}}
+				\caption{Typy koevoluce.}
+				\label{koevoluce_types}
+			\end{figure}
+
+			\subsubsection{Problémy kompozièního charakteru}
+			Pøi øe¹ení problémù kompozièního charakteru je vyu¾íváno více populací, pøi\-èem¾ ka¾dá z~nich obsahuje
+			èást kandidátního øe¹ení. Pro získání ce\-li\-stvé\-ho øe¹ení problému je tøeba vyu¾ít jedince ze v¹ech populací,
+			proto¾e v~ka¾dé populaci je vyvíjena pouze nìjaká èást øe¹ení. Pøedstavit si to lze tøeba jako vývoj optimálního
+			stolního poèítaèe. V~jedné populaci se vyvíjí optimální zdroj, ve druhé populaci optimální základní deska, atd.
+			Výsledné øe¹ení problému hledání optimálního stolního poèítaèe obsahuje prvky ze v¹ech vyvíjených populací.
+
+			\subsubsection{Problémy zalo¾ené na testech}
+			Základní rozdíl problémù zalo¾ených na testech oproti kompozièním pro\-blé\-mùm je v~úèelu jednotlivých populací
+			koevoluce. Problémy zalo¾ené na testech vyu¾ívají pouze jednu popu\-laci obsahující kandidátní øe¹ení, ostatní
+			populace potom obsahují testy pro ohodnocení je\-dincù z~populace kandidátních øe¹ení. Typickým pøíkladem pro\-blé\-mu zalo¾eného na testech je symbolická 
+			regrese, blí¾e popsaná v~kapitole \ref{teorie_regrese}.
+
+		\subsection{Princip koevoluce pro problémy zalo¾ené na testech}
+			Koevoluce pro problémy zalo¾ené na testech obvykle pracuje se dvìma populacemi -- 
+			jednou populací kandidátních øe¹ení a~jednou populací tes\-tù. Zobrazení spolupráce obou populací je na obrázku 
+			\ref{koevoluce_princip}. 
+
+			\begin{figure}[h]
+				\centering
+				\includegraphics[width=130mm]{fig/koevoluce.jpg}
+				\caption{Princip koevoluce.}
+				\label{koevoluce_princip}
+			\end{figure}
+
+			\subsubsection{Populace kandidátních øe¹ení}
+			Populace kandidátních øe¹ení obsahuje mno¾inu jedincù, kteøí jsou vyhodnocováni v~aktuál\-ním kroku
+			evoluce. Tato mno¾ina se v~CoEA nijak neli¹í od té¾e mno¾iny v~klasických EA. Obsahuje 
+			$1 + \lambda$ jedincù, ze kterých se v~ka¾dé generaci vybírají rodièe a~modifikují potomci.
+
+			\subsubsection{Archiv kandidátních øe¹ení}
+			Mno¾ina kandidátních øe¹ení je obnovována periodicky ka¾dých nìkolik krokù, kdy je do ní
+			pøidán v¾dy nejvhodnìj¹í jedinec z~populace kandidátních øe¹ení. Tato mno¾ina je vyu¾ívána k~ohodnocení
+			jedincù v~evoluci testù.
+
+			\subsubsection{Mno¾ina v¹ech trénovacích vektorù}
+			Mno¾ina v¹ech trénovacích vektorù je mno¾inou obsahující v¹echny trénovací vektory. Bývá obsáhlej¹í
+			a~proto je ponìkud zdlouhavé vyu¾ívat v¹echny její prvky pøi hodnocení kandidátních programù, 
+			co¾ se øe¹í za pomoci evoluce testù.
+
+			\subsubsection{Populace testù}
+			Test je malou podmno¾inou mno¾iny v¹ech trénovacích vektorù, a tedy obsahuje pouze vybrané trénovací vektory.
+			V~této práci jsou porovnávány dva typy koevoluce:
+			\begin{itemize}
+				\item \emph{Soutì¾ivá koevoluce} -- V~populaci testù je hledána sada trénovacích vektorù, která odhalí nejvíce
+					chyb v~aktuálnì vyvíjených kandidátních programech. Nejvhodnìj¹ím jedincem je tedy takový, na kterém mno¾ina 
+					kandidátních øe¹ení v~archivu dosahuje nejhor¹í fitness.
+				\item \emph{Koevoluce prediktorù fitness} -- Koevoluce prediktorù fitness je slo¾itìj¹ím typem koevoluce ne¾ soutì¾ivá
+					koevoluce. V~populaci testù jsou vyvíjeny prediktory fitness (jiné typy testù ne¾ v~soutì¾ivé koevoluci), které
+					jsou malými podmno¾inami celé trénovací mno¾iny. Fitness testu je urèena na základì odchylky fitness
+					urèené pomocí mno¾iny v¹ech trénovacích vektorù a fitness urèené pomocí testu pro dané kandidátní øe¹ení. Nejvhodnìj¹ím
+					jedincem je tedy takový, který doká¾e co nejpøesnìji urèit fitness kandidátního øe¹ení v~porovnání s~vyu¾itím mno¾iny
+					v¹ech trénovacích vektorù.
+			\end{itemize}
+
+			\subsubsection{Nejvhodnìj¹í test}
+			Nejvhodnìj¹í podmno¾ina trénovacích vektorù vybraná z~populace testù je po nìkolik evoluèních krokù pou¾ívána
+			k~ohodnocování kandidátních øe¹ení a~jejich vývoji. Pøi ka¾dé zmìnì této mno¾iny se mù¾e zmìnit hodnota
+			fitness jednotlivých kandidátních øe¹ení.
+
+		\subsection{Princip koevoluce prediktorù fitness}\label{koevoluce_prediktoru}
+			Koevoluce prediktorù fitness je druh koevoluce pou¾ívaný v~kartézském genetickém programování, je slo¾itìj¹ím
+			typem koevoluce ne¾ soutì¾ivá koevoluce, která byla vybrána pro tuto práci.
+			V~druhé populaci jsou v~koevoluci prediktorù fitness vyvíjeny 
+			prediktory fitness, které jsou men¹ími podmno¾inami celé trénovací mno¾iny. Prediktoru je vypoètena fitness
+			a~na jejím základì se predikuje fitness pro celou trénovací mno¾inu \cite{vsikulova2012coevolution}.
+
+
+	\section{Symbolická regrese}\label{teorie_regrese}
+		\begin{figure}[t]
+			\centering
+			\subfloat[][vstup]{\includegraphics[width=60mm]{fig/points.pdf}}\hspace{3em}
+			\subfloat[][výstup: nalezená závislost y = $\frac{10}{5 + (x - 3)^2}$]{\includegraphics[width=60mm]{fig/regression.pdf}}
+			\caption{Symbolická regrese.}
+			\label{regrese}
+		\end{figure}
+
+		Symbolická regrese je pøístupem k~hledání funkèních pøedpisù, který u\-mo¾\-òu\-je vyjádøit v~symbolické formì vztah 
+		mezi závislými a~nezávislými promìnnými. Úkolem symbolické regrese je zjistit, jakým zpùsobem jednotlivé
+		nezávislé promìnné (vstupy) ovlivòují závislé promìnné (výstupy) a~následnì ovìøit správnost a~obecnost 
+		vytvoøeného modelu. Je tedy hledána funkce, která s~co nejmen¹í odchylkou prochází stanovenými trénovacími vektory.
+		Pøíklad práce symbolické regrese je naznaèen na obrázku \ref{regrese}. 
+
+		V~souèasné dobì je symbolická regrese velmi èasto øe¹ena s~pomocí automatizovaných systémù, a» u¾ jde
+o~evoluèní algoritmy èi jiný druh automatizovaných výpoètù. Uplatòuje se Kozovo genetické programování \cite{koza1992genetic}. V~této práci
+		je symbolická regrese øe¹ena pomocí CGP, které je vzhledem k~nároènosti výpoètù optimalizováno pomocí
+		koevoluce.
+
+\chapter{Návrh}\label{navrh}
+	Tato kapitola je vìnována návrhu programu, který øe¹í sym\-bo\-lic\-kou regresi s~pomocí
+	kartéz\-ské\-ho genetického programování a~soutì¾ivé koevoluce. Soutì¾ivá koevoluce je jednodu¹¹ím druhem
+	koevoluce ne¾ koevoluce prediktorù fitness pøedstavená v~èásti \ref{koevoluce_prediktoru}. Jak se ukázalo 
+	v~\cite{vsikulova2012coevolution}, koevoluce prediktorù fitness dokázala vybrané úlohy symbolické regrese 
+	urychlit 2-5 krát. Cílem této práce je ovìøit, zda-li je mo¾né podobných výsledkù dosáhnout i~pøi 
+	pou¾ití jednodu¹¹ího pøístupu -- soutì¾ivé koevoluce. 
+
+	Koevoluèní algoritmus zkoumaný v~této práci vyu¾ívá dvì soubì¾né evoluce:%
+	\begin{itemize}
+		\item \emph{Evoluci kandidátních øe¹ení}, která jsou vyvíjena na principu CGP, jeho¾ teoretické základy jsou uvedeny v~èásti 
+		\ref{teorie_CGP}.
+		\item \emph{Evoluci podmno¾in mno¾iny v¹ech trénovacích vektorù}, která probíhá na principu GA, teoreticky
+		popsaném v~èásti \ref{teorie_GA}.
+	\end{itemize}
+
+	Mechanismy, které vyu¾ívají tyto soubì¾né evoluce, jsou popsány dále v~této kapitole. Koevoluèní algoritmus 
+	je v~této práci porovnáván s~variantou, která koevoluci nevyu¾ívá -- symbolická regrese je øe¹ena pomocí 
+	standardního CGP. Èást \ref{navrh_CGP} proto popisuje øe¹ení symbolické regrese pomocí CGP pro koevoluèní
+	variantu i~pro variantu, je¾ koevoluci nevyu¾ívá.
+
+	\section{Evoluce kandidátních øe¹ení}\label{navrh_CGP}
+		Kandidátní øe¹ení jsou vyvíjena na principu CGP, jak je popsáno v~èásti \ref{teorie_CGP}.
+		Pou¾itý algoritmus CGP je znázornìn na obrázku \ref{cgp_algorithm}. Celý algoritmus probíhá nad populací, která je
+		slo¾ena z~dále popsaných jedincù (kandidátních øe¹ení). Ka¾dý z~krokù tohoto algoritmu lze provést nìkolika 
+		rùznými zpùsoby, které jsou popsány a~následnì je mezi nimi vybráno v~této kapitole.
+
+		\begin{figure}[t]
+			\centering
+			\includegraphics[width=100mm]{fig/CGP_algorithm.png}
+			\caption{Algoritmus CGP.}
+			\label{cgp_algorithm}
+		\end{figure}	
+
+		\subsection{Kandidátní øe¹ení}
+			Jedinec je reprezentován møí¾kou výpoèetních uzlù, které jsou vzájemnì propojeny. Tato møí¾ka 
+			tvoøí orientovaný acyklický graf, který vyjadøuje matematickou funkci -- kandidátní øe¹ení problému.
+
+			Ka¾dý výpoèetní uzel má dva vstupy, nad nimi¾ vykonává po¾adovanou funkci a~jeden výstup, jak je ukázáno na
+			obrázku \ref{vypocetni_uzel}. Uzel na obrázku vykonává operaci sèítání nad vstupy $x_1$ a~$x_2$. 
+			Výsledek je po provedení operace k~dispozici na výstupu výpoèetního uzlu. Ka¾dý uzel je zakódován tøemi celými
+			èísly, kdy první dvì znaèí propojení vstupù a~poslední znaèí provádìnou funkci. Uzel na obrázku 
+			\ref{vypocetni_uzel} by mohl být zakódován napøíklad sekvencí 1\,0\,3. Za pøedpokladu,
+			¾e kandidátní øe¹ení má jeden primární vstup by to znamenalo, ¾e vstup $x_1$ je napojen na výstup prvního
+			výpoèetního uzlu, vstup $x_2$ je napojen na primární vstup kandidátního øe¹ení a~pro sèítání je
+			pou¾ita konstanta 3.
+
+			Speciálním typem výpoèetního uzlu je uzel realizující konstantu. Takový uzel nemá propojený vstup
+			s~¾ádným jiným uzlem v~møí¾ce. Má aktivní pouze jeden vstup, který je napojen na nìkterou konstantu
+			z~tabulky konstant. Tato naètená konstanta prochází na výstup výpoèetního uzlu nezmìnìná. Vzhledem
+			k~charakteru testovacích úloh, které jsou popsány v~kapitole experimenty, jsem zvolila následující
+			mno¾inu konstant: $\{0, 1, \pi, e\}$.
+
+			Spoleènì s~jedincem je tøeba pro dal¹í pou¾ití uchovávat dal¹í informace. Jeho souèástí tedy kromì 
+			tabulky uzlù a~jejich propojení bude i~hodnota výstupu a~fitness pro aktuální trénovací
+			vektor a~indikátor aktivity u~ka¾dého uzlu.
+
+		\subsection{Generování poèáteèní populace}
+			Vytvoøení poèáteèní populace lze provádìt dvìma zpùsoby závisejícími na typu zadané úlohy. Pøi
+			hledání øe¹ení zatím nevyøe¹eného problému se vyu¾ívá náhodného generování poèáteèních genotypù, 
+			zatímco pøi optimalizaci ji¾ vyøe¹ené úlohy se jako poèáteèní populace pou¾ívají ji¾ existující 
+			øe¹ení a~jejich mutace. Vzhledem k~tomu, ¾e symbolická regrese jako taková spadá do kategorie 
+			první -- hledání nových øe¹ení zatím nevyøe¹ených pro\-blé\-mù, je v~této práci pou¾ito náhodné 
+			generování poèáteèní populace.
+
+			\begin{figure}[t]
+				\centering
+				\includegraphics[width=40mm]{fig/vypocetni_uzel.png}
+				\caption{Výpoèetní uzel.}
+				\label{vypocetni_uzel}
+			\end{figure}
+
+		\subsection{Hledání aktivních uzlù}
+			Hledání aktivních uzlù je procesem oznaèování uzlù, které jsou pøímo i~nepøímo pøipojeny na výstup a~tedy
+			jsou pou¾ity pro vlastní výpoèet výstupní hodnoty programu. K~hledání aktivních uzlù lze opìt pøistoupit
+			dvìma zpùsoby. Pro oznaèení aktivních uzlù lze vyu¾ít buïto rekurzivní sestup stromem aktivních uzlù nebo 
+			zpìtný prùchod celým genotypem. Pro tuto práci byla z~dùvodu ni¾¹ích pamì»ových nárokù a~jednoduchosti
+			implementace vybrána metoda zpìtného prùchodu genotypem. 
+
+			Zpìtný prùchod genotypem zaèíná v~uzlu, který je pøipojen na primární výstup programu. Jeho vstupy jsou 
+			oznaèeny jako aktivní. Poté je procházeno celým jedincem od posledního sloupce smìrem k~prvnímu a~poka¾dé,
+			kdy¾ je nalezen aktivní uzel, jeho vstupy jsou také oznaèeny jako aktivní.
+
+		\subsection{Spu¹tìní kandidátního programu nad trénovacím vektorem}
+			Sou¹tìní kandidátního programu se provádí pro ka¾dý vektor trénovací mno¾iny. Skrze primární vstupy do programu
+			vstoupí hodnoty, nad kterými jsou poté v~odpovídajícím poøadí provádìny funkce jednotlivých aktivních uzlù,
+			dokud se nedostanou k~primárnímu výstupu. Na primárním výstupu se potom nachází výsledná hodnota
+			kandidátního øe¹ení pro aktuální trénovací vektor.
+
+			Pøi výpoètu dílèích výsledkù jednotlivých výpoèetních uzlù mù¾e dojít k~výjimkám, pro které
+			je tøeba vlo¾it speciální o¹etøení. Tato o¹etøení je tøeba provést pro v¹echny funkce, které 
+			nejsou definovány na nìkteré èásti de\-fi\-niè\-ní\-ho oboru -- v~pøípadì této práce se jedná pouze
+			o~dìlení, pro které je vyu¾ita následující funkce.
+			\begin{equation}
+				\begin{matrix} \frac{x}{y} = \left\{
+				\begin{array}{l l}
+					\frac{x}{y} & \quad \text{pokud $y \in R - \{0\}$}\\
+				    1 & \quad \text{pokud $y$ = 0}
+				\end{array} \right.\end{matrix}
+			\end{equation}
+
+		\subsection{Vyhodnocení fitness}
+			Jakmile je vypoètena hodnota kandidátního øe¹ení pro daný vstup, lze ji ohodnotit pomocí fitness.
+			Pro hodnocení fitness byly zva¾ovány dvì metody -- metoda skóre a~støední kvadra\-tické odchylky.
+			Ve vztahu \ref{fitness_skore} pro metodu skóre a~vztahu \ref{fitness_odchylka} pro metodu støední
+			kvadratické odchylky jsou pou¾ity promìnné $n$ -- poèet trénovacích vektorù, $y_i$ -- oèekávaný výstup 
+			pro aktuální vektor a~$o_i$ -- získaný výstup pro aktuální vektor:
+
+			\begin{equation}
+				\begin{matrix} fitness = \sum\limits_{i = 0}^{n} \left\{
+				\begin{array}{l l}
+					1 & \quad \text{pokud $abs(y_i - o_i) < tolerance$}\\
+				    0 & \quad \text{jinak}
+				\end{array} \right.\end{matrix}
+				\label{fitness_skore}
+			\end{equation}
+
+			\begin{equation}
+				fitness = \frac {\sum\limits_{i = 0}^{n} (y_i - o_i)^2}{n}
+				\label{fitness_odchylka}
+			\end{equation}
+
+			V~praxi se ukázala jako vhodnìj¹í metoda skóre, která funguje na principu tzv. \emph{hitu}. U¾ivatel 
+			stanoví toleranci, se kterou chce pova¾ovat výsledek za odpovídající oèekávané hodnotì. Pro ka¾dý trénovací
+			vektor je potom vypoèten rozdíl oèekávaného a~získaného výsledku. Pokud je 
+			men¹í ne¾ zadaná tolerance, je ke skóre jedince pøiètena jednièka. Nej\-lep¹í jedinec je takový, 
+			který dosáhl nejvy¹¹í hodnoty fitness. Hodnota fitness je ponechána jako hrubá fitness, tudí¾ fitness 
+			jedince, který je schopen úplnì vyøe¹it danou úlohu je rovna poètu trénovacích vektorù.
+
+		\subsection{Výbìr rodièù}
+			Pøi výbìru rodièù lze vyu¾ít tøi druhy selekce pøedstavené v~èásti \ref{teorie_fitness} -- deterministickou, turnajovou
+a~proporcionální selekci. Pro selekci rodièù v~CGP byla vybrána jednoduchá deterministická
+			selekce, kdy rodièem se stane v¾dy právì jeden nejlep¹í jedinec z~pøedcházející generace. Tato
+			mo¾nost byla zvolena z~toho dùvodu, ¾e v~turnajové i~proporcionální selekci hrozí ztráta nejlep¹ího
+			jedince, co¾ by pro velmi pomalu probíhající vývoj symbolické regrese mohlo být fatální.
+
+			Výbìr nejlep¹ího jedince se provádí pomocí porovnání hodnot fitness v¹ech jedincù populace.
+			V~pøípadì shodné hodnoty fitness u~dvou jedincù generace se uplatòují druhotná kritéria:
+			\begin{description}
+				\item [Jedinec s~ménì aktivními uzly --]pro zaji¹tìní co nejjednodu¹¹ího vygenerovaného funk\-èního pøedpisu 
+					jsou upøednostòováni jedinci s~ménì aktivními uzly -- tedy reprezentující jedno\-du¹¹í
+				vztahy.
+				\item [Jedinec, který nebyl rodièem -- ]pro zachování diverzity populace je vý\-hod\-nìj\-¹í jako rodièe
+				zvolit jedince, který je¹tì rodièem nebyl. Aèkoliv má stejnou fitness, v~jeho neaktivních
+				uzlech se mohou objevit dùle¾ité neutrální mutace, které pozitivnì ovlivní dal¹í vývoj.
+			\end{description}
+
+		\subsection{Vytváøení nové generace}
+			V~CGP se k~vytváøení potomkù vyu¾ívá výhradnì operátor mutace. $\lambda$~je\-din\-cù je tedy mutováno
+			z~jediného rodièe. V~ka¾dém potomku je mutováno náhodnì 1-8\% genù, kdy genem je my¹lena jedna hodnota
+			uzlu (jeden ze vstupù nebo funkce). Výbìr mutovaného genu se provádí
+			na základì dvou náhod -- nejprve je náhodnì zvolen výpoèetní uzel, ve kterém bude mutace provedena,
+			poté je opìt náhodnì zvo\-len gen, který bude mutován. Mutaci lze provádìt nìkolika rùznými zpùsoby, závisejícími
+			na mutovaném genu. Pro tyto dále po\-psané situace je tøeba definovat dva pojmy -- \emph{funkèní uzel} je uzel, 
+			který provádí nìkterou z~definovaných matematických operací, \emph{konstantní uzel} je uzel generující konstantu.
+			\begin{description}
+				\item [Mutace vstupu funkèního uzlu] -- mutace jednoho ze vstupù uzlu, který realizuje nìkte\-rou 
+					matematickou funkci. Pøi této mutaci je ná\-hod\-nì generováno èíslo odpoví\-dající èíslu výpoèetního
+					uzlu le¾ícího v~tolika pøedcházejících sloupcích, kolik odpovídá parametru $l-back$, pøípadnì èíslo
+					indentifikující primární vstup. Toto èíslo se stane novým vstupem mutovaného uzlu.
+				\item [Mutace funkce funkèního uzlu] -- jestli¾e je mutován uzel pro\-vá\-dì\-jí\-cí nìkterou matema\-tickou
+					funkci na uzel provádìjící jinou matematickou funkci, nejsou tøeba ¾ádné speciální kontroly.
+					Pokud je v¹ak mutován funkèní uzel na konstantní uzel, je tøeba provést 
+					dal¹í kontroly, které jsou popsány v~mutaci konstantního uzlu.
+				\item [Mutace konstantního uzlu] -- a» u¾ je mutován konstantní uzel na funkèní nebo funkèní
+					na konstantní, pøi tìchto pøevodech je v¾dy tøeba provést kontrolu a~pøípadnou korekci prvního
+					vstupu tohoto uzlu. Pøi mutaci na konstantní uzel musí první vstup spadat do rozsahu tabulky konstant.
+					Pøi mutaci na funkèní uzel musí první vstup odpovídat podmínkám pro vstup funkèního uzlu.
+					Tato problematika je øe¹ena tak, ¾e první vstup je v¾dy pøegenerován tak, aby odpovídal podmínkám.
+				\item [Mutace primárního výstupu] -- pøi mutaci primárního výstupu je v¾dy náhodnì vygene\-rováno èíslo 
+					odpovídající výstupu nìkterého z~vý\-po\-èet\-ních uzlù v~møí¾ce genotypu.
+			\end{description}
+
+	\section{Evoluce podmno¾in mno¾iny v¹ech trénovacích vektorù}\label{navrh_GA}
+		Koevoluèní varianta této práce sestává ze dvou rùzných evolucí -- evoluce kandidátních øe¹ení a~evoluce 
+		podmno¾in mno¾iny trénovacích vektorù (dále oznaèovaných pojmem \emph{test}). Evoluce kandidátních øe¹ení 
+		probíhá ve svém vlastním vláknì na principech popsaných v~èásti \ref{navrh_CGP}. Pro evoluci testù 
+		je implementován jednoduchý genetický algoritmus, který probíhá v~druhém vláknì. 
+
+		Práce koevoluèního vlákna tkví v~evoluci testù se snahou vytvoøit takový test, který v~aktuálních kandidátních 
+		øe¹eních odhalí co nejvíce chyb -- tedy takovou podmno¾inu mno¾iny trénovacích vektorù, se kterou vybraná
+		kandidátní øe¹ení dosáhnou nejhor¹í fitness. 
+
+		Paralelní bìh dvou vláken lze provádìt s~rùznými metodami zpo¾ïování. Dvì nej\-pou¾ívanìj¹í mo¾nosti jsou
+		zpo¾dìní na základì doby výpoètu a~umìlé zpo¾dìní pomocí synchronizaèních prostøedkù. V~této práci je 
+		koevoluèní vlákno umìle zpo¾dìno v~pomìru 1 generace koevoluce ke 100 generacím CGP. 
+
+		Pøínosem soutì¾ivé koevoluce v~kartézském genetickém programování je zrychlení procesu ohodnocování jednotlivých 
+		kandidátních øe¹ení. Fitness ka¾dého kandidátního øe¹ení je toti¾ posuzována pouze dle schopnosti reagovat na nìkolik
+		trénovacích vektorù v~testu. Bez koevoluce je tøeba vyhodnotit celou trénovací mno¾inu, co¾ je nepomìrnì více trénovacích
+		vektorù.
+
+		\subsection{Test}
+			Jedinec evoluce testù je sada
+			tré\-no\-va\-cích vektorù vybraná z~celé mno¾iny tréno\-vacích vektorù pomocí genetického algoritmu (znázornìno na obrázku \ref{coev_jedinec}).
+			Spolu s~jedincem je tøeba uchovávat aktuální fitness daného jedince. 
+
+			\begin{figure}[h]
+				\centering
+				\includegraphics[width=80mm]{fig/coev_jedinec.jpg}
+				\caption{Jedinec CGP.}
+				\label{coev_jedinec}
+			\end{figure}
+
+		\subsection{Archivy}
+			Pro úspì¹nou práci CGP s~koevolucí je tøeba pøidat prostøedky pro komunikaci mezi evolucemi. V~této práci 
+			jsou realizovány pomocí dvou archivù, jak je naznaèeno na obrázku \ref{koevoluce_princip}, archiv
+			kandidátních øe¹ení a~archiv obsahující nejvhodnìj¹í test. 
+
+			\subsubsection{Archiv kandidátních øe¹ení}
+				Archiv kandidátních øe¹ení je rozdìlen na dvì poloviny, které se li¹í strategií obmìòování.
+				Jedna polovina archivu je obmìòována v¾dy tìsnì pøed aktivací koevoluèního vlákna (tedy ka¾dých 100 
+				generací), kdy je do archivu vlo¾en aktuální jedinec s~nejvy¹¹í fitness. Do druhé poloviny 
+				archivu je vkládán takté¾ právì jeden nejlep¹í prvek populace, ale tehdy, kdy¾ dojde ke zmìnì
+				fitness. V~obou dvou èástech archivu se novým jedincem nahrazuje nejstar¹í jedinec dané èásti
+				archivu.
+
+			\subsubsection{Archiv s~nejvhodnìj¹ím testem}
+				V~ka¾dé generaci koevoluce je nalezen test, který má nejlep¹í schopnost odhalovat chyby
+v~kandidátních øe¹eních a~ten se pro dal¹í periodu stane testem pou¾ívaným v~evoluci kandidátních
+				øe¹ení. 
+
+		\subsection{Vyhodnocení fitness}
+			V~evoluci testù je hledán takový jedinec, který pøi interakci s~jedinci z~populace kandidátních øe¹ení
+			odhalí nejvíce chyb -- tedy kandidátní øe¹ení budou pro nìj dosahovat co nejhor¹ích fitness. Vztah pro výpoèet fitness
+			testu je uveden v~rovnici \ref{coev_fitness}, kde $n$ je poèet kandidátních øe¹ení v~archivu, $g_{test}$ je hledaná fitness 
+			testu a $f_i$ je fitness dosa¾ená na daném testù $i$-tým kandidátním øe¹ením. Na daném testu 
+			jsou spu¹tìna v¹echna kandidátní øe¹ení v~archivu, jejich¾ dosa¾ené fitness jsou poté seèteny,
+			èím¾ je získána fitness hodnota testu. Nejvhodnìj¹ím testem v~generaci je takový test, jeho¾
+			hodnota fitness je nejni¾¹í. Tedy takový, na kterém dosáhli jedinci ulo¾eni v~archivu kandidátních
+			øe¹ení nejhor¹ích výsledkù.
+
+			\begin{equation}
+				g_{test} = \sum_{i = 0}^{n} f_i(test)
+				\label{coev_fitness}
+			\end{equation}
+
+		\subsection{Výbìr rodièù}
+			Výbìr rodièù lze dìlat nìkolika rùznými zpùsoby, jak bylo popsáno v~kapitole \ref{teorie_fitness}. Pro potøeby koevoluèního 
+			algoritmu z~nich byla vybrána turnajová selekce. V~turnajové selekci sice hrozí, ¾e rodièem se 
+			nestane nejkvalitnìj¹í jedinec populace, co¾ ale nevadí, proto¾e je vyu¾íváno pøekrývání generací,
+			kde jsou nejlep¹í jedinci z~pøedchozí generace zachováni do dal¹í.
+
+			Turnaj je provádìn jednoúrovòovì. Provede se náhodný výbìr dvou jedincù z~generace, následnì je 
+			porovnána jejich fitness a~jedinec s~lep¹í (tedy ni¾¹í) fitness se stává rodièem. Toto je opakováno
+			tolikrát, kolik rodièù je pro novou generaci potøeba.
+
+		\subsection{Vytváøení nové generace}
+			Nová generace sestává ze tøí druhù jedincù -- z~nìkolika nejlep¹ích jedincù pøedchozí gene\-race, 
+			z~nìkolika potomkù rodièù vybraných z~pøedchozí generace a~z~nìkolika novì náhodnì vygenerovaných
+			jedincù. Pomìr jednotlivých slo¾ek je pøedmìtem experimentù, které jsou dokumentovány dále v~této 
+			práci, v~kapitole \ref{experimenty}.
+
+			Tvorba potomkù je provádìna pomocí vícebodového køí¾ení, které je zná\-zor\-nì\-no vý¹e na obrázku 
+			\ref{krizeni}. Ze dvou rodièù jsou vytvoøeni dva potomci, tak¾e je tøeba vybrat právì tolik 
+			rodièù, kolik je po¾adováno pro dal¹í generaci potomkù.
+
+\chapter{Implementace}\label{implementace}
+	Praktická èást práce -- program øe¹ící symbolickou regresi s~pomocí soutì¾ivé koevoluce a~s~pomocí
+	standardního CGP je napsán
+	v~jazyce C/C++. Pøístup k~problému je ryze funkcionální, odpovídá tedy pøístupu v~jazyce C, nicménì pro 
+	mo¾nost vyu¾ití u¾iteèných roz¹íøení v~podobì nìkterých datových typù a~kon\-tej\-ne\-rù je implementace provedena
+v~jazyce C++ dle standardu C++98. Pro pøeklad a~sestavení programu je pou¾it pøekladaè G++. 
+
+	Praktická èást této práce sestává dvou programù -- symbolické regrese s~klasickým CGP a~koevoluèní varianty CGP. Tyto dvì 
+	varianty implementace v¹ak mají mnoho spoleèného kódu, z~dùvodu konzistence jsem se tedy rozhodla obì varianty
+	uchovávat v~jednom zdrojovém textu. Èásti, ve kterých se kód klasického CGP li¹í od koevoluèní varianty, jsou
+	rozdìleny pomocí direktiv preprocesoru, které se øídí existencí (nebo neexistencí) symbo\-lické konstanty
+	COEVOLUTION. Tímto zpùsobem lze z~jednoho zdrojového kódu dvìma rùznými zpùsoby pøekladu získat dva rùzné
+	programy.
+
+	Zdrojový kód je rozdìlen do nìkolika modulù, zastupujících jednotlivé fáze zpracování, jako jsou napøíklad
+	vstupnì-výstupní operace, tvorba poèáteèní populace, výpoèet hodnot, evoluèní krok nebo koevoluce. Funkce obsa¾ené
+	v~jednotlivých modulech jsou volány z~hlavního modulu $cocgp.cpp$.
+
+	Tato kapitola pojednává o~problémech týkajících se pøímo praktické èásti této práce. Nejde o~kompletní postup celé
+	implementace, nýbr¾ o~nìkolik implementaèních detailù, které byly vybrány jako nejzajímavìj¹í nebo nejspecifiètìj¹í
+	pro vytvoøený program. V~èásti \ref{implementace_paralelizace} jsou zmínìny vyu¾ité zpùsoby paralelizace, èást
+	\ref{implementace_rand} je vìnována generátoru náhodných èísel a~jeho poèáteèní hodnotì.Èást \ref{implementace_iofiles}
+	a~\ref{implementace_io} jsou potom vìnovány práci se vstupem a~výstupem. V~poslední èásti \ref{implementace_exec}
+	se nachází jednoduchý návod ke zkompilování a~spu¹tìní výsledného programu pod operaèním systémem Linux.
+
+	\section{Paralelizace}\label{implementace_paralelizace}
+		Jak bylo uvedeno vý¹e, koevoluèní varianta symbolické regrese je spou¹tìna ve dvou para\-lelních vláknech. 
+		Pro paralelizaci jsem zvolila vlákna daná standardem POSIX, jak jsou popsána v~\cite{lampathreads}. Jako sdílenou 
+		pamì» vyu¾ívanou pro oba dva archivy -- archiv kandidátních øe¹ení a~archiv obsahující aktuálnì
+		vyu¾ívaný test, vyu¾ívám objekty sdílené pamìti dle standardu POSIX. Tyto objekty jsou namapovány pomocí funkcí \textit{shm\_open} 
+		a~\textit{mmap}, které jsou definovány v~systémové knihovnì pro management sdílené pamìti -- \textit{sys/mman.h}.
+
+		Pro zamezení konfliktùm pøi pøístupu do sdílené pamìti jsou oba dva archivy chránìny binárními
+		semafory dle standardu POSIX -- mutexy (\textit{mutual exclusion}).
+		Pro minimalizaci doby strávené v~kritických sekcích jsem se rozhodla pøi ka¾dé práci se sdílenou pamìtí nejprve obsah sdílené
+		pamìti zkopírovat do lokální pamìti a~teprve poté nad ní provádìt dané funkce. 
+
+	\section{Generování pseudonáhodných èísel}\label{implementace_rand}
+		Zpùsob generování pseudonáhodných èísel je v~této práci klíèovou otázkou, proto¾e generátor je vyu¾íván
+		témìø ve v¹ech fázích evoluce, jako je generování poèáteèní populace nebo výbìr mutovaných uzlù a~genù
+v~ka¾dém evoluèním kroku. 
+
+		Vyu¾ila jsem funkci \textit{rand} ze standardní knihovny jazyka C. Tato
+		funkce generuje sekvenci pseudonáhodných èísel, která je opakovatelná za pøed\-po\-kla\-du, ¾e funkce 
+		\textit{rand} dostane stej\-nou poèáteèní hodnotu. V~jednodu¹¹ích úlohách lze jako poèáteèní hodnotu vyu¾ít návrat
+		funkce \textit{time}, která vrací rozdílnou hodnotu ka¾dou sekundu. Vzhledem k~tomu, ¾e pøi testování
+		této práce pomocí testovacích skriptù mnohdy dochází k~nìkolikerému spu¹tìní bìhem jedné sekundy,
+		nelze tento nedostatek tolerovat. Proto jsem se rozhodla pou¾ít funkci \textit{gettimeofday} ze systémové
+		knihovny \textit{sys/time.h}, která vrací strukturu timeval, ze které vyu¾ívám souèet hodnot v~sekundách 
+		a~mi\-kro\-se\-kun\-dách. Toto zaruèuje rozdílnou poèáteèní hodnotu generátoru ka¾dou mi\-kro\-se\-kun\-du s~opakováním ka¾dých
+		24 hodin. Pravdìpo\-dobnost, ¾e se testovacímu skriptu povede spustit program dvakrát pøesnì ve stejnou 
+		mi\-kro\-se\-kun\-du dne je 
+		\begin{equation}
+			\frac{1}{24*60*60*1000} = 1.15741*10^{-8}
+		\end{equation}
+		co¾ jsem se rozhodla pova¾ovat za zanedbatelné èíslo.
+
+	\section{Formát vstupních souborù}\label{implementace_iofiles}
+		Jako u¾ivatelský vstup vyu¾ívám mimo parametrù pøíkazové øádky dva soubory -- soubor s~trénovacími 
+		vektory a~soubor s~povolenými funkcemi. Tyto
+		soubory mají podobnou strukturu. V¾dy na prvním øádku je zapsán poèet hodnot nacházejících se v~souboru. Na ka¾dém
+		dal¹ím øádku potom následuje právì jedna hodnota daného formátu.
+
+		\subsection{Soubor s~povolenými funkcemi}
+			Pomocí souboru s~povolenými funkcemi u¾ivatel definuje, jaké funkce bude mo¾né realizovat ve výpoèetním
+			uzlu, tj. ze kterých základních funkcí má být hledaná funkce slo¾ena. Jednotlivé funkce jsou definovány 
+			následujícími symbolickými konstantami.
+
+			\begin{center}
+				\begin{minipage}[left]{40mm}
+					\begin{itemize}
+						\item PLUS -- sèítání
+						\item MINUS -- o1dèítání
+						\item MUL -- násobení
+						\item DIV -- dìlení
+					\end{itemize}
+				\end{minipage}
+				\begin{minipage}{35mm}
+					\begin{itemize}
+						\item EXP -- $e^x$
+						\item POW -- $y^x$
+						\item SIN -- $sin(x)$
+						\item COS -- $cos(x)$
+					\end{itemize}
+				\end{minipage}
+				\begin{minipage}{60mm}
+					\begin{itemize}
+						\item LOG -- $ln(x)$
+						\item ABS -- absolutní hodnota
+						\item CONST -- konstanta
+					\end{itemize}
+				\end{minipage} 
+			\end{center} 
+
+			Ka¾dá ze zadaných hodnot se nachází právì na jednom øádku ukonèeném znakem konce øádku. Pokud soubor
+			nevyhovuje specifikované definici, program skonèí s~chybou. 
+
+		\subsection{Soubor s~trénovacími vektory}
+			Prostøednictvím tohoto souboru u¾ivatel definuje trénovací vektory pro danou úlohu. Na ka¾dém 
+			øádku se nachází právì jeden trénovací vektor na jeho¾ prvních $n_i$ pozicích se nachází
+			hodnoty odpovídající primárním vstupùm, na dal¹ích $n_o$ pozicích se nachází odpovídající
+			oèekávané výstupy.
+
+			Následuje krátká ukázka testovacího souboru pou¾itého pro funkci $e^x * sin(x)$. Na prvním øádku 
+			je specifikováno, ¾e v~souboru se nachází právì 201 trénovacích vektorù, na ka¾dém dal¹ím 
+			øádku je vstup funkce a~oèekávaný výstup.
+			\begin{verbatim}
+				201
+				-10.000000 11982.862391
+				-9.900000 9118.859852
+				-9.800000 6608.991138
+				...
+			\end{verbatim}
+
+	\section{Naèítání vstupu}\label{implementace_io}
+		Hodnoty z~obou dvou vstupních souborù jsou na zaèátku naèteny do datových struktur. Naèítání probíhá po 
+		znaku pomocí funkce \textit{fgetc} ze standardní knihovny jazyka C, dokud není dosa¾eno bílého znaku (mezery
+		èi konce øádku), poté je naètený øetìzec zpracován. V~pøípadì zpracování dat ze souboru s~pou¾ívanými
+		funkcemi je vyhodnoceno, zda se jedná o~validní symbolickou konstantu pro nìkterou z~funkcí. V~pøípadì 
+		zpracování dat ze souboru s~trénovacími vektory je øetìzec pøeveden na èíslo typu double za pomoci
+		funkce \textit{strtod} ze standardní knihovny jazyka C. Tato funkce je schopna zpracovat i~èísla
+		zapsaná v~exponenciálním tvaru. Jako oddìlovaè desetinné èásti èísla je pou¾íván takový znak, který
+		odpovídá lokalizaènímu nastavení operaèního systému -- vìt¹inou tedy teèka, v~èeských variantách 
+		systému èárka.
+
+	\section{Záznamy statistických dat}\label{implementace_stats}
+		Pro porovnávání bìhu programu s~rùznými nastaveními je tøeba zaznamenávat statistiky rùzných druhù.
+    V~této práci je prùbì¾nì poèítáno nìkolik rùzných statistických hodnot:
+		\begin{description}
+			\item[Poèet generací] -- celkový poèet evoluèních krokù od poèátku bìhu programu po dosa¾ení po¾adovaného øe¹ení.
+			\item[Èas výpoètu] -- metriky vyu¾ití zdrojù bìhem výpoètu mìøené pomocí funk\-ce \textit{getrusage} ze systémové
+				knihovny \textit{sys/resource.h}. V~pøípadì koevoluèní varianty se jedná o~souèet vyu¾ití zdrojù z~obou
+				vláken.
+			\item[Poèet vyèíslených trénovacích vektorù] -- celkový poèet vyèíslení trénovacích vektorù za dobu bìhu programu. Tedy kolikrát
+				bìhem celé evoluce byly do nìkterého kandidátního øe¹ení naèteny vstupní hodnoty a~vypoèteny výstupní.
+		\end{description}
+		Po skonèení bìhu jsou spoleènì s~výsledným øe¹ením vypsány koneèné hodnoty tìchto mìøení.
+		Jednou za 100 generací je také pøi bìhu programu vy\-pi\-so\-vá\-na aktuální nejvy¹¹í fitness, díky
+		èemu¾ lze sledovat, jakým zpùsobem se fitness pøi jednotlivých nastaveních vyvíjí.
+
+	\section{Výpis øetìzce øe¹ení}\label{implementace_functions}
+		Pro usnadnìní práce s~výsledným øe¹ením je na konci bìhu také vypsán matematický vztah, který výsledné
+		øe¹ení pøedstavuje. Tato funkcionalita slou¾í hlavnì k~usnadnìní kontroly správnosti dosa¾eného øe¹ení.
+
+		Výpis øetìzce pøedstavujícího nalezenou funkci probíhá pomocí rekurzivního sestupu s~vyu¾itím dvousmìrnì
+	    vázaného seznamu. Na zaèátku je do seznamu vlo¾en neterminální uzel stromu øe¹ení, který je postupnì 
+	    rozvíjen dle hodnot v~chromozomu. Algoritmus konèí, jakmile jsou v¹echny vìtve rozvinuty a¾ k~listùm --
+	    k~primárním vstupùm programu. 
+
+	\section{Kompilace a~spu¹tìní}\label{implementace_exec}
+		Pro kompilaci a~spu¹tìní programu vyu¾ívám \textit{Makefile} pro program \textit{make}, pomocí kterého lze program jak zkompilovat,
+		tak spustit varianty s~koevolucí i~bez koevoluce. Nastavení vstupních souborù a~ve¹kerých parametrù je tøeba
+		provést pøímo v~souboru Makefile.%
+		\\ \\
+			\verb|make|  \emph{ -- pøelo¾ení a~slinkování celého programu} \\
+			\verb|make run|  \emph{ -- spu¹tìní varianty bez koevoluce}\\
+			\verb|make coev| \emph{ -- spu¹tìní varianty s~koevolucí}
+
+\chapter{Experimentální vyhodnocení}\label{experimenty}
+	Úèelem této práce je vytvoøit program, který øe¹í symbolickou regresi pomocí kartézského genetického
+	programování. Pro ovìøení funkènosti programu byla pou¾ita sada testù pou¾í\-vaná v~rámci komunity
+	vìnující se symbolické regresi. 
+
+	Tato kapitola shrnuje prùbìh testování a~metody výbìru parametrù pro jednotlivé èásti výpoètu (\ref{experimenty_CGP}
+	pro evoluci kandidátních øe¹ení a~\ref{experimenty_coev} pro evoluci testù). V~èásti \ref{experimenty_script}
+	jsou popsány skripty vyu¾ité pro automatizované testování a~poloautomatizované zpracování výsledkù. Dùle¾itou èástí
+	této kapitoly je také \ref{experimenty_results}, ve které jsou shrnuty výsledky testování pro jednotlivé funkce.
+
+	Funkce $f_1$, $f_2$ a~$f_3$ lze zaøadit do kategorie jednodu¹¹ích testù, které slou¾í
+	hlavnì k~ovìøení, zda symbolická regrese pracuje správnì. Funkce $f_4$ a~$f_5$ jsou nároènìj¹í testy, které jsou pøevzaty 
+	z~webové stránky vìnující se zátì¾ovým testùm symbolické regrese \cite{vladislavleva2011}. 
+	Pou¾ití testù spoèívá ve vyu¾ití pøedepsaných vzta\-hù pro vygenerování trénovací mno¾iny (201 vzorkù pøedepsané funkce
+	na zadaném intervalu), nad kterou potom probíhá evoluce. Mno¾iny trénovacích vektorù pro 
+	jednotlivé funkce jsou znázornìny na o\-bráz\-ku
+	\ref{training_sets}.
+
+	\begin{figure}
+		\centering
+		\subfloat[][Trénovací mno¾ina $f_1$]{\includegraphics[width=60mm]{fig/inputs_x_2_3.pdf}}
+		\subfloat[][Trénovací mno¾ina $f_2$]{\includegraphics[width=60mm]{fig/inputs_sinx_ex.pdf}}\\
+		\subfloat[][Trénovací mno¾ina $f_3$]{\includegraphics[width=60mm]{fig/inputs_sums.pdf}}
+		\subfloat[][Trénovací mno¾ina $f_4$]{\includegraphics[width=60mm]{fig/inputs_salustowitz.pdf}}\\
+		\subfloat[][Trénovací mno¾ina $f_5$]{\includegraphics[width=60mm]{fig/inputs_unwrapped_ball.pdf}}
+		\caption{Zobrazení trénovacích vektorù v~rovinì.}
+		\label{training_sets}
+	\end{figure}		
+
+	\subsubsection{Funkèní pøedpisy jednotlivých zátì¾ových testù}
+		\begin{equation}
+			f_1: f(x) = x^2 - x^3,\, x \in \left<-10, 10\right>
+		\end{equation}
+		\begin{equation}
+			f_2: f(x) = e^{|x|} sin(x),\, x \in \left<-10, 10\right>
+		\end{equation}
+		\begin{equation}
+			f_3: f(x) = x^2 e^{sin(x)} + x + sin(\frac{\pi}{x^3}),\, x \in \left<-10, 10\right>
+		\end{equation}
+		\begin{equation}
+			f_4: f(x) = e^{-x} x^3 cos(x) sin(x) (cos(x) sin(x)^2 - 1),\, x \in \left<0, 10\right>
+		\end{equation}
+		\begin{equation}
+			f_5: f(x) = \frac{10}{5 + (x - 3)^2},\, x \in \left<-2, 8\right>
+		\end{equation}
+
+	\section{Nastavení evoluce kandidátních øe¹ení}\label{experimenty_CGP}
+		V~symbolické regresi se vyskytuje mnoho u¾ivatelsky modifikovatelných pa\-ra\-met\-rù. Vzhle\-dem k~charakteru
+		této práce -- porovnání techniky soutì¾ivé koevoluce s~technikou koevoluce prediktorù fitness, byly parametry
+		pro CGP zvoleny tak, jak je popsáno v~èlánku \cite{vsikulova2012coevolution}. Tento èlánek popisuje
+		experimenty na sadì testù pou¾ité i~v~této práci za vyu¾ití koevoluce prediktorù fitness. Zvolené parametry
+		jsou zapsány v~tabulce \ref{CGP_parametry}.
+
+	\section{Nastavení evoluce testù}\label{experimenty_coev}
+		S~koevolucí pøichází mnoho dal¹ích parametrù, jejich¾ co nejvýhodnìj¹í nastavení je tøeba najít. Hledání tohoto nastavení
+		bylo provedeno na funkci $f_1$, nad kterou byla koevoluce spu¹tìna s~nìkolika nastaveními, ze kterých poté byla
+		vybrána co nejvýhodnìj¹í hodnota. Toto srovnání bylo provedeno vizuální metodou v~grafech znázornìných na obrázku \ref{coev_params}.
+		Jako hlavní parametr pro srovnání byl zvolen poèet vyèíslených trénovacích vektorù, jeho¾ znázornìní je uvedeno na obrázku \ref{coev_params}. Dále byly
+		porovnávány následující parametry: poèet generací, èas øe¹ení a~procento úspì¹ných bìhù. Grafy pro tyto parametry jsou
+		uvedeny v~pøíloze \ref{priloha_coev_testy}.
+		\begin{figure}
+			\centering
+			\subfloat[][]{\includegraphics[width=60mm]{fig/results/test_coev_params/archives/counted_nodes.pdf}}
+			\subfloat[][]{\includegraphics[width=60mm]{fig/results/test_coev_params/crossing/counted_nodes.pdf}}\\
+			\subfloat[][]{\includegraphics[width=60mm]{fig/results/test_coev_params/generation/counted_nodes.pdf}}
+			\subfloat[][]{\includegraphics[width=60mm]{fig/results/test_coev_params/cg_parts/counted_nodes.pdf}}\\
+			\subfloat[][]{\includegraphics[width=60mm]{fig/results/test_coev_params/test_size/counted_nodes.pdf}}
+			\caption{Porovnání nastavení koevoluce.}
+			\label{coev_params}
+		\end{figure}
+	
+		\begin{table}
+			\centering
+			\begin{tabular}{p{83mm} || r}
+				\hline
+				Poèet øádkù v~chromozomu & 1 \\
+				Poèet sloupcù v~chromozomu & 32 \\
+				Poèet mutovaných genù % 
+				\tablefootnote{Pro obecnost je v~této práci poèet vyjádøen v~procentech -- 1-8\% genù je mutováno, %
+					tedy 1-8\% z~97 (32*3+1) genù. Pøi zaokrouhlení nahoru tato hodnota pøesnì odpovídá 1-8 mutovaným genùm na jedince.} 
+				& 1-8\% \\
+				\hline
+				Procento maximální fitness akceptované jako øe¹ení & 97 \\
+				Tolerance hitu u~jednotlivých funkcí & $f_1$, $f_2$: 0.5, $f_3$: 1.5, $f_4$, $f_5$: 0.025 \\
+				Maximální poèet generací & $f_1, f_2, f_3$: 8\,000\,000, $f_4, f_5$: 16\,000\,000 \\
+				\hline
+			\end{tabular}
+			\caption{Nastavení CGP pøejaté z~\cite{vsikulova2012coevolution}.}
+			\label{CGP_parametry}
+		\end{table}
+
+		Parametry, jejich¾ vliv na rychlost øe¹ení je zaznamenán v~jednotlivých grafech, byly testovány za nezmìnìných okolních 
+		podmínek. Na základì tìchto vý\-sled\-kù byly jako nej\-vhodnìj¹í vybrány parametry uvedené v~tabulce \ref{koevoluce_params}.
+
+		\begin{table}
+			\centering
+			\begin{tabular}{p{7cm} | p{35mm} | r} 
+				\hline
+				Parametr & Testované hodnoty & Vybraná hodnota \\
+				\hline \hline
+				Velikost archivu (v~násobcích velikosti populace)& 1, 2, 3 & 2 \\ \hline
+				Poèet bodù køí¾ení & 1, 2, 3 & 3 \\ \hline
+				Poèet prvkù v~generaci & 8, 16, 32 & 32 \\ \hline
+				Slo¾ení generace (nej\-lep¹í jedinci - køí¾enci - novì generovaní jedinci) & 12-10-10, 10-12-10, 10-10-12, 
+				16-8-8 8-16-8, 8-8-16 & 8-16-8 \\ \hline
+				Poèet trénovacích vektorù v~testu & 8, 12, 16, 20 & $f_1, f_2, f_3$: 8, $f_4, f_5$: 16 \\ \hline
+			\end{tabular}
+			\caption{Experimentálnì vybrané nastavení koevoluce.}
+			\label{koevoluce_params}
+		\end{table}
+
+	\section{Skripty pro testování a~vyhodnocování}\label{experimenty_script}
+		Pro testování byla pou¾ita sada jednoduchých testovacích skriptù v~jazyce bash. Ka¾dý ze skriptù obsahoval právì
+		jedno testované nastavení programu. Pro dané nastavení byl bìh 
+		opakovanì spou¹tìn (50krát u~jednodu¹¹ích funkcí, 30krát u~funkcí slo¾itìj¹ích). Pøi ka¾dém spu¹tìní byly vytvoøeny dva soubory - soubor s~výsledným øe¹ením
+		a~souhrnnými statistikami za celý bìh a~soubor obsahující prùbì¾né hodnoty fitness vypisované ka¾dých 100 generací.
+
+		Pro vyhodnocení výsledkù byla pou¾ita dvojice skriptù -- skript v~jazyce bash pro naètení dat zaznamenaných do 
+		statistických souborù. Z~tohoto skriptu byl opakovanì volán skript v~jazyce R, který zaji¹»oval zpracování 
+		naètených dat do kvartilových grafù a~jejich vykreslení do finální podoby prezentované v~této práci.
+
+	\section{Posuzovaná kritéria a~výsledky}\label{experimenty_results}
+		Pøi porovnání výsledkù programu s~koevolucí a~bez koevoluce byly porovnávány stejné parametry jako pøi výbìru parametrù
+		pro koevoluci. Hlavními oèekávanými pøínosy koevoluèního
+		øe¹ení bylo zkrá\-ce\-ní doby výpoètu a~omezení pøípadù, kdy dojde k~uváznutí v~lokálním extrému. 
+		\subsection{Funkce $f_1$}
+			U~nejjednodu¹¹í funkce $f_1$ bylo pøi standardním CGP nalezeno øe¹ení v~96\% spu¹tìní. Pøi zbylých 4\% spu¹tìní
+			do¹lo k~uváznutí v~lokálním extrému. Tento nedostatek byl pou¾itím koevoluce odstranìn -- pøi jejím vyu¾ití bylo
+			nalezeno øe¹ení ve 100\% spu¹tìní. I~ostatní pøedpokládané pøínosy koevoluce byly dosáhnuty. Graf ukazující,
+			¾e pøi vyu¾ití koevoluce bylo tøeba podstatnì ménì vyèíslení trénovacích vektorù i~generací, je uveden na obrázku \ref{f1_result},
+			dal¹í grafy jsou uvedeny v~pøíloze (\ref{f1_more_result}). 
+
+			Urychlení výpoètu bylo vypoèteno podle dvou kritérií -- podle poètu vyèíslených tréno\-vacích vektorù
+			a~podle èasu. V~èase byla koevoluèní varianta na této funkci 2x ry\-chlej¹í, vyèíslení tréno\-vacích vektorù v¹ak bylo
+			potøeba 27x ménì. Rozdílné výsledky jsou zpùsobeny hlavnì tím, ¾e koevoluèní varianta pracuje ve dvou vláknech, co¾
+			znamená mnoho re¾ie navíc, která zabere procesorový èas.
+
+			\begin{figure}[h]
+				\centering
+				\subfloat{\includegraphics[width=50mm]{fig/results/x_2_3/counted_nodes.pdf}}
+				\subfloat{\includegraphics[width=50mm]{fig/results/x_2_3/generation_count.pdf}}
+				\caption{Srovnání výsledkù CGP a~koevoluce pro funkci $x^2-x^3$.}
+				\label{f1_result}
+			\end{figure}
+
+		\subsection{Funkce $f_2$}
+			Pøi testování na funkci $f_2$ bylo pøi vyu¾ití standardního CGP nalezeno øe¹ení v~98\% spu¹tìní. Pøi zbylých 2\%,
+			tedy pøi jednom bìhu z~padesáti, do¹lo k~uváznutí v~lokálním extrému. Pøi nasazení koevoluèní varianty programu
+			bylo nalezeno øe¹ení pøi 100\% spu¹tìní. Graf ukazující porovnání poètu generací a~poètu vyèíslení trénovacích vektorù
+			pro obì varianty je uveden na obrázku \ref{f2_result}, dal¹í grafy jsou uvedeny v~pøíloze (\ref{f2_more_result}).
+
+			Na této funkci bylo urychlení pomocí koevoluce nejvýznamnìj¹í, prùmìrný èas výpoètu byl s~koevoluèní variantou
+			181x krat¹í, prùmìrný poèet vyèíslených trénovacích vektorù byl pak dokonce 336x ni¾¹í. Z~grafu na obrázku \ref{f2_gen}
+			je patrné, ¾e v~koevoluèní variantì byl k~nalezení øe¹ení potøeba výraznì ni¾¹í poèet generací, v~ka¾dé
+			generaci navíc místo 201 trénovacích vektorù bylo vyèíslováno pouze 8.
+
+			\begin{figure}[h!]
+				\centering
+				\subfloat{\includegraphics[width=50mm]{fig/results/sinx_ex/counted_nodes.pdf}}
+				\subfloat{\label{f2_gen}\includegraphics[width=50mm]{fig/results/sinx_ex/generation_count.pdf}}
+				\caption{Srovnání výsledkù CGP a~koevoluce pro funkci $sin(x)*e^{|x|}$.}
+				\label{f2_result}
+			\end{figure}
+
+		\subsection{Funkce $f_3$}
+			Pøi hledání funkce $f_3$ pomocí standardního CGP bylo øe¹ení nalezeno v~82\% spu¹tìní. Pøi øe¹ení 
+			s~koevolucí bylo øe¹ení nalezeno ve 100\% pøípadù. Srovnání efektivity hledání na základì poètu vyèíslených trénovacích
+			vektorù a poètu generací je uvedeno na obrázku \ref{f3_result}. Dal¹í grafy jsou uvedeny v~pøíloze  (\ref{f3_more_result}).
+
+			Urychlení pomocí koevoluce na této funkci bylo velmi významné. Pøi porovnání z~hlediska výpoèetního èasu
+			byl výpoèet pomocí koevoluce urychlen 14x, z~hlediska poètu vyèíslených trénovacích vektorù byl potom výpoèet
+			urychlen 28x.
+			\begin{figure}
+				\centering
+				\subfloat{\includegraphics[width=50mm]{fig/results/sums/counted_nodes.pdf}}
+				\subfloat{\includegraphics[width=50mm]{fig/results/sums/generation_count.pdf}}
+				\caption{Srovnání výsledkù CGP a~koevoluce pro funkci $x^2 e^{sin(x)} + x + sin(\frac{\pi}{x^3})$.}
+				\label{f3_result}
+			\end{figure}
+
+			Zajímavostí u~funkce $f_3$ je èlen $sin(\frac{\pi}{x^3})$. Tento èlen je toti¾ ve výsledných øe¹eních
+			bez ztráty fitness naprosto zanedbáván. Nalezená øe¹ení odpovídají funkci $x^2 e^{sin(x)} + x$. Porovnání
+			nalezené funkce s~trénovacími vektory (na èásti definièního oboru, kde má zane\-dba\-ný èlen nejvìt¹í vliv) je ukázáno
+			na obrázku \ref{f3_comparsion}. Je vidìt drobná nepøesnost, která v¹ak odpovídá toleranci zvolené pro tuto 
+			funkci.
+
+			\begin{figure}
+				\centering
+				\includegraphics[width=90mm]{fig/results/porovnani.pdf}
+				\caption{Srovnání nalezené funkce $x^2 e^{sin(x)} + x$ s~hledanou funkcí $x^2 e^{sin(x)} + x + sin(\frac{\pi}{x^3})$.}
+				\label{f3_comparsion}
+			\end{figure}
+
+		\subsection{Funkce $f_4$}
+			Pøi hledání funkce $f_4$ klasické CGP selhalo a nenalezlo øe¹ení ani v~jednom ze tøiceti provedených spu¹tìní.
+			Zpùsobeno to bylo uváznutím v~lokálním extrému. Aèkoliv nìkteré druhy koevoluce hledání øe¹ení této funkce dokázaly optimalizovat, soutì¾ivá koevoluce
+			nebyla pøi testování schopna hledání øe¹ení nijak ovlivnit. Ani jedno øe¹ení nebylo nalezeno ani pøi testování koevoluèní
+			metody. V~tomto pøípadì se v¹ak nemluví o~uváznutí v~lokálním extrému, nýbr¾ o~cyklení ve výpoèetních smyèkách.
+
+			Na obrázku \ref{f4_result_a} je znázornìn rozdíl mezi uváznutím v~lokálním
+			extrému u~CGP a cyklení u~soutì¾ivé koevoluce. CGP se poka¾dé dostalo na stejnou hodnotu fitness (lokální extrém), na které uvázlo a skonèilo.
+			Koevoluce konèila s~nìkolika rozdílnými hodnotami fitness. Na obrázku \ref{f4_result_b} lze potom pozorovat èasový rozdíl 
+			ve vyèíslení 16 milionù generací pomocí CGP oproti CGP s~koevolucí. Ostatní grafy jsou uvedeny v~pøíloze  (\ref{f4_more_result}).
+
+			\begin{figure}
+				\centering
+				\subfloat[][]{\label{f4_result_a}\includegraphics[width=50mm]{fig/results/salustowitz/success_rate.pdf}}
+				\subfloat[][]{\label{f4_result_b}\includegraphics[width=50mm]{fig/results/salustowitz/count_time.pdf}}
+				\caption{Srovnání výsledkù CGP a~koevoluce pro funkci $e^{-x} x^3 cos(x) sin(x) (cos(x) sin(x)^2 - 1)$.}
+				\label{f4_result}
+			\end{figure}
+
+		\subsection{Funkce $f_5$}
+			Pøi hledání funkce $f_5$, stejnì jako u~funkce $f_4$, klasické CGP selhalo a nenalezlo øe¹ení ani v~jednom ze tøiceti provedených spu¹tìní.
+			Koevoluèní varianta na tom nebyla lépe -- také se jí nepodaøilo nalézt ani jedno øe¹ení. Aèkoliv se bezpochyby jedná
+			o~nejslo¾itìj¹í ze zadaných funkcí, jiné koevoluèní mechanismy dokázaly procento nalezených øe¹ení podstatnì zvý¹it.
+			Toto se soutì¾ivé koevoluci nepodaøilo, co¾ poukazuje na zji¹tìnou vlastnost sotì¾ivé koevoluce -- doká¾e velmi efektivnì
+			optimalizovat øe¹ení jednoduchých funkcí, ale k~øe¹ení slo¾itìj¹ích funkcí není vhodná.
+
+			Na obrázku \ref{f5_result_a} lze pozorovat, ¾e ve funkci $f_5$ bylo více lokálních extrémù, ve kterých CGP pøi výpoètu uvázlo. Koevoluèní
+			varianta opìt cyklila ve výpoèetních cyklech. Výpo\-èetní èas (znázornìn na obrázku \ref{f5_result_b}),
+			aèkoliv nevedl k~úspì¹nému øe¹ení, je i pøi øe¹ení $f_5$ podstatnì ni¾¹í u~koevoluèního pøístupu, ne¾ u~CGP. Toto je zpùsobeno 
+			mno¾stvím vyèíslených trénovacích vektorù pøi jednotlivých variantách. Dal¹í grafy jsou uvedeny v~pøí\-loze  (\ref{f5_more_result}).
+
+			\begin{figure}
+				\centering
+				\subfloat[][]{\label{f5_result_a}\includegraphics[width=50mm]{fig/results/ball/success_rate.pdf}}
+				\subfloat[][]{\label{f5_result_b}\includegraphics[width=50mm]{fig/results/ball/count_time.pdf}}
+				\caption{Srovnání výsledkù CGP a~koevoluce pro funkci $\frac{10}{5 + (x - 3)^2}$.}
+				\label{f5_result}
+			\end{figure}
+
+	\section{Shrnutí výsledkù}
+		Testování této práce bylo provedeno na pìti funkcích, které byly rozdìleny na skupinu jednodu¹¹ích ($f_1$, $f_2$ a~$f_3$)
+		a~slo¾itìj¹ích ($f_4$, $f_5$) funkcí. Koevoluèní varianta se u~funkcí $f_1$ a¾ $f_3$ dokázala vyhnout pøípadùm uváznutí
+		v~lokálním extrému, zkrátila dobu výpoètu a~sní¾ila jak poèet generací, tak poèet vyèíslených trénovacích vektorù. U~funkcí $f_4$
+		a~$f_5$ se koevoluèní variantì nepodaøilo nalézt po¾adované výsledky, co¾ bylo pravdìpodobnì zpùsobeno známým problémem
+		soutì¾ivé koevoluce -- zacyklením se do výpoèetních smyèek. 
+
+		Porovnání s~koevolucí prediktorù fitness dle \cite{vsikulova2012coevolution} ukazuje, ¾e soutì¾ivá koevoluce, jako jednodu¹¹í
+		typ koevoluce, je vhodnìj¹í pro øe¹ení jednodu¹¹ích úloh, na slo¾itìj¹ích úlohách potom ale selhává. Koevoluci prediktorù 
+		fitness se podaøilo urychlit v¹echny úlohy popsané v~této kapitole 2-5krát. Soutì¾ivé koevoluci se pak povedlo urychlit
+		úlohy $f_1$ a¾ $f_3$ 2-181krát, úlohy $f_4$ a~$f_5$ ale vyøe¹it nedokázala.
+		
+
+\chapter{Závìr}\label{zaver}
+	Hlavním cílem této práce bylo navrhnout, implementovat a~otestovat program øe¹ící symbolickou regresi pomocí kartézského
+	genetického pro\-gra\-mo\-vá\-ní a~soutì¾ivé koevoluce. Tento program byl implementován ve dvou variantách -- s~vyu¾itím
+	koevoluce a~za pomoci standardního CGP -- a~funguje v~prostøedí operaèního systému Linux. Výstupem této práce 
+	jsou testy provedené na pìti vybraných 
+	úlohách, které provìøily funkènost programu. Bìhem testování se ukázalo, ¾e koevoluèní varianta vykazuje lep¹í 
+	výsledky ve v¹ech ohledech -- èas výpoètu, poèet vyèíslených trénovacích vektorù, ale i~zamezení pøípadùm uváznutí
+v~lo\-kál\-ním extrému u~jednodu¹¹ích funkcí. U~slo¾itìj¹ích funkcí pak ale soutì¾ivá koevoluce selhává v~základním
+	po¾adavku na symbolickou regresi -- nalézt øe¹ení. 
+
+	Souèástí práce bylo také srovnání výsledkù s~pøedchozím pøístupem øe¹ení symbo\-lické regrese pomocí kartézského
+	genetického programování s~vyu¾itím koevoluce prediktorù fitness. Oèekávaným výsledkem bylo, ¾e soutì¾ivá koevoluce
+	bude dosahovat podstatnì men¹ích zrychlení ne¾ koevoluce prediktorù fitness. V~prùbìhu testování se v¹ak ukázalo, ¾e
+	pøi øe¹ení jednodu¹¹ích úloh je urychlení pomocí soutì¾ivé koevoluce vy¹¹í, ne¾ urychlení pomocí koevoluce prediktorù 
+	fitness. Pøi øe¹ení slo¾itìj¹ích úloh se v¹ak soutì¾ivá koevoluce dostává do výpoèetních cyklù, které mají za dùsledek
+	nenalezení výsledného øe¹ení ve zkou\-maném poètu generací. 
+
+	Za stejných podmínek, za jakých se koevoluci prediktorù fitness
+	povedlo urychlit testovací úlohy $f_1$ a¾ $f_3$ 2-5krát, se soutì¾ivé koevoluci povedlo výpoèet urychlit 2-181krát.
+	Pøi øe¹ení funkcí $f_4$ a~$f_5$ v¹ak soutì¾ivá koevoluce nedokázala nalézt øe¹ení ve stanoveném poètu 16 milionù
+	generací.
+
+	Na tuto práci by bylo mo¾né navázat jejím roz¹íøením o~u¾ivatelské rozhraní, které by mohlo program pøiblí¾it
+	potenciálním u¾ivatelùm napøíklad v~pro\-støe\-dí výzkumných laboratoøí a~podobnì. 
+
+	V~prùbìhu øe¹ení této práce jsem se seznámila s~metodami soft-computingu, kterým se budu dále pøi studiu vìnovat. Pøi
+	implementaci jsem si v~praxi vyzkou¹ela metody para\-lelizace a~nauèila jsem se práci s~jazykem R, který je velmi 
+	u¾iteèný pøi zpracování statistických dat. V~neposlední øadì jsem se také nauèila zpracovávat technickou dokumentaci
+	pomocí sazebního systému \LaTeX.
+
+
+%=========================================================================

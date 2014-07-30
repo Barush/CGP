@@ -1,0 +1,153 @@
+%============================================================================
+% tento soubor pouzijte jako zaklad
+% (c) 2008 Michal Bidlo
+% E-mail: bidlom AT fit vutbr cz
+%============================================================================
+% kodovaní: iso-8859-2 (zmena prikazem iconv, recode nebo cstocs)
+%----------------------------------------------------------------------------
+% zpracování: make, make pdf, make desky, make clean
+% pøipomínky posílejte na e-mail: bidlom AT fit.vutbr.cz
+% vim: set syntax=tex encoding=latin2:
+%============================================================================
+\documentclass[cover]{fitthesis} % odevzdani do wisu - odkazy, na ktere se da klikat
+%\documentclass[print]{fitthesis} % pro tisk - na odkazy se neda klikat
+%\documentclass[english,print]{fitthesis} % pro tisk - na odkazy se neda klikat
+%      \documentclass[english]{fitthesis}
+% * Je-li prace psana v anglickem jazyce, je zapotrebi u tridy pouzit 
+%   parametr english nasledovne:
+%      \documentclass[english]{fitthesis}
+% * Neprejete-li si vysazet na prvni strane dokumentu desky, zruste 
+%   parametr cover
+
+% zde zvolime kodovani, ve kterem je napsan text prace
+% "latin2" pro iso8859-2 nebo "cp1250" pro windows-1250, "utf8" pro "utf-8"
+%\usepackage{ucs}
+\usepackage[latin2]{inputenc}
+%\usepackage[T1, IL2]{fontenc}
+\usepackage{url}
+\DeclareUrlCommand\url{\def\UrlLeft{<}\def\UrlRight{>} \urlstyle{tt}}
+
+%zde muzeme vlozit vlastni balicky
+\usepackage[czech]{babel}
+\usepackage{subfig}
+\usepackage{textcomp}
+\usepackage{tablefootnote}
+
+
+% =======================================================================
+% balíèek "hyperref" vytváøí klikací odkazy v pdf, pokud tedy pou¾ijeme pdflatex
+% problém je, ¾e balíèek hyperref musí být uveden jako poslední, tak¾e nemù¾e
+% být v ¹ablonì
+\ifWis
+\ifx\pdfoutput\undefined % nejedeme pod pdflatexem
+\else
+  \usepackage{color}
+  \usepackage[unicode,colorlinks,hyperindex,plainpages=false,pdftex]{hyperref}
+  \definecolor{links}{rgb}{0.4,0.5,0}
+  \definecolor{anchors}{rgb}{1,0,0}
+  \def\AnchorColor{anchors}
+  \def\LinkColor{links}
+  \def\pdfBorderAttrs{/Border [0 0 0] }  % bez okrajù kolem odkazù
+  \pdfcompresslevel=9
+\fi
+\fi
+
+%Informace o praci/projektu
+%---------------------------------------------------------------------------
+\projectinfo{
+  %Prace
+  project=BP,            %typ prace BP/SP/DP/DR
+  year=2014,             %rok
+  date=\today,           %datum odevzdani
+  %Nazev prace
+  title.cs={Soutì¾ivá koevoluce v~kartézském genetickém programování},  %nazev prace v cestine
+  title.en={Competitive Coevolution in Cartesian Genetic Programming}, %nazev prace v anglictine
+  %Autor
+  author={Barbora Skøivánková},   %jmeno prijmeni autora
+  %author.title.p=Bc., %titul pred jmenem (nepovinne)
+  %author.title.a=PhD, %titul za jmenem (nepovinne)
+  %Ustav
+  department=UPSY, % doplnte prislusnou zkratku: UPSY/UIFS/UITS/UPGM
+  %Skolitel
+  supervisor= Michaela ©ikulová, %jmeno prijmeni skolitele
+  supervisor.title.p=Ing.,   %titul pred jmenem (nepovinne)
+  %supervisor.title.a={Ph.D.},    %titul za jmenem (nepovinne)
+  %Klicova slova, abstrakty, prohlaseni a podekovani je mozne definovat 
+  %bud pomoci nasledujicich parametru nebo pomoci vyhrazenych maker (viz dale)
+  %===========================================================================
+  %Klicova slova
+  keywords.cs={Symbolická regrese, evoluèní algoritmy, kartézské genetické programování, koevoluce.}, %klicova slova v ceskem jazyce
+  keywords.en={Symbolic regression, evolutionary algorithms, cartesian genetic programming, coevolution.}, %klicova slova v anglickem jazyce
+  %Abstract
+  abstract.cs={Symbolická regrese je metoda hledání pøedpisù funkcí, které co nejpøesnìji prochází danými body v~rovinì nebo prostoru.
+	V~této práci je øe¹ena symbolická regrese s~vyu¾itím kartézské\-ho genetického programování a soutì¾ivé koevoluce. Tato úloha byla ji¾ 
+	døíve øe¹ena pomocí kartézského genetického programování a koevoluce prediktorù fitness. V~této práci je zkou\-máno, zda-li jednodu¹¹í soutì¾ivá
+	koevoluce doká¾e dosáhnout obdobných výsledkù jako koevoluce prediktorù fitness. Symbolická regrese je v~této práci testována na pìti
+	rùznì slo¾itých úlohách. Pøi testování se ukázalo, ¾e pøi øe¹ení jednodu¹¹ích úloh dosahuje soutì¾ivá koevoluce oproti klasickému kartézskému
+	genetickému programování výraznì vy¹¹ího zrychlení 
+	ne¾ koevoluce prediktorù fitness. Slo¾itìj¹í úlohy, ve kterých koevoluce prediktorù fitness obstála stejnì dobøe jako v~jednodu¹¹ích,
+	v¹ak soutì¾ivá koevoluce vyøe¹it nedokázala.}, % abstrakt v ceskem jazyce
+  abstract.en={Symbolic regression is a function formula search approach dealing with isolated points of the function in plane or space. 
+	In this thesis, the symbolic regression is performed by Cartesian Genetic Programming and Competitive Coevolution. This task has
+	already been resolved by Cartesian Genetic Programming using Coevolution of Fitness Predictors. This thesis is concerned with comparison of
+	Coevolution of Fitness Predictors with simpler Competitive Coevolution approach in terms of approach effort. Symbolic regression has been tested on five 
+	functions with different complexity. It has been shown, that Competitive Coevolution accelerates the symbolic regression task on plainer functions 
+	in comparison with Coevolution of Fitness Predictors. However, Competitive Coevolution is not able to solve more complex functions in 
+	which Coevolution of Fitness Predictors succeeded.}, % abstrakt v anglickem jazyce
+  %Prohlaseni
+  declaration={Prohla¹uji, ¾e jsem tuto bakaláøskou práci vypracovala samostatnì pod vedením
+	Ing. Michaely ©ikulové. },
+  %Podekovani (nepovinne)
+  acknowledgment={Na tomto místì bych ráda podìkovala svojí vedoucí Ing. Michaele ©ikulové za 
+	precizní konzultace plné cenných rad pro vypracování této práce a~v~neposlední øadì také za 
+	ochotu pravidelnì konzultovat i~za ztí¾ených podmínek zpùsobených studijním pobytem 2\,000\,km
+	od univerzity.} % nepovinne
+}
+
+%Abstrakt (cesky, anglicky)
+%\abstract[cs]{}
+%\abstract[en]{Do tohoto odstavce bude zapsán výtah (abstrakt) práce v anglickém jazyce.}
+
+%Klicova slova (cesky, anglicky)
+%\keywords[cs]{Symbolická regrese, evoluèní algoritmy, kartézské genetické programování, soutì¾ivá koevoluce.}
+%\keywords[en]{Symbolic regression, evolutionary algorithms, cartesian genetic programming, competitive coevolution.}
+
+%Prohlaseni
+%\declaration{Prohla¹uji, ¾e jsem tuto bakaláøskou práci vypracoval samostatnì pod vedením pana X...
+%Dal¹í informace mi poskytli...
+%Uvedl jsem v¹echny literární prameny a publikace, ze kterých jsem èerpal.}
+
+%Podekovani (nepovinne)
+%\acknowledgment{V této sekci je mo¾no uvést podìkování vedoucímu práce a tìm, kteøí poskytli odbornou pomoc
+%(externí zadavatel, konzultant, apod.).}
+
+\begin{document}
+  % Vysazeni titulnich stran
+  % ----------------------------------------------
+  \maketitle
+  % Obsah
+  % ----------------------------------------------
+  
+  % Seznam obrazku a tabulek (pokud prace obsahuje velke mnozstvi obrazku, tak se to hodi)
+  % \listoffigures
+  % \listoftables 
+
+  % Text prace
+  % ----------------------------------------------
+  \input{obsah} % viz. obsah.tex
+
+  % Pouzita literatura
+  % ----------------------------------------------
+\ifczech
+  \bibliographystyle{czechiso}
+\else 
+  \bibliographystyle{plain}
+%  \bibliographystyle{alpha}
+\fi
+  \begin{flushleft}
+  \bibliography{literatura} % viz. literatura.bib
+  \end{flushleft}
+  \appendix
+  
+  \input{prilohy} % viz. prilohy.tex
+\end{document}

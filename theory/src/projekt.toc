@@ -1,0 +1,89 @@
+\select@language {czech}
+\contentsline {chapter}{\numberline {1}\'Uvod}{3}{chapter.1}
+\contentsline {chapter}{\numberline {2}Teoretick\'y z\'aklad pr\'ace}{4}{chapter.2}
+\contentsline {section}{\numberline {2.1}Evolu\v cn\IeC {\'\i } algoritmy}{4}{section.2.1}
+\contentsline {subsection}{\numberline {2.1.1}Terminologie}{4}{subsection.2.1.1}
+\contentsline {subsection}{\numberline {2.1.2}Princip evolu\v cn\IeC {\'\i }ho algoritmu}{5}{subsection.2.1.2}
+\contentsline {subsubsection}{Vytvo\v ren\IeC {\'\i } po\v c\'ate\v cn\IeC {\'\i } populace}{5}{section*.2}
+\contentsline {subsubsection}{Ohodnocen\IeC {\'\i } populace}{5}{section*.4}
+\contentsline {subsubsection}{V\'yb\v er rodi\v c\r u}{6}{section*.5}
+\contentsline {subsubsection}{Vytvo\v ren\IeC {\'\i } nov\'e generace}{6}{section*.6}
+\contentsline {subsubsection}{Ukon\v covac\IeC {\'\i } podm\IeC {\'\i }nka}{7}{section*.8}
+\contentsline {subsection}{\numberline {2.1.3}Genetick\'y algoritmus}{7}{subsection.2.1.3}
+\contentsline {subsubsection}{Pou\v z\IeC {\'\i }van\'e oper\'atory}{8}{section*.9}
+\contentsline {subsection}{\numberline {2.1.4}Genetick\'e programov\'an\IeC {\'\i }}{8}{subsection.2.1.4}
+\contentsline {subsubsection}{Reprezentace jedinc\r u}{8}{section*.10}
+\contentsline {subsubsection}{Mno\v ziny termin\'al\r u a~funkc\IeC {\'\i }}{8}{section*.12}
+\contentsline {subsubsection}{Generov\'an\IeC {\'\i } po\v c\'ate\v cn\IeC {\'\i } populace}{8}{section*.13}
+\contentsline {subsubsection}{V\'ypo\v cet fitness}{9}{section*.14}
+\contentsline {subsubsection}{Pou\v z\IeC {\'\i }van\'e oper\'atory}{9}{section*.15}
+\contentsline {section}{\numberline {2.2}Kart\'ezsk\'e genetick\'e programov\'an\IeC {\'\i }}{9}{section.2.2}
+\contentsline {subsection}{\numberline {2.2.1}Definice CGP}{9}{subsection.2.2.1}
+\contentsline {subsubsection}{Reprezentace jedinc\r u}{10}{section*.17}
+\contentsline {subsubsection}{Generov\'an\IeC {\'\i } po\v c\'ate\v cn\IeC {\'\i } populace}{11}{section*.19}
+\contentsline {subsubsection}{V\'ypo\v cet fitness}{11}{section*.20}
+\contentsline {subsubsection}{Pou\v z\IeC {\'\i }van\'e oper\'atory}{12}{section*.21}
+\contentsline {subsection}{\numberline {2.2.2}Genotyp-fenotyp mapov\'an\IeC {\'\i }}{12}{subsection.2.2.2}
+\contentsline {section}{\numberline {2.3}Koevoluce}{12}{section.2.3}
+\contentsline {subsection}{\numberline {2.3.1}Probl\'emy \v re\v sen\'e s~pomoc\IeC {\'\i } koevoluce}{12}{subsection.2.3.1}
+\contentsline {subsubsection}{Probl\'emy kompozi\v cn\IeC {\'\i }ho charakteru}{13}{section*.23}
+\contentsline {subsubsection}{Probl\'emy zalo\v zen\'e na testech}{13}{section*.24}
+\contentsline {subsection}{\numberline {2.3.2}Princip koevoluce pro probl\'emy zalo\v zen\'e na testech}{13}{subsection.2.3.2}
+\contentsline {subsubsection}{Populace kandid\'atn\IeC {\'\i }ch \v re\v sen\IeC {\'\i }}{13}{section*.26}
+\contentsline {subsubsection}{Archiv kandid\'atn\IeC {\'\i }ch \v re\v sen\IeC {\'\i }}{13}{section*.27}
+\contentsline {subsubsection}{Mno\v zina v\v sech tr\'enovac\IeC {\'\i }ch vektor\r u}{13}{section*.28}
+\contentsline {subsubsection}{Populace test\r u}{14}{section*.29}
+\contentsline {subsubsection}{Nejvhodn\v ej\v s\IeC {\'\i } test}{14}{section*.30}
+\contentsline {subsection}{\numberline {2.3.3}Princip koevoluce prediktor\r u fitness}{15}{subsection.2.3.3}
+\contentsline {section}{\numberline {2.4}Symbolick\'a regrese}{15}{section.2.4}
+\contentsline {chapter}{\numberline {3}N\'avrh}{16}{chapter.3}
+\contentsline {section}{\numberline {3.1}Evoluce kandid\'atn\IeC {\'\i }ch \v re\v sen\IeC {\'\i }}{16}{section.3.1}
+\contentsline {subsection}{\numberline {3.1.1}Kandid\'atn\IeC {\'\i } \v re\v sen\IeC {\'\i }}{16}{subsection.3.1.1}
+\contentsline {subsection}{\numberline {3.1.2}Generov\'an\IeC {\'\i } po\v c\'ate\v cn\IeC {\'\i } populace}{17}{subsection.3.1.2}
+\contentsline {subsection}{\numberline {3.1.3}Hled\'an\IeC {\'\i } aktivn\IeC {\'\i }ch uzl\r u}{18}{subsection.3.1.3}
+\contentsline {subsection}{\numberline {3.1.4}Spu\v st\v en\IeC {\'\i } kandid\'atn\IeC {\'\i }ho programu nad tr\'enovac\IeC {\'\i }m vektorem}{18}{subsection.3.1.4}
+\contentsline {subsection}{\numberline {3.1.5}Vyhodnocen\IeC {\'\i } fitness}{18}{subsection.3.1.5}
+\contentsline {subsection}{\numberline {3.1.6}V\'yb\v er rodi\v c\r u}{19}{subsection.3.1.6}
+\contentsline {subsection}{\numberline {3.1.7}Vytv\'a\v ren\IeC {\'\i } nov\'e generace}{19}{subsection.3.1.7}
+\contentsline {section}{\numberline {3.2}Evoluce podmno\v zin mno\v ziny v\v sech tr\'enovac\IeC {\'\i }ch vektor\r u}{20}{section.3.2}
+\contentsline {subsection}{\numberline {3.2.1}Test}{20}{subsection.3.2.1}
+\contentsline {subsection}{\numberline {3.2.2}Archivy}{20}{subsection.3.2.2}
+\contentsline {subsubsection}{Archiv kandid\'atn\IeC {\'\i }ch \v re\v sen\IeC {\'\i }}{21}{section*.35}
+\contentsline {subsubsection}{Archiv s~nejvhodn\v ej\v s\IeC {\'\i }m testem}{21}{section*.36}
+\contentsline {subsection}{\numberline {3.2.3}Vyhodnocen\IeC {\'\i } fitness}{21}{subsection.3.2.3}
+\contentsline {subsection}{\numberline {3.2.4}V\'yb\v er rodi\v c\r u}{21}{subsection.3.2.4}
+\contentsline {subsection}{\numberline {3.2.5}Vytv\'a\v ren\IeC {\'\i } nov\'e generace}{21}{subsection.3.2.5}
+\contentsline {chapter}{\numberline {4}Implementace}{23}{chapter.4}
+\contentsline {section}{\numberline {4.1}Paralelizace}{23}{section.4.1}
+\contentsline {section}{\numberline {4.2}Generov\'an\IeC {\'\i } pseudon\'ahodn\'ych \v c\IeC {\'\i }sel}{24}{section.4.2}
+\contentsline {section}{\numberline {4.3}Form\'at vstupn\IeC {\'\i }ch soubor\r u}{24}{section.4.3}
+\contentsline {subsection}{\numberline {4.3.1}Soubor s~povolen\'ymi funkcemi}{24}{subsection.4.3.1}
+\contentsline {subsection}{\numberline {4.3.2}Soubor s~tr\'enovac\IeC {\'\i }mi vektory}{25}{subsection.4.3.2}
+\contentsline {section}{\numberline {4.4}Na\v c\IeC {\'\i }t\'an\IeC {\'\i } vstupu}{25}{section.4.4}
+\contentsline {section}{\numberline {4.5}Z\'aznamy statistick\'ych dat}{25}{section.4.5}
+\contentsline {section}{\numberline {4.6}V\'ypis \v ret\v ezce \v re\v sen\IeC {\'\i }}{26}{section.4.6}
+\contentsline {section}{\numberline {4.7}Kompilace a~spu\v st\v en\IeC {\'\i }}{26}{section.4.7}
+\contentsline {chapter}{\numberline {5}Experiment\'aln\IeC {\'\i } vyhodnocen\IeC {\'\i }}{27}{chapter.5}
+\contentsline {subsubsection}{Funk\v cn\IeC {\'\i } p\v redpisy jednotliv\'ych z\'at\v e\v zov\'ych test\r u}{27}{section*.38}
+\contentsline {section}{\numberline {5.1}Nastaven\IeC {\'\i } evoluce kandid\'atn\IeC {\'\i }ch \v re\v sen\IeC {\'\i }}{27}{section.5.1}
+\contentsline {section}{\numberline {5.2}Nastaven\IeC {\'\i } evoluce test\r u}{29}{section.5.2}
+\contentsline {section}{\numberline {5.3}Skripty pro testov\'an\IeC {\'\i } a~vyhodnocov\'an\IeC {\'\i }}{29}{section.5.3}
+\contentsline {section}{\numberline {5.4}Posuzovan\'a krit\'eria a~v\'ysledky}{31}{section.5.4}
+\contentsline {subsection}{\numberline {5.4.1}Funkce $f_1$}{31}{subsection.5.4.1}
+\contentsline {subsection}{\numberline {5.4.2}Funkce $f_2$}{31}{subsection.5.4.2}
+\contentsline {subsection}{\numberline {5.4.3}Funkce $f_3$}{32}{subsection.5.4.3}
+\contentsline {subsection}{\numberline {5.4.4}Funkce $f_4$}{33}{subsection.5.4.4}
+\contentsline {subsection}{\numberline {5.4.5}Funkce $f_5$}{33}{subsection.5.4.5}
+\contentsline {section}{\numberline {5.5}Shrnut\IeC {\'\i } v\'ysledk\r u}{34}{section.5.5}
+\contentsline {chapter}{\numberline {6}Z\'av\v er}{35}{chapter.6}
+\contentsline {chapter}{\numberline {A}Obsah CD}{37}{appendix.A}
+\contentsline {subsubsection}{Technick\'a zpr\'ava}{37}{section*.49}
+\contentsline {subsubsection}{Praktick\'a \v c\'ast}{37}{section*.50}
+\contentsline {chapter}{\numberline {B}Grafy s~roz\v s\IeC {\'\i }\v ren\'ymi v\'ysledky test\r u}{38}{appendix.B}
+\contentsline {section}{\numberline {B.1}Grafy k~v\'yb\v eru parametr\r u koevoluce}{38}{section.B.1}
+\contentsline {section}{\numberline {B.2}Grafy k~v\'ysledk\r um testov\'an\IeC {\'\i } pro jednotliv\'e funkce}{42}{section.B.2}
+\contentsline {subsection}{\numberline {B.2.1}Funkce $f_1$}{42}{subsection.B.2.1}
+\contentsline {subsection}{\numberline {B.2.2}Funkce $f_2$}{42}{subsection.B.2.2}
+\contentsline {subsection}{\numberline {B.2.3}Funkce $f_3$}{43}{subsection.B.2.3}
+\contentsline {subsection}{\numberline {B.2.4}Funkce $f_4$}{43}{subsection.B.2.4}
+\contentsline {subsection}{\numberline {B.2.5}Funkce $f_5$}{44}{subsection.B.2.5}

@@ -1,0 +1,112 @@
+\chapter{Obsah CD}
+
+	\subsubsection{Technická zpráva}
+		Technická zpráva ve formátu \verb|pdf| se nachází v~adresáøi \verb|theory|. Zdrojové kódy
+		pro \LaTeX a v¹echny vyu¾ité balíèky se nachází v~adresáøi \verb|theory/src|. Po pøípadnì provedených
+		zmìnách lze technickou zprávu ve formátu pdf vygenerovat pomocí pøíkazu \verb|make|.
+
+	\subsubsection{Praktická èást}
+		Adresáø \verb|practice| obsahuje následující souborovou strukturu:
+		\begin{description}
+			\item[src] - v~tomto adresáøi se nachází ve¹keré zdrojové kódy, po pøelo¾ení pøíkazem \verb|make|
+				se zde nachází také soubory spustitelné pøíkazy \verb|make run| - pro variantu vyu¾ívající klasické
+				CGP, pøípadnì \verb|make coev| pro variantu vyu¾ívající koevoluci.
+			\item[bin] - v tomto adresáøi se nachází obì verze spustitelného programu. \verb|cgp| provádí symbo\-lickou
+				regresi se standardním CGP, \verb|coecgp| pak provádí optimalizovanou koevoluèní variantu CGP.
+			\item[testfiles] - tento adresáø obsahuje testovací soubory pro funkce $f_1$ a¾ $f_5$ vyu¾ité pøi 
+				testování.
+			\item[testscripts] - v~tomto adresáøi se nachází testovací skripty pro jednotlivé funkce, vyu¾ité
+				v~rámci testování vytvoøené aplikace.
+			\item[results] - v~tomto adresáøi se nachází adresáø \verb|res_processing|, ve kterém se nachází 
+				dvojice skriptù v~jazycích \verb|bash| a~\verb|R|, které byly vyu¾ity pro zpracování výsledkù.
+				Dále se zde nachází adresáø \verb|res_data| obsahující statistické soubory z~testování funkcí
+				$f_1$ a¾ $f_5$. V~adresáøi \verb|res_graphs| jsou umístìny grafy vygenerované dvojicí skriptù 
+				v~adresáøi \verb|res_processing|.
+		\end{description}
+
+\chapter{Grafy s~roz¹íøenými výsledky testù}
+
+	\section{Grafy k~výbìru parametrù koevoluce}\label{priloha_coev_testy}
+			Tato èást práce obsahuje grafy znázoròující srovnání jednotlivých nastavení koevoluce. Ve vlastním
+			textu práce bylo uvedeno srovnání na základì poètu vyèíslených vektorù. V~této pøíloze jsou pøidána
+			také srovnání na základì èasu stráveného na procesoru, na základì poètu generací vedoucích k~nalezení
+			øe¹ení a na základì maximální dosa¾ené fitness. Hodnota maximální dosa¾ené fitness má význam v~pøípadì, 
+			¾e nebylo nalezeno øe¹ení.
+
+			Testy byly provádìny na padesáti spu¹tìních s~ka¾dým nastavením. Zmìny porovná\-vaných parametrù byly
+			provádìny za nezmìnìných ostatních podmínek.
+		\begin{figure}
+			\centering
+			\subfloat[][]{\includegraphics[width=60mm]{fig/results/test_coev_params/archives/count_time.pdf}}
+			\subfloat[][]{\includegraphics[width=60mm]{fig/results/test_coev_params/crossing/count_time.pdf}}\\
+			\subfloat[][]{\includegraphics[width=60mm]{fig/results/test_coev_params/generation/count_time.pdf}}
+			\subfloat[][]{\includegraphics[width=60mm]{fig/results/test_coev_params/cg_parts/count_time.pdf}}\\
+			\subfloat[][]{\includegraphics[width=60mm]{fig/results/test_coev_params/test_size/count_time.pdf}}
+			\caption{Porovnání jednotlivých nastavení koevoluce na základì èasu.}
+			\label{coev_params_time}
+		\end{figure}
+		\begin{figure}
+			\centering
+			\subfloat[][]{\includegraphics[width=60mm]{fig/results/test_coev_params/archives/generation_count.pdf}}
+			\subfloat[][]{\includegraphics[width=60mm]{fig/results/test_coev_params/crossing/generation_count.pdf}}\\
+			\subfloat[][]{\includegraphics[width=60mm]{fig/results/test_coev_params/generation/generation_count.pdf}}
+			\subfloat[][]{\includegraphics[width=60mm]{fig/results/test_coev_params/cg_parts/generation_count.pdf}}\\
+			\subfloat[][]{\includegraphics[width=60mm]{fig/results/test_coev_params/test_size/generation_count.pdf}}
+			\caption{Porovnání jednotlivých nastavení koevoluce na základì poètu generací.}
+			\label{coev_params_gener}
+		\end{figure}
+		\begin{figure}
+			\centering
+			\subfloat[][]{\includegraphics[width=60mm]{fig/results/test_coev_params/archives/success_rate.pdf}}
+			\subfloat[][]{\includegraphics[width=60mm]{fig/results/test_coev_params/crossing/success_rate.pdf}}\\
+			\subfloat[][]{\includegraphics[width=60mm]{fig/results/test_coev_params/generation/success_rate.pdf}}
+			\subfloat[][]{\includegraphics[width=60mm]{fig/results/test_coev_params/cg_parts/success_rate.pdf}}\\
+			\subfloat[][]{\includegraphics[width=60mm]{fig/results/test_coev_params/test_size/success_rate.pdf}}
+			\caption{Porovnání jednotlivých nastavení koevoluce na základì maximální dosa¾ené fitness.}
+			\label{coev_params_fit}
+		\end{figure}
+		\newpage	
+
+	\section{Grafy k~výsledkùm testování pro jednotlivé funkce}
+		\subsection{Funkce $f_1$}
+			\begin{figure}[h!]
+				\centering
+				\subfloat{\includegraphics[width=50mm]{fig/results/x_2_3/count_time.pdf}}
+				\subfloat{\includegraphics[width=50mm]{fig/results/x_2_3/success_rate.pdf}}
+				\caption{Srovnání výsledkù CGP a~koevoluce pro funkci $x^2-x^3$.}
+				\label{f1_more_result}
+			\end{figure}
+		\subsection{Funkce $f_2$}
+			\begin{figure}[h!]
+				\centering
+				\subfloat{\includegraphics[width=50mm]{fig/results/sinx_ex/count_time.pdf}}
+				\subfloat{\includegraphics[width=50mm]{fig/results/sinx_ex/success_rate.pdf}}
+				\caption{Srovnání výsledkù CGP a~koevoluce pro funkci $sin(x)*e^{|x|}$.}
+				\label{f2_more_result}
+			\end{figure}
+		\newpage
+		\subsection{Funkce $f_3$}
+			\begin{figure}[h!]
+				\centering
+				\subfloat{\includegraphics[width=50mm]{fig/results/sums/count_time.pdf}}
+				\subfloat{\includegraphics[width=50mm]{fig/results/sums/success_rate.pdf}}
+				\caption{Srovnání výsledkù CGP a~koevoluce pro funkci $x^2 e^{sin(x)} + x + sin(\frac{\pi}{x^3})$.}
+				\label{f3_more_result}
+			\end{figure}
+		\subsection{Funkce $f_4$}
+			\begin{figure}[h!]
+				\centering
+				\subfloat{\includegraphics[width=50mm]{fig/results/salustowitz/counted_nodes.pdf}}
+				\subfloat{\includegraphics[width=50mm]{fig/results/salustowitz/generation_count.pdf}}
+				\caption{Srovnání výsledkù CGP a~koevoluce pro funkci $e^{-x} x^3 cos(x) sin(x) (cos(x) sin(x)^2 - 1)$.}
+				\label{f4_more_result}
+			\end{figure}
+		\newpage
+		\subsection{Funkce $f_5$}
+			\begin{figure}[h!]
+				\centering
+				\subfloat{\includegraphics[width=50mm]{fig/results/ball/counted_nodes.pdf}}
+				\subfloat{\includegraphics[width=50mm]{fig/results/ball/generation_count.pdf}}
+				\caption{Srovnání výsledkù CGP a~koevoluce pro funkci $\frac{10}{5 + (x - 3)^2}$.}
+				\label{f5_more_result}
+			\end{figure}
