@@ -5,13 +5,21 @@
 /********************* xskri01@stud.fit.vutbr.cz ******************************/
 /******************************************************************************/
 
-/************* MODUL USED TO FIND PARENTS AND MUTATE IT ***********************/
+/************* MODUL USED TO FIND PARENTS AND NEW GENERATION ******************/
 /** file name: 			evolution.cpp
 	creation date:		10/2013
 **/
 
 #include "evolution.h"
 
+/******************************************************************************
+	Function copyGenotype - copies content of one individual into another
+		individual
+	Takes parameters:
+		@from - pointer to individual which is copied
+		@to - pointer to individual into which is copied
+		@geneticP - pointer to a struct of all CGP params
+******************************************************************************/
 void copyGenotype(TIndividual* from, TIndividual* to, TCgpProperties* geneticP){
 	//copy program nodes
 	for(int i = 0; i < geneticP->rows; i++){
@@ -28,6 +36,14 @@ void copyGenotype(TIndividual* from, TIndividual* to, TCgpProperties* geneticP){
 	to->fitness = from->fitness;
 }
 
+/******************************************************************************
+	Function getParents - selects the best individual in the generation compared
+		by fitness. Secondary parameters - the one which was not parent is better
+		and the one with shorter equation is better.
+	Takes parameters:
+		@geneticArray - pointer to a vector of whole population
+		@geneticP - pointer to a struct of all CGP params
+******************************************************************************/
 void getParents(vector<TIndividual>* geneticArray, TCgpProperties* geneticP){
 	int max = -1;
 	TIndividual* parent;
@@ -50,8 +66,16 @@ void getParents(vector<TIndividual>* geneticArray, TCgpProperties* geneticP){
 	copyGenotype(parent, &geneticArray->at(0), geneticP);
 }
 
+/******************************************************************************
+	Function changeGenes - selects 1-8% of genes in the genotype and randomly 
+		changes it
+	Takes parameters:
+		@genotype - pointer to an individual to be changed
+		@geneticP - pointer to a struct of all CGP params
+		@functions - pointer to an array of available functions
+******************************************************************************/
 void changeGenes(TIndividual* genotype, TCgpProperties* geneticP, TFuncAvailable* functions){
-	//generate percent - 3-10
+	//generate percent - 1-8
 	double percent = ((rand() % 8) + 1) / 100;	//uniform(1,8) 
 	int nodesCount = geneticP->rows * geneticP->cols;
 	int index, row, col, part;
@@ -129,6 +153,14 @@ void changeGenes(TIndividual* genotype, TCgpProperties* geneticP, TFuncAvailable
 	}
 }
 
+
+/******************************************************************************
+	Function createChildren - controls the process of creating children
+	Takes parameters:
+		@geneticArray - pointer to a vector of whole population
+		@geneticP - pointer to a struct of all CGP params
+		@functions - pointer to an array of available functions
+******************************************************************************/
 void createChildren(vector<TIndividual>* geneticArray, TCgpProperties* geneticP, TFuncAvailable* functions){
 	for(int i = 1; i < geneticP->individCount; i++){
 		//copy parent
@@ -138,6 +170,16 @@ void createChildren(vector<TIndividual>* geneticArray, TCgpProperties* geneticP,
 	}
 }
 
+/******************************************************************************
+	Function evolutionStep - controls one evolution step, is called for each
+		generation, manages the deffirences between CGP and coevolution
+	Takes parameters:
+		@input - pointer to an array of all training vectors
+		@geneticP - pointer to a struct of all CGP params
+		@geneticArray - pointer to a vector of whole population
+		@functions - pointer to an array of available functions
+		@test - pointer to the test - in variant without coevolution is NULL
+******************************************************************************/
 void evolutionStep(TData* input, TCgpProperties* geneticP, vector<TIndividual>* geneticArray, TFuncAvailable* functions, TTest* test){
 
 #ifdef COEVOLUTION

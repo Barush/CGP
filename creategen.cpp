@@ -12,7 +12,14 @@
 
 #include "creategen.h"
 
-//alocation of a single subject of CGP
+/******************************************************************************
+	Function alocateIndividual - allocation of a space for single individual
+	Takes parameters:
+		@row - number of rows in CGP matrix
+		@col - number of cols in CGP matrix
+		@subject - pointer to an individual, which is allocated 
+		@geneticP - pointer to CGP parameters
+******************************************************************************/
 TIndividual* alocateIndividual(int row, int col, TIndividual* subject, TCgpProperties* geneticP){
 	vector< vector<TCell> >* program = new vector< vector<TCell> >(row);
 	if(program == NULL){
@@ -23,11 +30,6 @@ TIndividual* alocateIndividual(int row, int col, TIndividual* subject, TCgpPrope
 	//make columns in all rows
 	for(int i = 0; i < row; i++){
 		program->at(i).resize(col);
-		/*if(program->at(i) == NULL){
-			geneticP->ecode = EALLOC;
-			delete(program);
-			return NULL;
-		}*/
 	}
 	
 	subject->fitness = 0;
@@ -39,7 +41,14 @@ TIndividual* alocateIndividual(int row, int col, TIndividual* subject, TCgpPrope
 	return subject;
 }
 
-//fill in the CGP matrix
+/******************************************************************************
+	Function createIndividual - alocates and fills in the CGP matrix with 
+		random generated numbers
+	Takes parameters:
+		@geneticP - pointer to CGP parameters
+		@subject - pointer to individual to be created
+		@functions - pointer to an array of available functions
+******************************************************************************/
 TIndividual* createIndividual(TCgpProperties* geneticP, TIndividual *subject, TFuncAvailable* functions){
 	alocateIndividual(geneticP->rows, geneticP->cols, subject, geneticP);
 	if(geneticP->ecode != EOK)
@@ -71,7 +80,7 @@ TIndividual* createIndividual(TCgpProperties* geneticP, TIndividual *subject, TF
 				}
 			}
 		} //end of one row
-	} // end of whole matrix
+	} //end of whole matrix
 
 	if((geneticP->cols - geneticP->l_back) <= 0){
 		//output can be every node
@@ -85,7 +94,12 @@ TIndividual* createIndividual(TCgpProperties* geneticP, TIndividual *subject, TF
 	return subject;
 }
 
-//create an array of individuals as a generation
+/******************************************************************************
+	Function createGeneration - create an array of individuals as a generation
+	Takes parameters:
+		@geneticP - pointer to CGP parameters structure
+		@functions - pointer to an array of available functions
+******************************************************************************/
 vector<TIndividual>* createGeneration(TCgpProperties* geneticP, TFuncAvailable* functions){
 	vector<TIndividual>* generation = new vector<TIndividual>(geneticP->individCount);
 	if(generation == NULL){
@@ -103,6 +117,12 @@ vector<TIndividual>* createGeneration(TCgpProperties* geneticP, TFuncAvailable* 
 }
 
 
+/******************************************************************************
+	Function destroyGeneration - deletes all individuals from memory space
+	Takes parameters:
+		@geneticArray - vector of whole population
+		@geneticP - pointer to CGP parameters structure
+******************************************************************************/
 void destroyGeneration(vector<TIndividual>* geneticArray, TCgpProperties* geneticP){
 	for(int i = 0; i < geneticP->individCount; i++){
 		delete((*geneticArray)[i].CgpProgram);

@@ -22,6 +22,11 @@
 #define L_BACK 20
 #define GENER 5
 
+/******************************************************************************
+	Function printUsage - writes out the help message
+	Takes parameters:
+		--
+******************************************************************************/
 void printUsage(){
 	cout << endl << "COEVOLUTION IN CGP" << endl;
 	cout << "BACHELORS THESIS" << endl;
@@ -51,6 +56,11 @@ void printUsage(){
 	return;
 }
 
+/******************************************************************************
+	Function printError - prints out the error message
+	Takes parameters:
+		@codee - error code identifying the error
+******************************************************************************/
 void printError(TErrCode code){
 	if(code == ECMD){
 		cerr << "Invalid params of cmd." << endl;
@@ -68,6 +78,13 @@ void printError(TErrCode code){
 	}
 }
 
+/******************************************************************************
+	Function getParams - function which fills in the CGPProperties structure
+		with CL parameters 
+	Takes parameters:
+		@argv - vector of all parameters to process
+		@argc - pnumber of parameters to process
+******************************************************************************/
 TCgpProperties* getParams(char** argv, int argc){
 	TCgpProperties* params = (TCgpProperties*)malloc(sizeof(struct cgpProperties));
 
@@ -146,7 +163,7 @@ TCgpProperties* getParams(char** argv, int argc){
 			params->coevICnt = atoi(argv[i]);
 		}
 		else if(!strcmp(argv[i], "-a")){
-			//count of individs in coevolution generation
+			//size of archive compared to cgp generation
 			i++;
 			params->archiveSize = atoi(argv[i]);
 		}
@@ -179,6 +196,11 @@ TCgpProperties* getParams(char** argv, int argc){
 	return params;
 }
 
+/******************************************************************************
+	Function intToStr - function used for writing out the solution
+	Takes parameters:
+		@val - numeric value which you want to represent by string
+******************************************************************************/
 char* intToStr(int val){
 	//conversion int to string
 	stringstream intStr;
@@ -191,6 +213,12 @@ char* intToStr(int val){
 	return result;
 }
 
+/******************************************************************************
+	Function getPrintable - makes strings of constants used for writing out 
+		the solution
+	Takes parameters:
+		@ind - index to the table of constants
+******************************************************************************/
 char* getPrintable(int ind){
 	char* str = (char*)malloc(sizeof(char) * 10);
 
@@ -208,6 +236,15 @@ char* getPrintable(int ind){
 	return str;
 }
 
+/******************************************************************************
+	Function expandNode - node expansion for recursive descent used for text
+		representation of the result function
+	Takes parameters:
+		@tmp - pointer to the node to expand
+		@result - pointer to the cgp individual to represent
+		@stack - first item of the recursive descent stack
+		@geneticP - pointer to all CGP parameters
+******************************************************************************/
 void expandNode(TStackItem** tmp, TIndividual* result, TStackItem** stack, TCgpProperties* geneticP){
 	int row, col;
 
@@ -378,6 +415,14 @@ void expandNode(TStackItem** tmp, TIndividual* result, TStackItem** stack, TCgpP
 	}
 }
 
+
+/******************************************************************************
+	Function printReadableResult - prints the found function in a string easily
+		readable for human
+	Takes parameters:
+		@result - the individual to represent by string
+		@geneticP - pointer to a struct of all CGP params
+******************************************************************************/
 void printReadableResult(TIndividual* result, TCgpProperties* geneticP){
 	TStackItem* stack;
 	TStackItem* node = (TStackItem*)malloc(sizeof(struct stackItem));
@@ -415,7 +460,12 @@ void printReadableResult(TIndividual* result, TCgpProperties* geneticP){
 	return;
 }
 
-
+/******************************************************************************
+	Function printResult - prints result in the for of CGP programm
+	Takes parameters:
+		@result - the individual to be written out
+		@geneticP - pointer to a struct of all CGP params
+******************************************************************************/
 void printResult(TIndividual* result, TCgpProperties* geneticP){
 	cerr << "====================================================================" << endl;
 	for(int i = 0; i < geneticP->rows; i++){
@@ -438,6 +488,12 @@ void printResult(TIndividual* result, TCgpProperties* geneticP){
 	return;
 }
 
+/******************************************************************************
+	Function getDataCount - function, which reads the first line of a file and
+		returns the number, whiuch is written there
+	Takes parameters:
+		@data - pointer to a file handler
+******************************************************************************/
 int getDataCount(FILE* data){
 	int count, i = 0;
 	char line[20], c;
@@ -455,6 +511,14 @@ int getDataCount(FILE* data){
 	return count;
 }
 
+/******************************************************************************
+	Function getNextData - function which reads a line in the file with training
+		vectors and seves it into the right vector
+	Takes parameters:
+		@data - pointer to a file handler
+		@dataArray - pointer to an array of training vectors
+		@ioCount - number of arrays to read
+******************************************************************************/
 void getNextData(FILE* data, double* dataArray, int ioCount){
 	int i = 0;
 	int j = 0;
@@ -493,6 +557,13 @@ void getNextData(FILE* data, double* dataArray, int ioCount){
 	return;
 }
 
+/******************************************************************************
+	Function getData - function which opens the data file and leads the data
+		loading
+	Takes parameters:
+		@filename - the name of a file to read
+		@geneticP - pointer to a struct of all CGP params
+******************************************************************************/
 TData* getData(char* filename, TCgpProperties* geneticP){	
 	FILE* data;						//input file
 	TData* input = (TData*)malloc(sizeof(struct data));
@@ -518,6 +589,11 @@ TData* getData(char* filename, TCgpProperties* geneticP){
 	return input;
 }
 
+/******************************************************************************
+	Function destroyData - destroys the data structures used for data storage
+	Takes parameters:
+		@input - pointer to a data structure with data
+******************************************************************************/
 void destroyData(TData* input){
 	for(int i = 0; i < input->dataCount; i++){
 		free(input->data[i]);
@@ -526,6 +602,12 @@ void destroyData(TData* input){
 	free(input);
 }
 
+/******************************************************************************
+	Function getFunc - decodes the symbolic constant to the index of each 
+		function
+	Takes parameters:
+		@input - function file handler
+******************************************************************************/
 int getFunc(FILE* input){
 	int i = 0;
 	char line[6], c;
@@ -578,6 +660,13 @@ int getFunc(FILE* input){
 
 }
 
+/******************************************************************************
+	Function getFunctions - opens the function files and leads the function
+		loading
+	Takes parameters:
+		@filename - name of the file with functions
+		@params - pointer to a struct of all CGP params
+******************************************************************************/
 TFuncAvailable* getFunctions(char* filename, TCgpProperties* params){
 	FILE* input;
 	TFuncAvailable* functions = (TFuncAvailable*)malloc(sizeof(struct funcAvailable));
@@ -598,6 +687,12 @@ TFuncAvailable* getFunctions(char* filename, TCgpProperties* params){
 	return functions;
 }
 
+/******************************************************************************
+	Function destoryFunctions - destroys the data structure used for storing
+		functions
+	Takes parameters:
+		@fnc - pointer to a data structure with functions
+******************************************************************************/
 void destroyFunctions(TFuncAvailable* fnc){
 	delete(fnc->funArr);
 	free(fnc);

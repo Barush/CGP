@@ -12,14 +12,14 @@
 
 #include "evalexpre.h"
 
-/***********************************************************************
+/******************************************************************************
 	Function getActiveNodes - makes marking of active nodes on whole generation
 	and fills the activeNodes vector of each genotype and counts active 
 	nodes into activeNodesCount
 	Takes parameters:
 		@geneticArray - pointer to an array of whole generation
 		@geneticP - pointer to a structure of params of CGP
-***********************************************************************/
+*******************************************************************************/
 void getActiveNodes(vector<TIndividual>* geneticArray, TCgpProperties* geneticP){
 	for(int ind = 0; ind < geneticP->individCount; ind++){
 		//reset activenodes count
@@ -69,6 +69,13 @@ void getActiveNodes(vector<TIndividual>* geneticArray, TCgpProperties* geneticP)
 	}//for all individuals
 }
 
+/***********************************************************************
+	Function countVal - counts the result of the operands with function
+	Takes parameters:
+		@func - realized operation
+		@op1 - first operand
+		@op2 - second operand
+***********************************************************************/
 double countVal(int func, double op1, double op2){
 	double value;
 

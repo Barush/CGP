@@ -40,7 +40,7 @@ using namespace std;
 									ENUMS
 ***************************************************************************/
 
-//Possible operations in CGP matrix, will be modified from program input
+//possible operations in CGP matrix
 typedef enum function {
 	MUL = 0,
 	DIV,	//1
@@ -55,6 +55,7 @@ typedef enum function {
 	EXP		//10
 }TFunction;
 
+//constants usable in CONST operation
 typedef enum constants {
 	PI = 0,
 	EULER,
@@ -62,11 +63,13 @@ typedef enum constants {
 	ZERO
 }TConstants;
 
+//possibilities for the syntactic tree nodes
 typedef enum stackFlag {
 	TERM = 0,
 	NONTERM
 }TStackFlag;
 
+//codes of runtime errors
 typedef enum errCodes{
 	EOK = 0,
 	ECMD,
@@ -86,6 +89,7 @@ typedef struct cell {
 	int function;
 }TCell;
 
+//all CGP properties structure
 typedef struct cgpProperties {
 	int inCount;			//count of main inputs
 	int outCount;			//count of main outputs
@@ -140,6 +144,7 @@ typedef struct stackItem {
 /***************************************************************************
 								COEVOLUTION STRUCTS
 ***************************************************************************/
+//individual for coevolution population								
 typedef struct coevIndividual{
 	double fitness;
 	vector<int>* value;
@@ -153,16 +158,19 @@ typedef struct shared{
 	bool end;
 }TShared;
 
+//shared memory archive of best solutions
 typedef struct archive{
 	pthread_mutex_t arch_sem;
 	TIndividual* arch;
 }TArchive;
 
+//one individual of coevolution population
 typedef struct test{
 	pthread_mutex_t test_sem;
 	TCoevIndividual test;
 }TTest;
 
+//coevolution properties
 typedef struct coevParams{
 	TShared* memory;
 	TCgpProperties* CGPparams;

@@ -1,10 +1,15 @@
-######################################
-# Nazev: Makefile
-# Ucel kodu: IPK projekt 2
-#      makefile pro preklad programu klient - server
-# Autor: Barbora Skrivankova, xskriv01, FIT VUT
-# Vytvoreno: brezen 2013
-######################################
+################################################################################
+######################### COEVOLUTION IN CGP ###################################
+########################## BACHELORS THESIS ####################################
+######################## BARBORA SKRIVANKOVA ###################################
+###################### xskri01@stud.fit.vutbr.cz ###############################
+################################################################################
+
+################## MAKEFILE FOR ALL BINARIES IN THESIS #########################
+### file name: 			Makefile
+###	creation date:		01/2014
+################################################################################
+
 
 CPPFLAGS = --std=c++98 -pedantic -g 
 COECPPFLAGS = --std=c++98 -pedantic -g -DCOEVOLUTION
