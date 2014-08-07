@@ -3,7 +3,7 @@ CGP
 
 	Competitive Coevolution in Cartesian Genetic Programming
 
-Bachelor's thesis on Faculty of Information Technology, Brno University of Technology
+	Bachelor's thesis on Faculty of Information Technology, Brno University of Technology
 
 
 Symbolic regression is a function formula search approach dealing with isolated points of the
